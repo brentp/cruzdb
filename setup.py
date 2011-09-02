@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+from distutils.core import setup
+
+
+
+setup(name='cruzdb',
+      version='0.1',
+      description='interface to UCSC genomic databases',
+      long_description=open('README.rst').read(),
+      author='Brent Pedersen',
+      author_email='bpederse@gmail.com',
+      url='https://github.com/brentp/cruzdb/',
+      packages=['cruzdb'],
+      # can also use mysql-ctypes
+      #requires=['mysql-python', 'sqlalchemy>=0.7'],
+      classifiers=[
+          'Development Status :: 4 - Beta',
+          'Environment :: Console',
+          'Intended Audience :: End Users/Desktop',
+          'Intended Audience :: Developers',
+          'Intended Audience :: System Administrators',
+          'License :: OSI Approved :: MIT License',
+          'Operating System :: MacOS :: MacOS X',
+          'Operating System :: POSIX',
+          'Topic :: Database',
+          'Topic :: Scientific/Engineering :: Bio-Informatic',
+          'Topic :: Scientific/Engineering :: Medical Science Apps.'
+    ],
+
+ )
