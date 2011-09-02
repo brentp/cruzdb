@@ -11,6 +11,9 @@ do the lifiting.
 
 """
 
+class CruzException(Exception):
+    pass
+
 
 class Mixin(object):
     _prefix_chain = ("tx", "chrom")
@@ -162,4 +165,32 @@ class Mixin(object):
             for start, end in self.exons:
                 seqs.append(_sequence(db, self.chrom, start + 1, end))
             return seqs
+
+    @property
+    def is_gene_pred(self):
+        """
+        http://genome.ucsc.edu/FAQ/FAQformat.html#format9
+        """
+        return hasattr(self, "exonStarts")
+
+    def bed12(self, score="0", rgb="."):
+        """convert the exon stuff into bed12
+        http://genome.ucsc.edu/FAQ/FAQformat.html#format1
+        # TODO: all name_fn kwarg like:
+            name_fn = lambda feat: feat.name + "," feat.name2
+        in case we want to show gene name and transcript name.
+        """
+        if not self.is_gene_pred:
+            raise CruzException("can't create bed12 from non genepred feature")
+        exons = self.exons
+        # go from global start, stop, to relative start, length...
+        sizes = ",".join([str(e[1] - e[0]) for e in exons]) + ","
+        starts = ",".join([str(e[0] - self.txStart) for e in exons]) + ","
+        return "\t".join(map(str, (
+            self.chrom, self.txStart, self.txEnd, self.name2 + "," + self.name,
+            score, self.strand, self.cdsStart, self.cdsEnd, rgb,
+            len(exons), sizes, starts)))
+
+
+
 

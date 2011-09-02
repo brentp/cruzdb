@@ -25,6 +25,11 @@ class TestGene(unittest.TestCase):
         self.assert_(self.gene.introns[0][0] == self.gene.exons[0][1])
         self.assert_(all((s < e) for s, e in self.gene.introns))
 
+    def testBed12(self):
+        expected = "chr1	891739	900347	PLEKHN1,NM_032129	0	+	891774	899818	.	16	118,100,147,81,73,128,96,81,76,137,150,141,141,219,49,663,	0,207,3780,4024,4189,4382,4616,4827,5578,5791,6364,6689,7003,7336,7819,7945,"
+        transcript = self.db.refGene.filter_by(name="NM_032129").first()
+        self.assertEqual(transcript.bed12(), expected)
+
 class Test2Db(unittest.TestCase):
     def setUp(self):
         self.dba = Genome('hg18')
