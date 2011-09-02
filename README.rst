@@ -46,6 +46,24 @@ As motivation, here's an example of some of the capabilities::
 this can be repeated using knownGene annotations by changing 'refGene' to 
 'knownGene'. And, it can be done easily for a set of genes.
 
+Code
+----
+
+Most of the per-row features are implemented in `cruzdb/models.py` in the
+Mixin class. If you want to add something to a feature (like the existing
+feature.utr5) add it here.
+
+The tables are reflected using `sqlalchemy`_ and mapped in the
+\_\_getattr\_\_\ method of the `Genome` class in `cruzdb/__init__.py`
+
+So a call like::
+
+    genome.knownGene
+
+calls the \_\_getattr\_\_ method with the table arg set to 'knownGene'
+that table is then reflected and an object with parent classes of `Mixin`
+and sqlalchemy's declarative_base is returned.
+
 
 Contributing
 ------------
@@ -65,7 +83,6 @@ If you have a feature you like to use/implement, open a ticket on github for
 discussion. Below are some ideas.
 
 
-
 TODO
 ----
 
@@ -76,7 +93,7 @@ TODO
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026941.html
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026899.html
  + http://biostar.stackexchange.com/questions/10144/ucsc-mysql-query/10147#10147
- + name lookup ens -> hugo
+ + simple name lookup/conversion ens -> hugo, etc.
 
  + methods for upstream, downstream, nearest
  + calculate bin to do more efficent query
@@ -91,3 +108,4 @@ TODO
 
 .. _`Genomes Database`: http://genome.ucsc.edu/cgi-bin/hgTables
 .. _`awk-ful`: https://gist.github.com/1173596
+.. _`sqlalchemy`: http://sqlalchemy.org/
