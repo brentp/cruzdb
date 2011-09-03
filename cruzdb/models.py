@@ -82,6 +82,15 @@ class Mixin(object):
         return "%s:%i-%i" % (self.chrom, self.start, self.end)
 
     @property
+    def bins(self):
+        bins = [1];
+        for b in range(1 + (start>>26), 1 + ((end-1)>>26)+1):     bins.append(b)
+        for b in range(9 + (start>>23), 9 + ((end-1)>>23)+1):     bins.append(b)
+        for b in range(73 + (start>>20), 73 + ((end-1)>>20)+1):   bins.append(b)
+        for b in range(585 + (start>>17), 585 + ((end-1)>>17)+1): bins.append(b)
+        return set(bins)
+
+    @property
     def introns(self):
         starts, ends = zip(*self.exons)
         return [(e, s) for e, s in zip(ends[:-1], starts[1:])]
