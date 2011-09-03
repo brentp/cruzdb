@@ -43,7 +43,10 @@ class Test2Db(unittest.TestCase):
         # session stuff?
         print ga.db, gb.db
 
-
+    def test_bins(self):
+        bins = Genome.bins(12345, 56779)
+        expected = set([1, 9, 73, 585])
+        self.assertEqual(bins, expected)
 
 if __name__ == "__main__":
     unittest.main()

@@ -96,8 +96,8 @@ TODO
  + simple name lookup/conversion ens -> hugo, etc.
 
  + methods for upstream, downstream, nearest
- + calculate bin to do more efficent query
- + auto join to kgXref 
+ + use bin to do more efficent query
+ + auto join to kgXref
  + histone, cpg, other informative tracks
  + intersect annos with snps
 
