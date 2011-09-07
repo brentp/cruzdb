@@ -4,6 +4,10 @@ import sys
 
 from tests import test
 
+def _open(filelike, mode='r'):
+    if hasattr(filelike, 'read'): return filelike
+    return open(filelike, mode)
+
 class Genome(object):
     url = "mysql://%(user)s%(password)s@%(host)s/%(db)s"
     __tables = {}
@@ -52,12 +56,12 @@ class Genome(object):
             self.url % dict(db=self.db, user=self.user, host=self.host,
             password="?" if self.password else ""))
 
-    def bed(self, filename=sys.stdout):
-        pass
-        # TODO allow writing bed6 and bed12...
-
-    def mirror(self, tables, to_url):
-        to_engine = create_engine(to_url)
+    @classmethod
+    def save_bed(cls, query, filename=sys.stdout):
+        # write a bed12 file of the query.
+        out = _open(filename, 'w')
+        for o in query:
+            out.write(o.bed12() + '\n')
 
 
 if __name__ == "__main__":
@@ -67,8 +71,9 @@ if __name__ == "__main__":
 
     f = g.refGene[19]
     print f.bed12()
-    import sys
-    sys.exit()
+    #import sys
+    #sys.exit()
+    f = g.refGene[19]
     print repr(f), f.cdsStart, f.cdsEnd
     print "exons", f.exons
     print "coding exons", f.coding_exons
@@ -81,7 +86,12 @@ if __name__ == "__main__":
     print f.browser_link
     #print f.cds_sequence
 
-    print g.knownGene.filter(g.table('knownGene').c.txStart > 10000).first()
+    from sqlalchemy import and_
+    query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 20000))
+    print query.first()
+
+    Genome.save_bed(query)
+    1/0
 
     """
     for transcript in g.knownGene:

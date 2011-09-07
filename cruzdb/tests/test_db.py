@@ -9,6 +9,21 @@ class TestBasic(unittest.TestCase):
     def testFirst(self):
         self.assert_(hasattr(self.db.refGene.first(), "txStart"))
 
+    def test_bed(self):
+        g = Genome('hg19')
+        from sqlalchemy import and_
+        from cStringIO import StringIO
+        query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 20000))
+        c = StringIO()
+        Genome.save_bed(query, c)
+        c.seek(0)
+        rows = c.readlines()
+        for toks in (row.split("\t") for row in rows):
+            self.assert_(len(toks) == 12)
+            self.assert_(int(toks[1]) > 10000)
+            self.assert_(int(toks[2]) < 20000)
+
+
 class TestGene(unittest.TestCase):
     def setUp(self):
         self.db = Genome('hg18')
