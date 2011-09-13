@@ -43,6 +43,20 @@ As motivation, here's an example of some of the capabilities::
     >>> muc5b.cds_sequence #doctest: +ELLIPSIS
     ['atgggtgccccgagcgcgtgccggacgctggtgttggctctggcggccatgctcgtggtgccgcaggcag', ...]
 
+
+    >>> transcript = g.knownGene.filter_by(name="uc001aaa.2").first()
+    >>> transcript.is_coding
+    False
+
+    # convert a genome coordinate to a local coordinate.
+    >>> transcript.localize(transcript.txStart)
+    0L
+
+    # or localize to the CDNA position.
+    >>> print transcript.localize(transcript.cdsStart, cdna=True)
+    None
+
+
 this can be repeated using knownGene annotations by changing 'refGene' to 
 'knownGene'. And, it can be done easily for a set of genes.
 

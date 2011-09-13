@@ -2,6 +2,69 @@ import unittest
 from cruzdb import Genome
 
 
+class TestMixin(unittest.TestCase):
+    """
+    class to just use the mixin without a connection
+    """
+    def setUp(self):
+        from cruzdb.models import Feature
+        self.f = Feature()
+        self.f.chrom = "chr1"
+        self.f.txStart = 10
+        self.f.txEnd = 61
+
+        self.f.cdsStart = 29
+        self.f.cdsEnd =  59
+        """
+        + exon
+        | coding-exon
+        _ UTR
+        - intron
+
+        10        20    26 29   34   39      47   52     59 61
+        ++++++++++______+++|||||-----||||||||-----|||||||+++
+
+        # introns = [(20, 26), (34, 39), (47, 52)]
+
+        # coding introns = [(34, 39), (47, 52)]
+        """
+        self.f.exonStarts = "10,26,39,52,"
+        self.f.exonEnds = "20,34,47,61,"
+
+        self.strand = '+'
+
+
+    def test_localize_out_of_bounds(self):
+        f = self.f
+        #self.assertEqual(f.localize(0, 80), [None, None])
+        self.assertEqual(f.localize(0, 80, 61, 60, cdna=True),
+                                     [None, None, None, None])
+
+        self.assertEqual(f.localize(0, 80, 61, 60, cdna=False),
+                                    [None, None, None, 34])
+
+    def test_localize_in_intron(self):
+        f = self.f
+        self.assertEqual(f.localize(34, cdna=True), None)
+
+    def test_localize_cdsBounds(self):
+        f = self.f
+        self.assertEqual(f.localize(f.cdsStart, cdna=True), 0)
+        # DOES THIS MAKE SENSE? if it's at cdsEnd, it's None
+        self.assertEqual(f.localize(f.cdsEnd, cdna=True), None)
+
+        l = sum(e - s for s, e in f.cds)
+        self.assertEqual(f.localize(f.cdsEnd - 1, cdna=True), l - 1)
+
+    def test_localize_txBounds(self):
+        f = self.f
+        self.assertEqual(f.localize(f.txStart, cdna=False), 0)
+        # DOES THIS MAKE SENSE? if it's at cdsEnd, it's None
+        self.assertEqual(f.localize(f.txEnd, cdna=False), None)
+
+        l = sum(e - s for s, e in f.exons)
+        self.assertEqual(f.localize(f.txEnd - 1, cdna=False), l - 1)
+
 class TestBasic(unittest.TestCase):
     def setUp(self):
         self.db = Genome('hg18')

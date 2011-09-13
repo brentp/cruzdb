@@ -35,6 +35,7 @@ class Mixin(object):
     @property
     def exons(self):
         # drop the trailing comma
+        if not self.is_gene_pred: return []
         starts = (int(s) for s in self.exonStarts[:-1].split(","))
         ends = (int(s) for s in self.exonEnds[:-1].split(","))
         return zip(starts, ends)
@@ -89,10 +90,14 @@ class Mixin(object):
         """
         return Genome.bins(self.start, self.end)
 
-    @property
-    def introns(self):
-        starts, ends = zip(*self.exons)
+    def _introns(self, exons=None):
+        if not self.is_gene_pred: return []
+        se = self.exons
+        if not (se or exons) or exons == []: return []
+        starts, ends = zip(*exons) if exons is not None else zip(*se)
         return [(e, s) for e, s in zip(ends[:-1], starts[1:])]
+
+    introns = property(_introns)
 
     @property
     def utr5(self):
@@ -211,6 +216,50 @@ class Mixin(object):
             score, self.strand, self.cdsStart, self.cdsEnd, rgb,
             len(exons), sizes, starts)))
 
+    def localize(self, *positions, **kwargs):
+        """
+        convert global coordinate(s) to local taking
+        introns into account and cds/tx-Start deinding on cdna=True kwarg
+        """
+        cdna = kwargs.get('cdna', False)
+        # TODO: account for strand ?? add kwarg ??
+        # if it's to the CDNA, then it's based on the cdsStart
+        start, end = (self.cdsStart, self.cdsEnd) if cdna else \
+                                        (self.start, self.end)
+        introns = self.introns or None
+        if cdna:
+            if not self.is_coding:
+                return ([None] * len(positions)) if len(positions) > 1 else None
+            introns = self._introns(self.cds) or None
 
+        if introns is None:
+            print start, positions, end
+            local_ps = [p - start if (start <= p < end) else None for p in positions]
+            return local_ps[0] if len(positions) == 1 else local_ps
 
+        introns = [(s - start, e - start) for s, e in introns]
+        positions = [p - start for p in positions]
+        # now both introns and positions are local starts based on cds/tx-Start
+        local_ps = []
+        l = end - start
+        for original_p in positions:
+            subtract = 0
+            p = original_p
+            if p < 0 or p >= l: # outside of transcript
+                local_ps.append(None)
+                continue
+            for s, e in introns:
+                # within intron
+                if s <= p <= e:
+                    subtract = None
+                    break
+                # otherwise, adjust for intron length.
+                elif p >= e:
+                    subtract += (e - s)
 
+            local_ps.append(p - subtract if subtract is not None else None)
+
+        assert all(p >=0 or p is None for p in local_ps), (local_ps)
+        return local_ps[0] if len(positions) == 1 else local_ps
+
+Feature = Mixin
