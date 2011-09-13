@@ -61,18 +61,21 @@ class Genome(object):
         # write a bed12 file of the query.
         out = _open(filename, 'w')
         for o in query:
-            out.write(o.bed12() + '\n')
+            out.write(o.bed() + '\n')
 
 
 if __name__ == "__main__":
     #g = Genome(db="hg18", host="localhost", user="")
     g = Genome(db="hg18")#, host="localhost", user="")
 
+    print g.cpgIslandExt[12].bed()
+    print g.cpgIslandExt[12].bed('length', 'perCpg')
+
+    import sys
+    sys.exit()
 
     f = g.refGene[19]
     print f.bed12()
-    #import sys
-    #sys.exit()
     f = g.refGene[19]
     print repr(f), f.cdsStart, f.cdsEnd
     print "exons", f.exons
@@ -104,7 +107,6 @@ if __name__ == "__main__":
 
     print list(g.session.execute(q))
 
-    print g.cpgIslandExt[12]
 
 
 

@@ -93,6 +93,7 @@ TODO
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026941.html
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026899.html
  + http://biostar.stackexchange.com/questions/10144/ucsc-mysql-query/10147#10147
+ + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
 
  + methods for upstream, downstream, nearest

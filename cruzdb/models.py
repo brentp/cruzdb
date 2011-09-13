@@ -181,6 +181,16 @@ class Mixin(object):
         """
         return hasattr(self, "exonStarts")
 
+    def bed(self, *attrs, **kwargs):
+        if self.is_gene_pred:
+            return self.bed12(**kwargs)
+        return "\t".join(map(str, (
+                             [self.chrom, self.start, self.end] +
+                             [getattr(self, attr) for attr in attrs]
+                         )))
+
+
+
     def bed12(self, score="0", rgb="."):
         """convert the exon stuff into bed12
         http://genome.ucsc.edu/FAQ/FAQformat.html#format1

@@ -9,7 +9,7 @@ class TestBasic(unittest.TestCase):
     def testFirst(self):
         self.assert_(hasattr(self.db.refGene.first(), "txStart"))
 
-    def test_bed(self):
+    def test_bed_gene_pred(self):
         g = Genome('hg19')
         from sqlalchemy import and_
         from cStringIO import StringIO
@@ -22,6 +22,11 @@ class TestBasic(unittest.TestCase):
             self.assert_(len(toks) == 12)
             self.assert_(int(toks[1]) > 10000)
             self.assert_(int(toks[2]) < 20000)
+
+    def test_bed_other(self):
+        g = self.db
+        self.assertEqual(g.cpgIslandExt[12].bed(), 'chr1	829557	830482')
+        self.assertEqual(g.cpgIslandExt[12].bed('length', 'perCpg'), 'chr1	829557	830482	925	17.9')
 
 
 class TestGene(unittest.TestCase):
