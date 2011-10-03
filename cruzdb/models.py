@@ -67,8 +67,11 @@ class Mixin(object):
     def cds_sequence(self):
         seqs = []
         cds = self.cds
+        if len(cds) == 0: return []
         # grab all the sequences at once to reduce number of requests.
         all_seq = _sequence(self.db, self.chrom, cds[0][0] + 1, cds[-1][1])
+        if len(cds) == 1:
+            return all_seq
         lowest = cds[0][0]
         cds0 = [(s - lowest, e - lowest) for s, e in cds]
         for cstart, cend in cds0:
