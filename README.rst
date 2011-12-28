@@ -29,15 +29,15 @@ As motivation, here's an example of some of the capabilities::
 
     # note that some of these are not coding because they are < cdsStart
     >>> muc5b.cdsStart
-    1200929L
+    1200929
 
     # the extent of the 5' utr.
     >>> muc5b.utr5
-    (1200870L, 1200929L)
+    (1200870, 1200929)
 
     # we can get the (first 4) actual CDS's with:
     >>> muc5b.cds[:4]
-    [(1200929L, 1200999), (1203486, 1203543), (1204010, 1204082), (1204420, 1204682)]
+    [(1200929, 1200999), (1203486, 1203543), (1204010, 1204082), (1204420, 1204682)]
 
     # the cds sequence from the UCSC DAS server as a list with one entry per cds
     >>> muc5b.cds_sequence #doctest: +ELLIPSIS
@@ -50,7 +50,7 @@ As motivation, here's an example of some of the capabilities::
 
     # convert a genome coordinate to a local coordinate.
     >>> transcript.localize(transcript.txStart)
-    0L
+    0
 
     # or localize to the CDNA position.
     >>> print transcript.localize(transcript.cdsStart, cdna=True)

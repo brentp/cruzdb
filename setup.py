@@ -11,7 +11,7 @@ setup(name='cruzdb',
       author='Brent Pedersen',
       author_email='bpederse@gmail.com',
       url='https://github.com/brentp/cruzdb/',
-      packages=['cruzdb'],
+      packages=['cruzdb', 'cruzdb.tests'],
       # can also use mysql-ctypes
       #requires=['mysql-python', 'sqlalchemy>=0.7'],
       classifiers=[
