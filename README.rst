@@ -110,7 +110,7 @@ TODO
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
 
- + methods for upstream, downstream, nearest
+ + methods for nearest gene
  + use bin to do more efficent query
  + auto join to kgXref
  + histone, cpg, other informative tracks

@@ -102,6 +102,40 @@ class Mixin(object):
 
     introns = property(_introns)
 
+    def _xstream(self, s, e):
+        f = Feature()
+        f.txStart = s
+        f.txEnd = e
+        f.name = "region"
+        f.cdsStart = f.cdsEnd = s
+        f.strand = self.strand
+        f.chrom = self.chrom
+        return f
+
+    def upstream(self, distance):
+        """
+        return the (start, end) of the region before the geneStart
+        """
+        if self.strand == "+":
+            e = self.start
+            s = e - distance
+        else:
+            s = self.end
+            e = s + distance
+        return self._xstream(s, e)
+
+    def downstream(self, distance):
+        """
+        return the (start, end) of the region before the geneStart
+        """
+        if self.strand == "+":
+            s = self.end
+            e = s + distance
+        else:
+            e = self.start
+            s = e - distance
+        return self._xstream(s, e)
+
     @property
     def utr5(self):
         if not self.is_coding or len(self.exons) < 2: return (None, None)
