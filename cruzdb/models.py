@@ -112,6 +112,20 @@ class Mixin(object):
         f.chrom = self.chrom
         return f
 
+    def is_upstream_of(self, other):
+        if self.chrom != other.chrom: return None
+        if other.strand != "-":
+            return self.end < other.start
+        # other feature is on - strand, so this must have higher start
+        return self.start > other.end
+
+    def is_downstream_of(self, other):
+        if self.chrom != other.chrom: return None
+        if other.strand != "-":
+            return self.start > other.end
+        # other feature is on - strand, so this must have higher start
+        return self.end < other.start
+
     def upstream(self, distance):
         """
         return the (start, end) of the region before the geneStart
