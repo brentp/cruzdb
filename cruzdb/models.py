@@ -114,23 +114,23 @@ class Mixin(object):
 
     def is_upstream_of(self, other):
         if self.chrom != other.chrom: return None
-        if other.strand != "-":
-            return self.end < other.start
+        if getattr(other, "strand", None) != "-":
+            return self.end <= other.start
         # other feature is on - strand, so this must have higher start
-        return self.start > other.end
+        return self.start >= other.end
 
     def is_downstream_of(self, other):
         if self.chrom != other.chrom: return None
-        if other.strand != "-":
-            return self.start > other.end
+        if getattr(other, "strand", None) != "-":
+            return self.start >= other.end
         # other feature is on - strand, so this must have higher start
-        return self.end < other.start
+        return self.end <= other.start
 
     def upstream(self, distance):
         """
         return the (start, end) of the region before the geneStart
         """
-        if self.strand == "+":
+        if getattr(self, "strand", None) == "+":
             e = self.start
             s = e - distance
         else:
@@ -142,7 +142,7 @@ class Mixin(object):
         """
         return the (start, end) of the region before the geneStart
         """
-        if self.strand == "+":
+        if getattr(self, "strand", None) == "+":
             s = self.end
             e = s + distance
         else:

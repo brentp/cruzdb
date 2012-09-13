@@ -31,7 +31,7 @@ class TestMixin(unittest.TestCase):
         self.f.exonStarts = "10,26,39,52,"
         self.f.exonEnds = "20,34,47,61,"
 
-        self.strand = '+'
+        self.strand = self.f.strand = '+'
 
 
     def test_localize_out_of_bounds(self):
@@ -65,15 +65,29 @@ class TestMixin(unittest.TestCase):
         l = sum(e - s for s, e in f.exons)
         self.assertEqual(f.localize(f.txEnd - 1, cdna=False), l - 1)
 
+    def test_upstream(self):
+        f = self.f
+        u = f.upstream(10)
+        self.assertEqual(u.end, f.start)
+        self.assert_(u.is_upstream_of(f))
+
+    def test_downstream(self):
+        f = self.f
+        u = f.downstream(10)
+        self.assertEqual(f.end, u.start)
+        self.assert_(u.is_downstream_of(f))
+        u.chrom = "fake"
+        self.assertEqual(None,  u.is_upstream_of(f))
+
 class TestBasic(unittest.TestCase):
     def setUp(self):
-        self.db = Genome('hg18')
+        self.db = Genome('hg18', host="localhost", user="brentp")
 
     def testFirst(self):
         self.assert_(hasattr(self.db.refGene.first(), "txStart"))
 
     def test_bed_gene_pred(self):
-        g = Genome('hg19')
+        g = Genome('hg19', host="localhost", user="brentp")
         from sqlalchemy import and_
         from cStringIO import StringIO
         query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 20000))
@@ -94,7 +108,7 @@ class TestBasic(unittest.TestCase):
 
 class TestGene(unittest.TestCase):
     def setUp(self):
-        self.db = Genome('hg18')
+        self.db = Genome('hg18', host="localhost", user="brentp")
         self.gene = self.db.refGene.filter_by(name2="MUC5B").first()
 
     def testExons(self):
@@ -115,8 +129,8 @@ class TestGene(unittest.TestCase):
 
 class Test2Db(unittest.TestCase):
     def setUp(self):
-        self.dba = Genome('hg18')
-        self.dbb = Genome('hg19')
+        self.dba = Genome('hg18', host="localhost", user="brentp")
+        self.dbb = Genome('hg19', host="localhost", user="brentp")
 
     def test_ok(self):
         ga = self.dba.refGene.filter_by(name2="MUC5B").first()
