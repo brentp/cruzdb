@@ -29,7 +29,11 @@ class Genome(object):
         #if not table in self.models.Base.metadata.tables:
         if not table in self.__tables:
             # make a new class
-            self.__tables[table] = type(table, (self.Base, self.models.Mixin), {})
+            try:
+                self.__tables[table] = type(table, (self.Base, getattr(self.models, table)), {})
+            except:
+                self.__tables[table] = type(table, (self.Base, self.models.Mixin), {})
+
 
     def __getattr__(self, table):
         self._map(table)

@@ -16,13 +16,13 @@ class CruzException(Exception):
     pass
 
 
-class Mixin(object):
-    _prefix_chain = ("tx", "chrom")
 
+
+class ABase(object):
+    _prefix_chain = ("tx", "chrom")
     @declared_attr
     def __tablename__(cls):
         return cls.__name__
-    name = Column(String, unique=True, primary_key=True)
     __table_args__ = {'autoload': True}
 
     @property
@@ -312,5 +312,16 @@ class Mixin(object):
 
         assert all(p >=0 or p is None for p in local_ps), (local_ps)
         return local_ps[0] if len(positions) == 1 else local_ps
+
+class Mixin(ABase):
+    name = Column(String, unique=True, primary_key=True)
+
+class kgXref(ABase):
+    kgID = Column(String, unique=True, primary_key=True)
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__tablename__, self.kgID)
+
+
 
 Feature = Mixin
