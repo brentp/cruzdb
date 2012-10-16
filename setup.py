@@ -2,11 +2,10 @@
 
 from distutils.core import setup
 
-
-
 setup(name='cruzdb',
       version='0.1',
-      description='interface to UCSC genomic databases',
+      description='''Interface to UCSC genomic databases.
+Also allows things like up/downstream queries''',
       long_description=open('README.rst').read(),
       author='Brent Pedersen',
       author_email='bpederse@gmail.com',
@@ -24,7 +23,7 @@ setup(name='cruzdb',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: POSIX',
           'Topic :: Database',
-          'Topic :: Scientific/Engineering :: Bio-Informatic',
+          'Topic :: Scientific/Engineering :: Bio-Informatics',
           'Topic :: Scientific/Engineering :: Medical Science Apps.'
     ],
 
