@@ -22,7 +22,7 @@ class Genome(object):
         self.engine = create_engine(self.dburl)
 
         self.session, self.Base = initialize_sql(self.engine)
-        self.models = __import__("models", globals(), locals(), ["Mixin"], -1)
+        self.models = __import__("models", globals(), locals(), ["Feature"], -1)
 
     def _map(self, table):
         # if the table hasn't been mapped, do so here.
@@ -32,7 +32,8 @@ class Genome(object):
             try:
                 self.__tables[table] = type(table, (self.Base, getattr(self.models, table)), {})
             except:
-                self.__tables[table] = type(table, (self.Base, self.models.Mixin), {})
+                self.__tables[table] = type(table, (self.Base,
+                    self.models.Feature), {})
 
 
     def __getattr__(self, table):
@@ -110,9 +111,3 @@ if __name__ == "__main__":
     q = kg.select(kg.c.txStart < 5000)
 
     print list(g.session.execute(q))
-
-
-
-
-#################################
-

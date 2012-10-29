@@ -15,9 +15,6 @@ do the lifiting.
 class CruzException(Exception):
     pass
 
-
-
-
 class ABase(object):
     _prefix_chain = ("tx", "chrom")
     @declared_attr
@@ -36,8 +33,8 @@ class ABase(object):
     def exons(self):
         # drop the trailing comma
         if not self.is_gene_pred: return []
-        starts = (int(s) for s in self.exonStarts[:-1].split(","))
-        ends = (int(s) for s in self.exonEnds[:-1].split(","))
+        starts = (long(s) for s in self.exonStarts[:-1].split(","))
+        ends = (long(s) for s in self.exonEnds[:-1].split(","))
         return zip(starts, ends)
 
     @property
@@ -47,8 +44,8 @@ class ABase(object):
         cdsEnd
         """
         # drop the trailing comma
-        starts = (int(s) for s in self.exonStarts[:-1].split(","))
-        ends = (int(s) for s in self.exonEnds[:-1].split(","))
+        starts = (long(s) for s in self.exonStarts[:-1].split(","))
+        ends = (long(s) for s in self.exonEnds[:-1].split(","))
         return [(s, e) for s, e in zip(starts, ends)
                                           if e > self.cdsStart and
                                              s < self.cdsEnd]
@@ -246,7 +243,6 @@ class ABase(object):
                          )))
 
 
-
     def bed12(self, score="0", rgb="."):
         """convert the exon stuff into bed12
         http://genome.ucsc.edu/FAQ/FAQformat.html#format1
@@ -313,7 +309,7 @@ class ABase(object):
         assert all(p >=0 or p is None for p in local_ps), (local_ps)
         return local_ps[0] if len(positions) == 1 else local_ps
 
-class Mixin(ABase):
+class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
 
 class kgXref(ABase):
@@ -321,7 +317,3 @@ class kgXref(ABase):
 
     def __repr__(self):
         return "%s(%s)" % (self.__tablename__, self.kgID)
-
-
-
-Feature = Mixin

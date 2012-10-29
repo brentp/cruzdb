@@ -2,7 +2,7 @@ import unittest
 from cruzdb import Genome
 
 
-class TestMixin(unittest.TestCase):
+class TestFeature(unittest.TestCase):
     """
     class to just use the mixin without a connection
     """

@@ -21,23 +21,23 @@ As motivation, here's an example of some of the capabilities::
 
     # the first 4 introns
     >>> muc5b.introns[:4]
-    [(1200999, 1203486), (1203543, 1204010), (1204082, 1204420), (1204682, 1204836)]
+    [(1200999L, 1203486L), (1203543L, 1204010L), (1204082L, 1204420L), (1204682L, 1204836L)]
 
     # the first 4 exons.
     >>> muc5b.exons[:4]
-    [(1200870, 1200999), (1203486, 1203543), (1204010, 1204082), (1204420, 1204682)]
+    [(1200870L, 1200999L), (1203486L, 1203543L), (1204010L, 1204082L), (1204420L, 1204682L)]
 
     # note that some of these are not coding because they are < cdsStart
     >>> muc5b.cdsStart
-    1200929
+    1200929L
 
     # the extent of the 5' utr.
     >>> muc5b.utr5
-    (1200870, 1200929)
+    (1200870L, 1200929L)
 
     # we can get the (first 4) actual CDS's with:
     >>> muc5b.cds[:4]
-    [(1200929, 1200999), (1203486, 1203543), (1204010, 1204082), (1204420, 1204682)]
+    [(1200929L, 1200999L), (1203486L, 1203543L), (1204010L, 1204082L), (1204420L, 1204682L)]
 
     # the cds sequence from the UCSC DAS server as a list with one entry per cds
     >>> muc5b.cds_sequence #doctest: +ELLIPSIS
@@ -50,7 +50,7 @@ As motivation, here's an example of some of the capabilities::
 
     # convert a genome coordinate to a local coordinate.
     >>> transcript.localize(transcript.txStart)
-    0
+    0L
 
     # or localize to the CDNA position.
     >>> print transcript.localize(transcript.cdsStart, cdna=True)
@@ -64,7 +64,7 @@ Code
 ----
 
 Most of the per-row features are implemented in `cruzdb/models.py` in the
-Mixin class. If you want to add something to a feature (like the existing
+Feature class. If you want to add something to a feature (like the existing
 feature.utr5) add it here.
 
 The tables are reflected using `sqlalchemy`_ and mapped in the
@@ -75,7 +75,7 @@ So a call like::
     genome.knownGene
 
 calls the \_\_getattr\_\_ method with the table arg set to 'knownGene'
-that table is then reflected and an object with parent classes of `Mixin`
+that table is then reflected and an object with parent classes of `Feature`
 and sqlalchemy's declarative_base is returned.
 
 
