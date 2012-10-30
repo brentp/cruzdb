@@ -72,6 +72,10 @@ class TestFeature(unittest.TestCase):
         self.assert_(u.is_upstream_of(f))
 
     def test_blat(self):
+        try:
+            import requests
+        except ImportError:
+            return
         g = Genome('hg18')
         f = g.refGene[19]
         f.chrom = "chr6"

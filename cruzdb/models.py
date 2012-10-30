@@ -204,7 +204,6 @@ class ABase(object):
 
     def __str__(self):
         # output something bed-like
-        # TODO: for most tables, this could be bed12
         fields = "chrom start end gene_name".split()
         s = "\t".join(map(str, (getattr(self, field) for field in fields)))
         if hasattr(self, "strand"):
@@ -289,7 +288,7 @@ class ABase(object):
     def localize(self, *positions, **kwargs):
         """
         convert global coordinate(s) to local taking
-        introns into account and cds/tx-Start deinding on cdna=True kwarg
+        introns into account and cds/tx-Start depending on cdna=True kwarg
         """
         cdna = kwargs.get('cdna', False)
         # TODO: account for strand ?? add kwarg ??

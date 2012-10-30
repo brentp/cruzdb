@@ -37,7 +37,9 @@ class Genome(object):
 
     def __getattr__(self, table):
         self._map(table)
-        return self.session.query(self.__tables[table])
+        mapped = self.session.query(self.__tables[table])
+        mapped.table = lambda : self.table(table)
+        return mapped
 
     def table(self, table):
         self._map(table)
@@ -47,18 +49,15 @@ class Genome(object):
         return self.engine.execute(query)
 
     @staticmethod
-    def bins(start, end):
+    def bins(start, end=None):
+        if end is None:
+            start, end = start.start, start.end
         bins = [1]
         bins.extend(xrange(1 + (start>>26), 1 + ((end-1)>>26)+1))
         bins.extend(xrange(9 + (start>>23), 9 + ((end-1)>>23)+1))
         bins.extend(xrange(73 + (start>>20), 73 + ((end-1)>>20)+1))
         bins.extend(xrange(585 + (start>>17), 585 + ((end-1)>>17)+1))
         return frozenset(bins)
-
-
-    @staticmethod
-    def bin_query(start, end, query):
-        return query.filter.c.bin.in_(Genome.bins(start, end))
 
     def __repr__(self):
         return "%s('%s')" % (self.__class__.__name__,
@@ -96,33 +95,44 @@ if __name__ == "__main__":
     print "3'utr", f.utr3
 
     print f.browser_link
+    #f.txEnd = f.txStart + 30
+    #print list(f.blat())
     #print f.cds_sequence
     import time
     from sqlalchemy import and_
-    query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 40000))
+    query = g.refGene.filter(and_(g.table('refGene').c.txStart > 10000, g.table('refGene').c.txEnd < 40000))
     t = time.time()
     query.all()
     print time.time() - t
 
-    query = query.filter(g.table('knownGene').c.bin.in_(Genome.bins(10000,
+    query = g.refGene.filter(and_(g.table('refGene').c.txStart > 10000, g.table('refGene').c.txEnd < 40000))
+    query = query.filter(g.table('refGene').c.bin.in_(Genome.bins(10000,
         40000)))
 
     t = time.time()
-    query = Genome.bin_query(10000, 40000, g.table('knownGene'))
+    #query = Genome.bin_query(10000, 40000, g.table('refGene'))
     query.all()
     print time.time() - t
-    1/0
 
-    Genome.save_bed(query)
+
+    g = Genome('hg19')
+    t = time.time()
+    q = g.snp135Common
+    q = q.filter(q.table().c.bin.in_(Genome.bins(1000, 2000)))
+    print q
+    q.first()
+    print time.time() - t
+
+    #Genome.save_bed(query)
     1/0
 
     """
-    for transcript in g.knownGene:
+    for transcript in g.refGene:
         print transcript, transcript.sequence()[:100] + "..."
         if transcript.txEnd > 8000: break
     """
 
-    kg = g.table('knownGene')
+    kg = g.table('refGene')
     q = kg.select(kg.c.txStart < 5000)
 
     print list(g.session.execute(q))
