@@ -227,6 +227,29 @@ class ABase(object):
                 seqs.append(_sequence(db, self.chrom, start + 1, end))
             return seqs
 
+    def blat(self, db=None):
+        """
+        make a request to the genome-browsers BLAT interface
+        """
+        import requests
+        seq = self.sequence()
+        r = requests.post('http://genome.ucsc.edu/cgi-bin/hgBlat',
+                data=dict(db=db or self.db, type="DNA", userSeq=seq, output="psl"))
+        if "Sorry, no matches found" in r.text:
+            raise StopIteration
+        text = r.text.split("<TT><PRE>")[1].split("</PRE></TT>")[0].strip().split("\n")
+        for istart, line in enumerate(text):
+            if "-----------" in line: break
+        istart += 1
+        for i, hit in enumerate(t.split("\t") for t in text[istart:]):
+            hit = hit[hit.index("YourSeq") + 4:]
+            f = Feature()
+            f.chrom = hit[0]
+            f.txStart = long(hit[2])
+            f.txEnd = long(hit[3])
+            f.name = "blat-hit-%i-to-%s" % (i + 1, self.name)
+            yield f
+
     @property
     def is_gene_pred(self):
         """

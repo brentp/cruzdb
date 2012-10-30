@@ -71,6 +71,16 @@ class TestFeature(unittest.TestCase):
         self.assertEqual(u.end, f.start)
         self.assert_(u.is_upstream_of(f))
 
+    def test_blat(self):
+        g = Genome('hg18')
+        f = g.refGene[19]
+        f.chrom = "chr6"
+        f.txStart = 135646802
+        f.txEnd = 135646832
+        r = list(f.blat())
+        self.assert_(str(f.txStart) in repr(r))
+        self.assert_(str(f.txEnd) in repr(r))
+
     def test_downstream(self):
         f = self.f
         u = f.downstream(10)
