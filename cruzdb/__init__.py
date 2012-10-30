@@ -35,7 +35,6 @@ class Genome(object):
                 self.__tables[table] = type(table, (self.Base,
                     self.models.Feature), {})
 
-
     def __getattr__(self, table):
         self._map(table)
         return self.session.query(self.__tables[table])
@@ -47,14 +46,19 @@ class Genome(object):
     def sql(self, query):
         return self.engine.execute(query)
 
-    @classmethod
-    def bins(cls, start, end):
+    @staticmethod
+    def bins(start, end):
         bins = [1]
-        for b in range(1 + (start>>26), 1 + ((end-1)>>26)+1):     bins.append(b)
-        for b in range(9 + (start>>23), 9 + ((end-1)>>23)+1):     bins.append(b)
-        for b in range(73 + (start>>20), 73 + ((end-1)>>20)+1):   bins.append(b)
-        for b in range(585 + (start>>17), 585 + ((end-1)>>17)+1): bins.append(b)
+        bins.extend(xrange(1 + (start>>26), 1 + ((end-1)>>26)+1))
+        bins.extend(xrange(9 + (start>>23), 9 + ((end-1)>>23)+1))
+        bins.extend(xrange(73 + (start>>20), 73 + ((end-1)>>20)+1))
+        bins.extend(xrange(585 + (start>>17), 585 + ((end-1)>>17)+1))
         return frozenset(bins)
+
+
+    @staticmethod
+    def bin_query(start, end, query):
+        return query.filter.c.bin.in_(Genome.bins(start, end))
 
     def __repr__(self):
         return "%s('%s')" % (self.__class__.__name__,
@@ -77,7 +81,7 @@ if __name__ == "__main__":
     print g.cpgIslandExt[12].bed('length', 'perCpg')
 
     import sys
-    sys.exit()
+    #sys.exit()
 
     f = g.refGene[19]
     print f.bed12()
@@ -93,10 +97,21 @@ if __name__ == "__main__":
 
     print f.browser_link
     #print f.cds_sequence
-
+    import time
     from sqlalchemy import and_
-    query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 20000))
-    print query.first()
+    query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 40000))
+    t = time.time()
+    query.all()
+    print time.time() - t
+
+    query = query.filter(g.table('knownGene').c.bin.in_(Genome.bins(10000,
+        40000)))
+
+    t = time.time()
+    query = Genome.bin_query(10000, 40000, g.table('knownGene'))
+    query.all()
+    print time.time() - t
+    1/0
 
     Genome.save_bed(query)
     1/0
