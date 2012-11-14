@@ -1,5 +1,6 @@
 import unittest
 from cruzdb import Genome
+import os
 
 
 class TestFeature(unittest.TestCase):
@@ -158,6 +159,23 @@ class Test2Db(unittest.TestCase):
         bins = Genome.bins(12345, 56779)
         expected = set([1, 9, 73, 585])
         self.assertEqual(bins, expected)
+
+    def test_mirror(self):
+
+        try:
+            os.unlink('/tmp/__u.db')
+        except OSError:
+            pass
+        g = Genome('hg18')
+        g.mirror(['chromInfo'], 'sqlite:////tmp/__u.db')
+        a = str(g.chromInfo.filter().first())
+
+        gs = Genome('sqlite:////tmp/__u.db')
+
+        b = str(gs.chromInfo.filter().first())
+        self.assertEqual(a, b)
+        os.unlink('/tmp/__u.db')
+
 
 if __name__ == "__main__":
     unittest.main()

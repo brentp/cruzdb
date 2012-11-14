@@ -56,9 +56,23 @@ As motivation, here's an example of some of the capabilities::
     >>> print transcript.localize(transcript.cdsStart, cdna=True)
     None
 
-
 this can be repeated using knownGene annotations by changing 'refGene' to 
 'knownGene'. And, it can be done easily for a set of genes.
+
+Mirror
+------
+
+The above uses the mysql interface from UCSC. It is now possible to mirror
+any tables from UCSC to a local sqlite database via:
+
+   >>> g = Genome('hg18')
+   >>> g.mirror(['chromInfo'], 'sqlite:////tmp/u.db')
+   Processing chromInfo
+
+and then use as:
+
+   >>> gs = Genome('sqlite:////tmp/u.db')
+
 
 Code
 ----
@@ -99,9 +113,6 @@ discussion. Below are some ideas.
 
 TODO
 ----
-
- + easily make a local copy of a set of tables--to, e.g. sqlite
-   Genome.mirror('hg18', ['refGene', 'knownwGene', 'cpgIslantExt'], to_url='sqlite:///hg18.db')
 
  + examples / THINGS this should make easy:
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026941.html

@@ -187,8 +187,13 @@ class ABase(object):
 
 
     def __repr__(self):
-        return "%s(%s:%s:%i-%i)" % (self.__tablename__, self.chrom, self.gene_name,
+        try:
+            self.start
+            return "%s(%s:%s:%i-%i)" % (self.__tablename__, self.chrom, self.gene_name,
                 self.start, self.end)
+        except:
+            return "%s(%s)" % (self.__tablename__, self.chrom)
+
 
     @property
     def gene_name(self):
@@ -333,6 +338,12 @@ class ABase(object):
 
 class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
+
+class chromInfo(ABase):
+    def __repr__(self):
+        return "%s(%s:%i)" % (self.__tablename__, self.chrom, self.size)
+
+    __str__ = __repr__
 
 class kgXref(ABase):
     kgID = Column(String, unique=True, primary_key=True)

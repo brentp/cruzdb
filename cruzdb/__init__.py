@@ -13,16 +13,26 @@ class Genome(object):
     __tables = {}
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu", password=""):
-        self.db = db
-        self.user = user
-        self.host = host
-        self.password = (":" + password) if password else ""
-        self.dburl = self.url % dict(db=self.db, user=self.user,
-            host=self.host, password=self.password)
+        if db.startswith(("sqlite://", "mysql://", "postgresql://")):
+            self.url = db
+            self.dburl = db
+            self.user = self.host = self.password = ""
+        else:
+            self.db = db
+            self.user = user
+            self.host = host
+            self.password = (":" + password) if password else ""
+            self.dburl = self.url % dict(db=self.db, user=self.user,
+                host=self.host, password=self.password)
+
         self.engine = create_engine(self.dburl)
 
         self.session, self.Base = initialize_sql(self.engine)
         self.models = __import__("models", globals(), locals(), ["Feature"], -1)
+
+    def mirror(self, tables, dest_url):
+        from mirror import mirror
+        mirror(self, tables, dest_url)
 
     def _map(self, table):
         # if the table hasn't been mapped, do so here.

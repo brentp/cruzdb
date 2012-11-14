@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='cruzdb',
-      version='0.1',
+      version='0.2',
       description='''Interface to UCSC genomic databases.
 Also allows things like up/downstream queries''',
       long_description=open('README.rst').read(),
