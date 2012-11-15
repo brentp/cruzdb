@@ -111,13 +111,14 @@ Contributing
 YES PLEASE!
 
 To start coding, it is probably polite to grab your own copy of some of the
-UCSC tables so as not to overload the UCSC server. After setting up mysql,
-you can run this `script <https://gist.github.com/987144>`_ to get your
-own set of commonly used tables.
+UCSC tables so as not to overload the UCSC server. 
+You can run something like::
 
-Then the connection line above would be something like::
+   Genome('hg18').mirror(["refGene", "cpgIslandExt", "chromInfo"], "sqlite:////tmp/hg18.db")
 
-    g = Genome(db="hg18", host="localhost", user="brentp")
+Then the connection would be something like::
+
+    g = Genome("sqlite:////tmp/hg18.db")
 
 If you have a feature you like to use/implement, open a ticket on github for
 discussion. Below are some ideas.
@@ -129,7 +130,6 @@ TODO
  + examples / THINGS this should make easy:
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026941.html
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026899.html
- + http://biostar.stackexchange.com/questions/10144/ucsc-mysql-query/10147#10147
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
  + auto join to kgXref
