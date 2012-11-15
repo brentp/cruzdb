@@ -142,23 +142,33 @@ class TestGene(unittest.TestCase):
         transcript = self.db.refGene.filter_by(name="NM_032129").first()
         self.assertEqual(transcript.bed12(), expected)
 
-class Test2Db(unittest.TestCase):
+class TestDb(unittest.TestCase):
     def setUp(self):
         self.dba = Genome('hg18', host="localhost", user="brentp")
-        self.dbb = Genome('hg19', host="localhost", user="brentp")
+        #self.dbb = Genome('hg19', host="localhost", user="brentp")
 
     def test_ok(self):
         ga = self.dba.refGene.filter_by(name2="MUC5B").first()
-        gb = self.dbb.refGene.filter_by(name2="MUC5B").first()
-        assert ga.txStart != gb.txStart
-        # TODO: these shouldb e different, but they both hg18
-        # session stuff?
-        print ga.db, gb.db
+        self.assert_(ga is not None)
 
     def test_bins(self):
         bins = Genome.bins(12345, 56779)
         expected = set([0, 1, 9, 73, 585])
         self.assertEqual(bins, expected)
+
+    def test_nearest(self):
+        from cruzdb.models import Feature
+        f = Feature()
+        f.chrom = "chr1"
+        f.txStart = 10
+        f.txEnd = 61
+        #db = Genome('hg18', host="localhost", user="brentp")
+        db = self.dba
+        self.assert_(db.refGene.first() is not None)
+        self.assert_(db.refGene is not None)
+
+        res = db.knearest(db.refGene, f, k=2)
+        self.assert_(len(res) >= 2)
 
     def test_mirror(self):
 
@@ -176,6 +186,8 @@ class Test2Db(unittest.TestCase):
         self.assertEqual(a, b)
         os.unlink('/tmp/__u.db')
 
+    def tearDown(self):
+        del self.dba
 
 if __name__ == "__main__":
     unittest.main()

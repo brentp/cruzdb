@@ -30,14 +30,17 @@ class Genome(object):
         self.session, self.Base = initialize_sql(self.engine)
         self.models = __import__("models", globals(), locals(), ["Feature"], -1)
 
+    def __del__(self):
+        self.session.close_all()
+
     def mirror(self, tables, dest_url):
         from mirror import mirror
         mirror(self, tables, dest_url)
 
     def _map(self, table):
         # if the table hasn't been mapped, do so here.
-        #if not table in self.models.Base.metadata.tables:
-        if not table in self.__tables:
+        #if not table in self.__tables:
+        if not table in self.Base.metadata.tables:
             # make a new class
             try:
                 self.__tables[table] = type(table, (self.Base, getattr(self.models,
@@ -54,6 +57,10 @@ class Genome(object):
         mapped.orm = lambda : self._map(table)
         return mapped
 
+    def table(self, table):
+        self._map(table)
+        return self.Base.metadata.tables[table]
+
     def bin_query(self, table, chrom, start, end):
         if isinstance(table, basestring):
             table = getattr(self, table)
@@ -68,7 +75,7 @@ class Genome(object):
             return q.filter(tbl.c.txStart <= end, tbl.c.txEnd >= start)
         return q.filter(tbl.c.chromStart <= end, tbl.c.chromEnd >= start)
 
-    def nearest(self, table, chrom_or_feat, start=None, end=None, n=1):
+    def knearest(self, table, chrom_or_feat, start=None, end=None, k=1):
 
         if start is None:
             assert end is None
@@ -79,7 +86,7 @@ class Genome(object):
         qstart, qend = start, end
         res = self.bin_query(table, chrom, qstart, qend)
         change = 300
-        while res.count() < n:
+        while res.count() < k:
             qstart = max(0, qstart - change)
             qend += change
             change *= 2
@@ -101,19 +108,14 @@ class Genome(object):
 
         # sort by dist and ...
         res = sorted(res, key=dist)
-        if len(res) == n:
+        if len(res) == k:
             return res
-        ndist = res[n - 1].dist
+        ndist = res[k - 1].dist
         # include all features that are the same distance as the nth closest
         # feature (accounts for ties).
-        while res[n - 1].dist == ndist and n < len(res):
-            n = n + 1
-        return res[:n]
-
-
-    def table(self, table):
-        self._map(table)
-        return self.Base.metadata.tables[table]
+        while res[k - 1].dist == ndist and k < len(res):
+            k = k + 1
+        return res[:k]
 
     def sql(self, query):
         return self.engine.execute(query)
