@@ -51,6 +51,7 @@ class Genome(object):
         self._map(table)
         mapped = self.session.query(self.__tables[table])
         mapped.table = lambda : self.table(table)
+        mapped.orm = lambda : self._map(table)
         return mapped
 
     def bin_query(self, table, chrom, start, end):
@@ -58,13 +59,57 @@ class Genome(object):
             table = getattr(self, table)
         tbl = table.table()
 
-        bins = Genome.bins(start, end)
         q = table
         q = q.filter(tbl.c.chrom == chrom)
-        q = q.filter(tbl.c.bin.in_(bins))
+        if hasattr(tbl.c, "bin"):
+            bins = Genome.bins(start, end)
+            q = q.filter(tbl.c.bin.in_(bins))
         if hasattr(tbl.c, "txStart"):
             return q.filter(tbl.c.txStart <= end, tbl.c.txEnd >= start)
         return q.filter(tbl.c.chromStart <= end, tbl.c.chromEnd >= start)
+
+    def nearest(self, table, chrom_or_feat, start=None, end=None, n=1):
+
+        if start is None:
+            assert end is None
+            chrom, start, end = chrom_or_feat.chrom, chrom_or_feat.start, chrom_or_feat.end
+        else:
+            chrom = chrom_or_feat
+
+        qstart, qend = start, end
+        res = self.bin_query(table, chrom, qstart, qend)
+        change = 300
+        while res.count() < n:
+            qstart = max(0, qstart - change)
+            qend += change
+            change *= 2
+            res = self.bin_query(table, chrom, qstart, qend)
+
+        def dist(f):
+
+            if start <= f.start <= end or start <= f.end <= end:
+                d = 0
+            else:
+                d = min(abs(f.start - start),
+                        abs(f.start - end),
+                        abs(f.end - end),
+                        abs(f.end - start))
+            # add dist as an attribute to the feature
+            f.dist = d
+            return d
+
+
+        # sort by dist and ...
+        res = sorted(res, key=dist)
+        if len(res) == n:
+            return res
+        ndist = res[n - 1].dist
+        # include all features that are the same distance as the nth closest
+        # feature (accounts for ties).
+        while res[n - 1].dist == ndist and n < len(res):
+            n = n + 1
+        return res[:n]
+
 
     def table(self, table):
         self._map(table)
@@ -154,7 +199,7 @@ if __name__ == "__main__":
     g = Genome('hg19')
     t = time.time()
     q = g.snp135Common
-    q = q.filter(q.table().c.bin.in_(Genome.bins(1000, 2000)))
+    q = q.filter(q.table.c.bin.in_(Genome.bins(1000, 2000)))
     print q
     q.first()
     print time.time() - t
