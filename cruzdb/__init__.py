@@ -40,16 +40,31 @@ class Genome(object):
         if not table in self.__tables:
             # make a new class
             try:
-                self.__tables[table] = type(table, (self.Base, getattr(self.models, table)), {})
+                self.__tables[table] = type(table, (self.Base, getattr(self.models,
+                    table)), {})
             except:
                 self.__tables[table] = type(table, (self.Base,
                     self.models.Feature), {})
+        return self.__tables[table]
 
     def __getattr__(self, table):
         self._map(table)
         mapped = self.session.query(self.__tables[table])
         mapped.table = lambda : self.table(table)
         return mapped
+
+    def bin_query(self, table, chrom, start, end):
+        if isinstance(table, basestring):
+            table = getattr(self, table)
+        tbl = table.table()
+
+        bins = Genome.bins(start, end)
+        q = table
+        q = q.filter(tbl.c.chrom == chrom)
+        q = q.filter(tbl.c.bin.in_(bins))
+        if hasattr(tbl.c, "txStart"):
+            return q.filter(tbl.c.txStart <= end, tbl.c.txEnd >= start)
+        return q.filter(tbl.c.chromStart <= end, tbl.c.chromEnd >= start)
 
     def table(self, table):
         self._map(table)
@@ -59,14 +74,23 @@ class Genome(object):
         return self.engine.execute(query)
 
     @staticmethod
-    def bins(start, end=None):
-        if end is None:
-            start, end = start.start, start.end
-        bins = [1]
-        bins.extend(xrange(1 + (start>>26), 1 + ((end-1)>>26)+1))
-        bins.extend(xrange(9 + (start>>23), 9 + ((end-1)>>23)+1))
-        bins.extend(xrange(73 + (start>>20), 73 + ((end-1)>>20)+1))
-        bins.extend(xrange(585 + (start>>17), 585 + ((end-1)>>17)+1))
+    def bins(start, end):
+        if end - start < 536870912:
+            offsets = [585, 73, 9, 1, 0]
+        else:
+            raise Exception("not implemented")
+            offsets = [4681, 585, 73, 9, 1, 0]
+        binFirstShift = 17
+        binNextShift = 3
+
+        start = start >> binFirstShift
+        end = (end - 1)  >> binFirstShift
+
+        bins = []
+        for offset in offsets:
+            bins.extend(range(offset + start, offset + end + 1))
+            start >>= binNextShift
+            end >>= binNextShift
         return frozenset(bins)
 
     def __repr__(self):
@@ -120,9 +144,11 @@ if __name__ == "__main__":
         40000)))
 
     t = time.time()
-    #query = Genome.bin_query(10000, 40000, g.table('refGene'))
+    query = g.bin_query(g.refGene, "chr1", 10000, 40000)
+
     query.all()
     print time.time() - t
+    1/0
 
 
     g = Genome('hg19')
