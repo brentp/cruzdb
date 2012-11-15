@@ -59,6 +59,18 @@ As motivation, here's an example of some of the capabilities::
 this can be repeated using knownGene annotations by changing 'refGene' to 
 'knownGene'. And, it can be done easily for a set of genes.
 
+Spatial
+-------
+
+k-nearest neighbors, upstream, and downstream searches are available.
+Up and downstream searches use the strand of the query feature to determine the direction:
+
+    >>> nearest = g.knearest("refGene", "chr1", 9444, 9555, k=6)
+    >>> up_list = g.upstream("refGene", "chr1", 9444, 9555, k=6)
+    >>> down_list = g.downstream("refGene", "chr1", 9444, 9555, k=6)
+
+
+
 Mirror
 ------
 
@@ -120,14 +132,11 @@ TODO
  + http://biostar.stackexchange.com/questions/10144/ucsc-mysql-query/10147#10147
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
-
- + use bin to do more efficent query
  + auto join to kgXref
  + histone, cpg, other informative tracks
  + intersect annos with snps
 
  + sphinx docs
- + **tests tests tests**
  + useful scripts in scripts/ dir
 
 

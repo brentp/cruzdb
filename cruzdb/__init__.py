@@ -75,11 +75,41 @@ class Genome(object):
             return q.filter(tbl.c.txStart <= end, tbl.c.txEnd >= start)
         return q.filter(tbl.c.chromStart <= end, tbl.c.chromEnd >= start)
 
-    def knearest(self, table, chrom_or_feat, start=None, end=None, k=1):
+    def upstream(self, table, chrom_or_feat, start=None, end=None, k=1):
+        res = self.knearest(table, chrom_or_feat, start, end, k, "up")
+        end = getattr(chrom_or_feat, "end", end)
+        start = getattr(chrom_or_feat, "start", start)
+        rev = getattr(chrom_or_feat, "strand", "+") == "-"
+        if rev:
+            return [x for x in res if x.end > start]
+        else:
+            return [x for x in res if x.start < end]
 
+    def downstream(self, table, chrom_or_feat, start=None, end=None, k=1):
+        res = self.knearest(table, chrom_or_feat, start, end, k, "down")
+        end = getattr(chrom_or_feat, "end", end)
+        start = getattr(chrom_or_feat, "start", start)
+        rev = getattr(chrom_or_feat, "strand", "+") == "-"
+        if rev:
+            return [x for x in res if x.start < end]
+        else:
+            return [x for x in res if x.end > start]
+
+    def knearest(self, table, chrom_or_feat, start=None, end=None, k=1,
+            _direction=None):
+        assert _direction in (None, "up", "down")
+
+
+        # they sent in a feature
         if start is None:
             assert end is None
             chrom, start, end = chrom_or_feat.chrom, chrom_or_feat.start, chrom_or_feat.end
+
+            # if the query is directional and the feature as a strand,
+            # adjust...
+            if _direction in ("up", "down") and getattr(chrom_or_feat,
+                    "strand", None) == "-":
+                _direction = "up" if _direction == "down" else "up"
         else:
             chrom = chrom_or_feat
 
@@ -87,8 +117,11 @@ class Genome(object):
         res = self.bin_query(table, chrom, qstart, qend)
         change = 300
         while res.count() < k:
-            qstart = max(0, qstart - change)
-            qend += change
+            if _direction in (None, "up"):
+                if qstart == 0 and _direction == "up": break
+                qstart = max(0, qstart - change)
+            if _direction in (None, "down"):
+                qend += change
             change *= 2
             res = self.bin_query(table, chrom, qstart, qend)
 
@@ -110,6 +143,11 @@ class Genome(object):
         res = sorted(res, key=dist)
         if len(res) == k:
             return res
+
+        if k > len(res): # had to break because of end of chrom
+            k = len(res)
+            if k == 0: return []
+
         ndist = res[k - 1].dist
         # include all features that are the same distance as the nth closest
         # feature (accounts for ties).

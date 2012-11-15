@@ -176,6 +176,25 @@ class TestDb(unittest.TestCase):
         res = db.knearest("refGene", f, k=2)
         self.assert_(key in ((n.chrom, n.start, n.end, n.name) for n in res))
 
+
+        f = db.refGene.order_by(db.refGene.table().c.txStart).filter(db.refGene.table().c.strand == "+").first()
+        assert f in db.upstream(db.refGene, f)
+
+        down = db.downstream(db.refGene, f, k=10)
+        self.assert_(len(down) >= 10)
+
+        self.assert_(all(d.start >= f.start for d in down))
+
+
+    def test_down_neg(self):
+        db = self.dba
+        fm = db.refGene.filter(db.refGene.table().c.strand == "-").first()
+        down = db.downstream(db.refGene, fm, k=10)
+
+        self.assert_(all(d.start <= fm.start for d in down))
+
+
+
     def test_mirror(self):
 
         try:
