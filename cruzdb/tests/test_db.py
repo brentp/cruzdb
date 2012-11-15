@@ -170,6 +170,12 @@ class TestDb(unittest.TestCase):
         res = db.knearest(db.refGene, f, k=2)
         self.assert_(len(res) >= 2)
 
+        f = db.refGene.first()
+        key = (f.chrom, f.start, f.end, f.name)
+
+        res = db.knearest("refGene", f, k=2)
+        self.assert_(key in ((n.chrom, n.start, n.end, n.name) for n in res))
+
     def test_mirror(self):
 
         try:
