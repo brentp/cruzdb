@@ -4,7 +4,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 def initialize_sql(engine):
-    Session = sessionmaker(autoflush=True)
+    Session = sessionmaker(autoflush=False)
     #if Session.registry.has(): return Session
     #Session = scoped_session(sessionmaker(bind=engine))
     session = Session(bind=engine)
