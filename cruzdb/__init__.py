@@ -109,7 +109,6 @@ class Genome(object):
             _direction=None):
         assert _direction in (None, "up", "down")
 
-
         # they sent in a feature
         if start is None:
             assert end is None
@@ -125,14 +124,15 @@ class Genome(object):
 
         qstart, qend = start, end
         res = self.bin_query(table, chrom, qstart, qend)
-        change = 400
+        i, change = 1, 350
         while res.count() < k:
             if _direction in (None, "up"):
                 if qstart == 0 and _direction == "up": break
                 qstart = max(0, qstart - change)
             if _direction in (None, "down"):
                 qend += change
-            change *= 2
+            i += 1
+            change *= (i + 5)
             res = self.bin_query(table, chrom, qstart, qend)
         def dist(f):
             d = 0
