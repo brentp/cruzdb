@@ -391,7 +391,8 @@ class SNP(ABase):
     __table_args__ = (
             PrimaryKeyConstraint('name', 'chrom', 'chromStart'),
             dict(autoload=True),)
-    name = Column(String, unique=False, primary_key=False)
+    # can't add name or it gives error on select.
+    #name = Column(String, unique=False)
 
 class chromInfo(ABase):
     def __repr__(self):
