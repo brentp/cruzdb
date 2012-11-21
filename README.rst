@@ -114,7 +114,7 @@ To start coding, it is probably polite to grab your own copy of some of the
 UCSC tables so as not to overload the UCSC server. 
 You can run something like::
 
-   Genome('hg18').mirror(["refGene", "cpgIslandExt", "chromInfo"], "sqlite:////tmp/hg18.db")
+   Genome('hg18').mirror(["refGene", "cpgIslandExt", "chromInfo", "knownGene", "kgXref"], "sqlite:////tmp/hg18.db")
 
 Then the connection would be something like::
 
@@ -132,7 +132,6 @@ TODO
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026899.html
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
- + auto join to kgXref
  + histone, cpg, other informative tracks
  + intersect annos with snps
 

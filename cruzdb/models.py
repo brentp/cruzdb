@@ -1,5 +1,7 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ForeignKey, Integer
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship, backref
+
 # needed to avoid circular imports
 #CHANGED:from init import Base
 from sequence import sequence as _sequence
@@ -21,6 +23,8 @@ class ABase(object):
     def __tablename__(cls):
         return cls.__name__
     __table_args__ = {'autoload': True}
+    __mapper_args__= {'always_refresh': True}
+
 
     @property
     def is_coding(self):
@@ -123,6 +127,13 @@ class ABase(object):
         # other feature is on - strand, so this must have higher start
         return self.end <= other.start
 
+    def distance(self, other):
+        if other.start > self.end:
+            return other.start - self.end
+        if self.start > other.end:
+            return self.start - other.end
+        return 0
+
     def upstream(self, distance):
         """
         return the (start, end) of the region before the geneStart
@@ -189,7 +200,7 @@ class ABase(object):
     def __repr__(self):
         try:
             self.start
-            return "%s(%s:%s:%i-%i)" % (self.__tablename__, self.chrom, self.gene_name,
+            return "%s(%s:%s:%i-%i)" % (self.__class__.__name__, self.chrom, self.gene_name,
                 self.start, self.end)
         except:
             return "%s(%s)" % (self.__tablename__, self.chrom)
@@ -307,7 +318,6 @@ class ABase(object):
             introns = self._introns(self.cds) or None
 
         if introns is None:
-            print start, positions, end
             local_ps = [p - start if (start <= p < end) else None for p in positions]
             return local_ps[0] if len(positions) == 1 else local_ps
 
@@ -336,6 +346,7 @@ class ABase(object):
         assert all(p >=0 or p is None for p in local_ps), (local_ps)
         return local_ps[0] if len(positions) == 1 else local_ps
 
+
 class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
 
@@ -346,7 +357,25 @@ class chromInfo(ABase):
     __str__ = __repr__
 
 class kgXref(ABase):
-    kgID = Column(String, unique=True, primary_key=True)
+    __tablename__ = "kgXref"
+    kgID = Column(String, primary_key=True)
 
-    def __repr__(self):
-        return "%s(%s)" % (self.__tablename__, self.kgID)
+
+class knownGene(ABase):
+    __tablename__ = "knownGene"
+
+    __preload_classes__ = ("kgXref",)
+
+    @declared_attr
+    def name(cls):
+        return Column(String, ForeignKey('kgXref.kgID'), primary_key=True)
+
+    @declared_attr
+    def kgXref(cls):
+        return relationship("kgXref", backref=backref("knownGene",
+        lazy="dynamic"))
+
+    @property
+    def name2(self):
+        return self.kgXref.geneSymbol
+

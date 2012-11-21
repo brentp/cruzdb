@@ -19,8 +19,11 @@ class Genome(object):
             self.user = self.host = self.password = ""
         else:
             self.db = db
-            self.user = user
+            if user == "genome" and host != "genome-mysql.cse.ucsc.edu":
+                import getpass
+                user = getpass.getuser()
             self.host = host
+            self.user = user
             self.password = (":" + password) if password else ""
             self.dburl = self.url % dict(db=self.db, user=self.user,
                 host=self.host, password=self.password)
@@ -28,10 +31,8 @@ class Genome(object):
         self.engine = create_engine(self.dburl)
 
         self.session, self.Base = initialize_sql(self.engine)
-        self.models = __import__("models", globals(), locals(), ["Feature"], -1)
-
-    def __del__(self):
-        self.session.close_all()
+        self.models = __import__("cruzdb.models", globals(), locals(),
+                [], -1).models
 
     def mirror(self, tables, dest_url):
         from mirror import mirror
@@ -43,9 +44,13 @@ class Genome(object):
         if not table in self.Base.metadata.tables:
             # make a new class
             try:
-                self.__tables[table] = type(table, (self.Base, getattr(self.models,
-                    table)), {})
-            except:
+                klass = getattr(self.models, table, None)
+                for k in getattr(klass, "__preload_classes__", []):
+                    self._map(k)
+                self.__tables[table] = type(table, (self.Base, getattr(self.models, table)), {})
+            except Exception:
+                if klass is not None:
+                    raise
                 self.__tables[table] = type(table, (self.Base,
                     self.models.Feature), {})
         return self.__tables[table]
