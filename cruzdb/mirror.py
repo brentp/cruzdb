@@ -41,8 +41,13 @@ def mirror(genome, tables, connection_string):
 
         for col in table.columns:
             # convert mysql-specific types to varchar
-            if isinstance(col.type, (LONGBLOB, ENUM)):
+            if isinstance(col.type, (LONGBLOB, ENUM)) \
+                    and not 'mysql' in connection_string:
                 col.type = VARCHAR()
+            elif str(col.type) == "VARCHAR" \
+                    and "mysql" in connection_string:
+                if col.type.length is None:
+                    col.type.length = 95
 
         table.metadata.create_all(dengine)
         destination.commit()
