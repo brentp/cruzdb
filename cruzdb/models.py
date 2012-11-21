@@ -1,6 +1,7 @@
-from sqlalchemy import Column, String, ForeignKey, Integer
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.schema import PrimaryKeyConstraint
 
 # needed to avoid circular imports
 #CHANGED:from init import Base
@@ -385,6 +386,12 @@ class ABase(object):
 
 class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
+
+class SNP(ABase):
+    __table_args__ = (
+            PrimaryKeyConstraint('name', 'chrom', 'chromStart'),
+            dict(autoload=True),)
+    name = Column(String, unique=False, primary_key=False)
 
 class chromInfo(ABase):
     def __repr__(self):

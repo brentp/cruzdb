@@ -57,8 +57,11 @@ class Genome(object):
             except Exception:
                 if klass is not None:
                     raise
-                self.__tables[table] = type(table, (self.Base,
-                    self.models.Feature), {})
+                if table.startswith('snp'):
+                    self.__tables[table] = type(table, (self.Base, getattr(self.models, 'SNP')), {})
+                else:
+                    self.__tables[table] = type(table, (self.Base,
+                        self.models.Feature), {})
         return self.__tables[table]
 
     def __getattr__(self, table):
@@ -81,6 +84,7 @@ class Genome(object):
         if hasattr(tbl.c, "bin"):
             bins = Genome.bins(start, end)
             q = q.filter(tbl.c.bin.in_(bins))
+
         if hasattr(tbl.c, "txStart"):
             return q.filter(tbl.c.txStart <= end).filter(tbl.c.txEnd >= start)
         return q.filter(tbl.c.chromStart <= end).filter(tbl.c.chromEnd >= start)

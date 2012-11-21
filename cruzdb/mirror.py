@@ -1,10 +1,11 @@
 # from http://www.tylerlesmann.com/2009/apr/27/copying-databases-across-platforms-sqlalchemy/
 
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.mysql import LONGBLOB, ENUM
 from sqlalchemy.types import VARCHAR
+import sqlalchemy
 import sys
 import os
 
@@ -25,16 +26,28 @@ def quick_mapper(table):
         __table__ = table
     return GenericMapper
 
+def page_query(q, limit=30000):
+    offset = 0
+    while True:
+        r = False
+        for elem in q.limit(limit).offset(offset):
+           r = True
+           yield elem
+        offset += limit
+        if not r:
+            break
+
 def mirror(genome, tables, connection_string):
     #source, sengine = make_session(from_db)
     #smeta = MetaData(bind=sengine)
     destination, dengine = make_session(connection_string)
-    from . import Genome
 
     for table_name in tables:
+        # cause it ot be mapped
         table = genome.table(table_name)
         print 'Processing', table_name
-        table = Table(table_name, genome.Base.metadata, autoload=True)
+        table = Table(table_name, genome.Base.metadata, autoload=True,
+                autoload_with=genome.engine)
 
         # need to prefix the indexes with the table name to avoid collisions
         for idx in table.indexes:
@@ -49,19 +62,34 @@ def mirror(genome, tables, connection_string):
                     and "mysql" in connection_string:
                 if col.type.length is None:
                     col.type.length = 95
+            if not "mysql" in connection_string:
+                if str(col.type).lower().startswith("set("):
+                    col.type = VARCHAR(15)
 
-        table.metadata.create_all(dengine)
+        try:
+            table.create(dengine)
+        except sqlalchemy.exc.OperationalError:
+            pass
+
         destination.commit()
-        #[c.index for c in table.columns]
-        NewRecord = quick_mapper(table)
+        ins = table.insert()
+
         columns = table.columns.keys()
-        for record in genome.session.query(table):
+        records = []
+        for i, record in enumerate(page_query(getattr(genome, table_name))):
+            #print i, "before"
             data = dict(
                 (str(column), getattr(record, column)) for column in columns
             )
-            destination.merge(NewRecord(**data))
+            records.append(data)
+            if 0 == i % 30000:
+                destination.execute(ins, records)
+                records = []
+                print >>sys.stderr, "processing record %i" % i
+                destination.commit()
         destination.commit()
 
+    from . import Genome
     return Genome(engine=dengine)
 
 if __name__ == "__main__":
