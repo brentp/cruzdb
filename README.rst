@@ -78,7 +78,7 @@ The above uses the mysql interface from UCSC. It is now possible to mirror
 any tables from UCSC to a local sqlite database via:
 
    >>> g = Genome('hg18')
-   >>> g.mirror(['chromInfo'], 'sqlite:////tmp/u.db')
+   >>> gs = g.mirror(['chromInfo'], 'sqlite:////tmp/u.db')
    Processing chromInfo
 
 and then use as:

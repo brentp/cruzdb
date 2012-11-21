@@ -173,8 +173,11 @@ class TestDb(unittest.TestCase):
         f = db.refGene.first()
         key = (f.chrom, f.start, f.end, f.name)
 
-        res = db.knearest("refGene", f, k=2)
-        self.assert_(key in ((n.chrom, n.start, n.end, n.name) for n in res))
+        for k in (2, 4, 6):
+            res = db.knearest("refGene", f, k=k)
+            assert len(res) >= k
+            self.assert_(key in ((n.chrom, n.start, n.end, n.name) for n in res),
+                    (res, f))
 
 
         f = db.refGene.order_by(db.refGene.table().c.txStart).filter(db.refGene.table().c.strand == "+").first()

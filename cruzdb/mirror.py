@@ -29,6 +29,7 @@ def mirror(genome, tables, connection_string):
     #source, sengine = make_session(from_db)
     #smeta = MetaData(bind=sengine)
     destination, dengine = make_session(connection_string)
+    from . import Genome
 
     for table_name in tables:
         table = genome.table(table_name)
@@ -60,12 +61,14 @@ def mirror(genome, tables, connection_string):
             )
             destination.merge(NewRecord(**data))
         destination.commit()
-    destination.close()
+
+    return Genome(engine=dengine)
 
 if __name__ == "__main__":
-    from cruzdb import Genome
-    g = Genome('hg18', host="localhost", user="brentp")
-    #print g.chromInfo
-    #print g.table('chromInfo')
+    if False:
+        from cruzdb import Genome
+        g = Genome('hg18', host="localhost", user="brentp")
+        #print g.chromInfo
+        #print g.table('chromInfo')
 
-    mirror(g, ['chromInfo', 'cpgIslandExt', 'refGene'], 'sqlite:////tmp/u.db')
+        mirror(g, ['chromInfo', 'cpgIslandExt', 'refGene'], 'sqlite:////tmp/u.db')

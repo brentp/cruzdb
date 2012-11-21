@@ -17,6 +17,19 @@ do the lifiting.
 class CruzException(Exception):
     pass
 
+
+class Interval(object):
+    __slots__ = ('chrom', 'start', 'end')
+    def __init__(self, start, end, chrom=None):
+        self.start, self.end = start, end
+        self.chrom = chrom
+
+    def overlaps(self, other):
+        if self.chrom != other.chrom: return False
+        if self.start > other.end: return False
+        if other.start > self.end: return False
+        return True
+
 class ABase(object):
     _prefix_chain = ("tx", "chrom")
     @declared_attr
@@ -63,6 +76,8 @@ class ABase(object):
         ces[-1] = (ces[-1][0], self.cdsEnd)
         assert all((s < e for s, e in ces))
         return ces
+
+    cdss = cds
 
     @property
     def cds_sequence(self):
@@ -127,11 +142,32 @@ class ABase(object):
         # other feature is on - strand, so this must have higher start
         return self.end <= other.start
 
-    def distance(self, other):
-        if other.start > self.end:
-            return other.start - self.end
-        if self.start > other.end:
-            return self.start - other.end
+    def features(self, other_start, other_end):
+        """
+        return e.g. "intron;exon" if the other_start, end overlap introns and
+        exons
+        """
+        other = Interval(other_start, other_end)
+        ovls = []
+        for ftype in ('introns', 'exons', 'utr5', 'utr3', 'cdss'):
+            feats = getattr(self, ftype)
+            if not isinstance(feats, list): feats = [feats]
+            if any(Interval(f[0], f[1]).overlaps(other) for f in feats):
+                ovls.append(ftype[:-1] if ftype[-1] == 's' else ftype)
+        if 'cds' in ovls: return [ft for ft in ovls if ft != 'exon']
+        return ovls
+
+    def distance(self, other_or_start=None, end=None, features=False):
+        if end is None:
+            assert other_or_start.chrom == self.chrom
+            other_start, other_end = other_or_start.start, other_or_start.end
+        else:
+            other_start, other_end = other_or_start, end
+        if other_start > self.end:
+            return other_start - self.end
+        if self.start > other_end:
+            return self.start - other_end
+        if features: return "+".join(self.features(other_start, other_end))
         return 0
 
     def upstream(self, distance):
@@ -372,8 +408,7 @@ class knownGene(ABase):
 
     @declared_attr
     def kgXref(cls):
-        return relationship("kgXref", backref=backref("knownGene",
-        lazy="dynamic"))
+        return relationship("kgXref", backref=backref("knownGene"), lazy="subquery")
 
     @property
     def name2(self):

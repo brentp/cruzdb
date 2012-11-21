@@ -12,23 +12,29 @@ class Genome(object):
     url = "mysql://%(user)s%(password)s@%(host)s/%(db)s"
     __tables = {}
 
-    def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu", password=""):
-        if db.startswith(("sqlite://", "mysql://", "postgresql://")):
-            self.url = db
-            self.dburl = db
-            self.user = self.host = self.password = ""
-        else:
-            self.db = db
-            if user == "genome" and host != "genome-mysql.cse.ucsc.edu":
-                import getpass
-                user = getpass.getuser()
-            self.host = host
-            self.user = user
-            self.password = (":" + password) if password else ""
-            self.dburl = self.url % dict(db=self.db, user=self.user,
-                host=self.host, password=self.password)
+    def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
+            password="", engine=None):
 
-        self.engine = create_engine(self.dburl)
+        if engine is not None:
+            self.engine = engine
+        else:
+            if db.startswith(("sqlite://", "mysql://", "postgresql://")):
+                self.url = db
+                self.dburl = db
+                self.user = self.host = self.password = ""
+            else:
+                self.db = db
+                if user == "genome" and host != "genome-mysql.cse.ucsc.edu":
+                    import getpass
+                    user = getpass.getuser()
+                self.host = host
+                self.user = user
+                self.password = (":" + password) if password else ""
+                self.dburl = self.url % dict(db=self.db, user=self.user,
+                    host=self.host, password=self.password)
+
+            self.engine = create_engine(self.dburl)
+
 
         self.session, self.Base = initialize_sql(self.engine)
         self.models = __import__("cruzdb.models", globals(), locals(),
@@ -36,7 +42,7 @@ class Genome(object):
 
     def mirror(self, tables, dest_url):
         from mirror import mirror
-        mirror(self, tables, dest_url)
+        return mirror(self, tables, dest_url)
 
     def _map(self, table):
         # if the table hasn't been mapped, do so here.
@@ -71,14 +77,13 @@ class Genome(object):
             table = getattr(self, table)
         tbl = table.table()
 
-        q = table
-        q = q.filter(tbl.c.chrom == chrom)
+        q = table.filter(tbl.c.chrom == chrom)
         if hasattr(tbl.c, "bin"):
             bins = Genome.bins(start, end)
             q = q.filter(tbl.c.bin.in_(bins))
         if hasattr(tbl.c, "txStart"):
-            return q.filter(tbl.c.txStart <= end, tbl.c.txEnd >= start)
-        return q.filter(tbl.c.chromStart <= end, tbl.c.chromEnd >= start)
+            return q.filter(tbl.c.txStart <= end).filter(tbl.c.txEnd >= start)
+        return q.filter(tbl.c.chromStart <= end).filter(tbl.c.chromEnd >= start)
 
     def upstream(self, table, chrom_or_feat, start=None, end=None, k=1):
         res = self.knearest(table, chrom_or_feat, start, end, k, "up")
@@ -120,7 +125,7 @@ class Genome(object):
 
         qstart, qend = start, end
         res = self.bin_query(table, chrom, qstart, qend)
-        change = 300
+        change = 400
         while res.count() < k:
             if _direction in (None, "up"):
                 if qstart == 0 and _direction == "up": break
@@ -129,20 +134,15 @@ class Genome(object):
                 qend += change
             change *= 2
             res = self.bin_query(table, chrom, qstart, qend)
-
         def dist(f):
-
-            if start <= f.start <= end or start <= f.end <= end:
-                d = 0
-            else:
-                d = min(abs(f.start - start),
-                        abs(f.start - end),
-                        abs(f.end - end),
-                        abs(f.end - start))
+            d = 0
+            if start > f.end:
+                d = start - f.end
+            elif f.start > end:
+                d = f.start - end
             # add dist as an attribute to the feature
             f.dist = d
             return d
-
 
         # sort by dist and ...
         res = sorted(res, key=dist)
@@ -150,18 +150,22 @@ class Genome(object):
             return res
 
         if k > len(res): # had to break because of end of chrom
-            k = len(res)
             if k == 0: return []
+            k = len(res)
 
         ndist = res[k - 1].dist
         # include all features that are the same distance as the nth closest
         # feature (accounts for ties).
-        while res[k - 1].dist == ndist and k < len(res):
+        while k < len(res) and res[k].dist == ndist:
             k = k + 1
         return res[:k]
 
     def sql(self, query):
         return self.engine.execute(query)
+
+    def annotate(self, fname, tables):
+        from .annotate import annotate
+        return annotate(self, fname, tables)
 
     @staticmethod
     def bins(start, end):
@@ -176,7 +180,7 @@ class Genome(object):
         start = start >> binFirstShift
         end = (end - 1)  >> binFirstShift
 
-        bins = []
+        bins = [1]
         for offset in offsets:
             bins.extend(range(offset + start, offset + end + 1))
             start >>= binNextShift
