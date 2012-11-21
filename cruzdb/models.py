@@ -393,6 +393,9 @@ class SNP(ABase):
             dict(autoload=True),)
     # can't add name or it gives error on select.
     #name = Column(String, unique=False)
+    @property
+    def name2(self):
+        return self.name + (("-" + self.func) if self.func != "unknown" else "")
 
 class chromInfo(ABase):
     def __repr__(self):

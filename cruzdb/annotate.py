@@ -18,7 +18,8 @@ def annotate(g, fname, tables):
         for tbl in tables:
             objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
             gp = objs[0].is_gene_pred
-            toks.append(";".join(o.name for o in objs))
+            print tbl
+            toks.append(";".join(o.gene_name for o in objs))
             toks.append(";".join(str(o.distance(f, features=gp)) for o in objs))
         print "\t".join(toks)
 
