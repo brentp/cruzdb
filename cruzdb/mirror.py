@@ -10,7 +10,8 @@ import os
 
 
 def make_session(connection_string):
-    if os.path.exists(connection_string.split("///")[1]) and \
+    if "///" in connection_string and \
+        os.path.exists(connection_string.split("///")[1]) and \
         connection_string.startswith("sqlite"):
             print >>sys.stderr, "attempting to add to existing sqlite database"
     engine = create_engine(connection_string, echo=False, convert_unicode=True)
