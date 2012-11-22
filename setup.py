@@ -3,9 +3,10 @@
 from distutils.core import setup
 
 setup(name='cruzdb',
-      version='0.2',
+      version='0.3',
       description='''Interface to UCSC genomic databases.
-Also allows things like up/downstream queries''',
+Also allows things like up/downstream/k-nearest-neighbor queries and mirroring
+of tables to local sqlite databases''',
       long_description=open('README.rst').read(),
       author='Brent Pedersen',
       author_email='bpederse@gmail.com',
