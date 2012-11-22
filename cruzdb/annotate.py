@@ -20,7 +20,19 @@ def annotate(g, fname, tables):
             objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
             gp = objs[0].is_gene_pred
             names = [o.gene_name for o in objs]
-            dists = [str(o.distance(f, features=gp)) for o in objs]
+            if hasattr(objs[0], 'strand'):
+                strands = [-1 if o.is_upstream_of(f) else 1 for o in objs]
+            else:
+                strands = [1 for o in objs]
+
+            dists = [o.distance(f, features=gp) for o in objs]
+
+            # convert to negative if the feature is upstream of the query
+            for i, s in enumerate(strands):
+                if s == 1: continue
+                if isinstance(dists[i], basestring): continue
+                dists[i] *= -1
+
 
             # keep uniqe name, dist combinations (occurs because of
             # transcripts)
