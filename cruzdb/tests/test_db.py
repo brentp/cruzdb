@@ -196,7 +196,9 @@ class TestDb(unittest.TestCase):
 
         self.assert_(all(d.start <= fm.start for d in down))
 
-
+    def test_dataframe(self):
+        kg = Genome('hg18', host='localhost').dataframe('knownGene', limit=10)
+        assert kg.shape[0] == 10
 
     def test_mirror(self):
 

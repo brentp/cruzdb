@@ -56,7 +56,14 @@ As motivation, here's an example of some of the capabilities::
     >>> print transcript.localize(transcript.cdsStart, cdna=True)
     None
 
-this can be repeated using knownGene annotations by changing 'refGene' to 
+DataFrames
+----------
+... are so in. We can get one from a table as::
+
+   >>> g.dataframe('knownGene', limit=20)
+
+
+All of the above can be repeated using knownGene annotations by changing 'refGene' to 
 'knownGene'. And, it can be done easily for a set of genes.
 
 Spatial

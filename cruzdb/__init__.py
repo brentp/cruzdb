@@ -44,6 +44,19 @@ class Genome(object):
         from mirror import mirror
         return mirror(self, tables, dest_url)
 
+    def dataframe(self, table, limit=None, offset=None):
+        from pandas import DataFrame
+        if isinstance(table, basestring):
+            table = getattr(self, table)
+        records = table.table().select()
+        if not limit is None:
+            records = records.limit(limit)
+        if not offset is None:
+            records = records.offset(offset)
+        records = list(records.execute())
+        cols = [c.name for c in table.table().columns]
+        return DataFrame.from_records(records, columns=cols)
+
     def _map(self, table):
         # if the table hasn't been mapped, do so here.
         #if not table in self.__tables:
