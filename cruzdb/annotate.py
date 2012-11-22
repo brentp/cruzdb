@@ -15,12 +15,21 @@ def annotate(g, fname, tables):
         f.txStart = int(toks[1])
         f.txEnd = int(toks[2])
 
+        sep = "^*^"
         for tbl in tables:
             objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
             gp = objs[0].is_gene_pred
-            print tbl
-            toks.append(";".join(o.gene_name for o in objs))
-            toks.append(";".join(str(o.distance(f, features=gp)) for o in objs))
+            names = [o.gene_name for o in objs]
+            dists = [str(o.distance(f, features=gp)) for o in objs]
+
+            # keep uniqe name, dist combinations (occurs because of
+            # transcripts)
+            name_dists = set(["%s%s%s" % (n, sep, d) \
+                            for (n, d) in zip(names, dists)])
+            name_dists = [nd.split(sep) for nd in name_dists]
+
+            toks.append(";".join(nd[0] for nd in name_dists))
+            toks.append(";".join(nd[1] for nd in name_dists))
         print "\t".join(toks)
 
         if i > 200: break
