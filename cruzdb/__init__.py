@@ -1,5 +1,6 @@
 from init import initialize_sql
 from sqlalchemy import create_engine
+from sqlalchemy import func
 import sys
 
 from tests import test
@@ -139,8 +140,9 @@ class Genome(object):
         else:
             chrom = chrom_or_feat
 
-        qstart, qend = start, end
+        qstart, qend = long(start), long(end)
         res = self.bin_query(table, chrom, qstart, qend)
+
         i, change = 1, 350
         while res.count() < k:
             if _direction in (None, "up"):
@@ -151,6 +153,7 @@ class Genome(object):
             i += 1
             change *= (i + 5)
             res = self.bin_query(table, chrom, qstart, qend)
+
         def dist(f):
             d = 0
             if start > f.end:
@@ -158,11 +161,14 @@ class Genome(object):
             elif f.start > end:
                 d = f.start - end
             # add dist as an attribute to the feature
-            f.dist = d
             return d
 
-        # sort by dist and ...
-        res = sorted(res, key=dist)
+        dists = sorted([(dist(f), f) for f in res])
+        if len(dists) == 0:
+            return []
+
+        dists, res = zip(*dists)
+
         if len(res) == k:
             return res
 
@@ -170,10 +176,10 @@ class Genome(object):
             if k == 0: return []
             k = len(res)
 
-        ndist = res[k - 1].dist
+        ndist = dists[k - 1]
         # include all features that are the same distance as the nth closest
         # feature (accounts for ties).
-        while k < len(res) and res[k].dist == ndist:
+        while k < len(res) and dists[k] == ndist:
             k = k + 1
         return res[:k]
 

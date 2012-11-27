@@ -37,7 +37,7 @@ class ABase(object):
     def __tablename__(cls):
         return cls.__name__
     __table_args__ = {'autoload': True}
-    __mapper_args__= {'always_refresh': True}
+    __mapper_args__= {'always_refresh': False, 'exclude_properties': ['dist', '_dist']}
 
 
     @property
@@ -386,6 +386,7 @@ class ABase(object):
 
 class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
+
 
 class SNP(ABase):
     __table_args__ = (

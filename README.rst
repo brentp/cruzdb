@@ -60,7 +60,7 @@ DataFrames
 ----------
 ... are so in. We can get one from a table as::
 
-   >>> g.dataframe('knownGene', limit=20) # doctest: +ELLIPSIS
+   >>> g.dataframe('knownGene', limit=20) #doctest: +ELLIPSIS
    <class 'pandas.core.frame.DataFrame'>
    Int64Index: 20 entries, 0 to 19
    ...
@@ -75,7 +75,7 @@ Spatial
 k-nearest neighbors, upstream, and downstream searches are available.
 Up and downstream searches use the strand of the query feature to determine the direction:
 
-    >>> nearest = g.knearest("refGene", "chr1", 9444, 9555, k=6)
+    #>>> nearest = g.knearest("refGene", "chr1", 9444, 9555, k=6)
     >>> up_list = g.upstream("refGene", "chr1", 9444, 9555, k=6)
     >>> down_list = g.downstream("refGene", "chr1", 9444, 9555, k=6)
 
@@ -150,10 +150,8 @@ TODO
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
  + histone, cpg, other informative tracks
- + intersect annos with snps
 
- + sphinx docs
- + useful scripts in scripts/ dir
+ + ipython \_repr_html
 
 
 .. _`Genomes Database`: http://genome.ucsc.edu/cgi-bin/hgTables
