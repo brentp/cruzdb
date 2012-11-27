@@ -60,7 +60,10 @@ DataFrames
 ----------
 ... are so in. We can get one from a table as::
 
-   >>> g.dataframe('knownGene', limit=20)
+   >>> g.dataframe('knownGene', limit=20) # doctest: +ELLIPSIS
+   <class 'pandas.core.frame.DataFrame'>
+   Int64Index: 20 entries, 0 to 19
+   ...
 
 
 All of the above can be repeated using knownGene annotations by changing 'refGene' to 
