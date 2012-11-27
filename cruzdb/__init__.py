@@ -180,9 +180,9 @@ class Genome(object):
     def sql(self, query):
         return self.engine.execute(query)
 
-    def annotate(self, fname, tables):
+    def annotate(self, fname, tables, feature_strand=False):
         from .annotate import annotate
-        return annotate(self, fname, tables)
+        return annotate(self, fname, tables, feature_strand)
 
     @staticmethod
     def bins(start, end):
