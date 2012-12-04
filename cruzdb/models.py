@@ -161,9 +161,9 @@ class ABase(object):
     def distance(self, other_or_start=None, end=None, features=False):
         if end is None:
             assert other_or_start.chrom == self.chrom
-            other_start, other_end = other_or_start.start, other_or_start.end
-        else:
-            other_start, other_end = other_or_start, end
+
+        other_start, other_end = get_start_end(other_or_start, end)
+
         if other_start > self.end:
             return other_start - self.end
         if self.start > other_end:
@@ -384,8 +384,33 @@ class ABase(object):
         return local_ps[0] if len(positions) == 1 else local_ps
 
 
+def get_start_end(other_or_start, end):
+    if end is None:
+        other_start, other_end = other_or_start.start, other_or_start.end
+    else:
+        other_start, other_end = other_or_start, end
+    return other_start, other_end
+
 class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
+
+class cpgIslandExt(Feature):
+    def distance(self, other_or_start=None, end=None, features="unused",
+            shore_dist=3000):
+        # leave features kwarg to match signature from Feature.distance
+        if end is None:
+            assert other_or_start.chrom == self.chrom
+        other_start, other_end = get_start_end(other_or_start, end)
+
+        dist = 0
+        if other_start > self.end:
+            dist = other_start - self.end
+        elif self.start > other_end:
+            dist = self.start - other_end
+
+        if dist > 0: dist = str(dist) + ("/shore" if dist <= shore_dist else "")
+        else: dist = "0/island"
+        return dist
 
 
 class SNP(ABase):
