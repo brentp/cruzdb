@@ -58,6 +58,66 @@ class Genome(object):
         cols = [c.name for c in table.table().columns]
         return DataFrame.from_records(records, columns=cols)
 
+    def load_file(self, fname, table=None, sep="\t", bins=False):
+        """
+        use some of the machinery in pandas to load a file into a table
+        """
+        convs = {"#chr": "chrom", "start": "txStart", "end": "txEnd", "chr":
+                "chrom", "pos": "start", "POS": "start"}
+        if table is None:
+            import os.path as op
+            table = op.basename(op.splitext(fname)[0]).replace(".", "_")
+            print >>sys.stderr, "writing to:", table
+
+        from pandas.io import sql
+        import pandas as pa
+
+        needs_name = False
+        for i, chunk in enumerate(pa.read_csv(fname, iterator=True, chunksize=20000, sep=sep)):
+            chunk.columns = [convs.get(k, k) for k in chunk.columns]
+            if not "name" in chunk.columns:
+                needs_name = True
+                chunk['name'] = chunk['chrom']
+            if bins:
+                chunk['bin'] = 1
+            if i == 0 and [] == self.engine.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='%s'" % table).fetchall():
+                schema = sql.get_sqlite_schema(chunk, table)
+                print schema
+                self.engine.execute(schema)
+            elif i == 0:
+                print >>sys.stderr,\
+                        """adding to existing table, you may want to drop first"""
+
+
+
+            tbl = getattr(self, table).table()
+            #wildcards = ','.join(['?'] * len(chunk.columns))
+            #insert_sql = 'INSERT INTO %s VALUES (%s)' % (table, wildcards)
+            cols = chunk.columns
+            data = list(dict(zip(cols, x)) for x in chunk.values)
+            if needs_name:
+                for d in data:
+                    d['name'] = "%s:%s" % (d.get("chrom"), d.get("txStart"))
+            if bins:
+                for d in data:
+                    d['bin'] = max(Genome.bins(int(d["txStart"]), int(d["txEnd"])))
+            self.engine.execute(tbl.insert(), data)
+            self.session.commit()
+            if i > 0:
+                print >>sys.stderr, "writing row:", i * 20000
+        if "txStart" in chunk.columns:
+            if "chrom" in chunk.columns:
+                ssql = """CREATE INDEX "%s.chrom_txStart" ON "%s" (chrom, txStart)""" % (table, table)
+            else:
+                ssql = """CREATE INDEX "%s.txStart" ON "%s" (txStart)""" % (table, table)
+
+            self.engine.execute(ssql)
+        if bins:
+            ssql = """CREATE INDEX "%s.chrom_bin" ON "%s" (chrom, bin)""" % (table, table)
+            self.engine.execute(ssql)
+
+        self.session.commit()
+
     def _map(self, table):
         # if the table hasn't been mapped, do so here.
         #if not table in self.__tables:
@@ -225,12 +285,17 @@ class Genome(object):
 
 if __name__ == "__main__":
     #g = Genome(db="hg18", host="localhost", user="")
-    g = Genome(db="hg18")#, host="localhost", user="")
+    import sys
+    #g = Genome(db="hg18", host="localhost")
+    g = Genome("sqlite:///hg18.db")
 
+    g.load_file('GSM882245.hg18.bed', bins=True)
+
+
+    1/0
     print g.cpgIslandExt[12].bed()
     print g.cpgIslandExt[12].bed('length', 'perCpg')
 
-    import sys
     #sys.exit()
 
     f = g.refGene[19]
