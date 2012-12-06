@@ -28,6 +28,8 @@ class Feature(object):
 
     def __repr__(self):
         fstr = "Feature(%d, %d" % (self.start, self.end)
+        if self.chrom is not None:
+            fstr += ", chrom=%s" % self.chrom
         if self.strand != 0:
             fstr += ", strand=%d" % self.strand
         if len(self.name):
@@ -127,7 +129,7 @@ class Intersecter(object):
     [Feature(0, 10, strand=-1)]
 
     >>> intersecter.knearest(Feature(1, 2), k=2)
-    [Feature(0, 10, strand=-1), Feature(3, 7, strand=1)]
+    [Feature(0, 10, strand=-1), Feature(3, 40, strand=-1), Feature(3, 7, strand=1)]
 
     """
 
@@ -174,7 +176,7 @@ class Intersecter(object):
         """
         intervals = self.intervals[f.chrom]
         iright = binsearch_left_start(intervals, f.start, 0 , len(intervals)) + 1
-        ileft  = binsearch_left_start(intervals, f.start - self.max_len - 1, 0, iright - 1)
+        ileft  = binsearch_left_start(intervals, f.start - self.max_len - 1, 0, 0)
 
         results = [(other, f) for other in intervals[ileft:iright] if other.end < f.start and distance(f, other) != 0]
         results.sort(cmp=_dist_compare)
@@ -248,39 +250,36 @@ class Intersecter(object):
             return self.left(f, n)
         return self.right(f, n)
 
-    def knearest(self, f_or_start, end=None, chrom=None, k=1, inclusive=True):
+    def knearest(self, f_or_start, end=None, chrom=None, k=1):
         """return the n nearest neighbors to the given feature
         f: a Feature object
-        n: the number of features to return
-        inclusive: True/False: other operations search only _around_ the query feature,
-            if inclusive is False, this query will not find a feature that is completely
-            contained within the query feature (this would be desired for up/down stream, 
-            but less intuitive for a neighborhood search
-
-            can nearly always ignore this and leave as True
+        k: the number of features to return
         """
+
+        def filter_feats(intervals, f):
+            feats = sorted((distance(f, iv), iv) for iv in intervals)
+            kk = k
+            while kk < len(feats) and feats[k - 1][0] == feats[kk][0]:
+                kk += 1
+            return [f[1] for f in feats[:kk]]
+
         if end is not None:
             f = Feature(f_or_start, end, chrom=chrom)
         else:
             f = f_or_start
 
-        intervals = self.intervals[f.chrom]
-        ilen = len(intervals)
-        ileft  = binsearch_left_start(intervals, f.start - self.max_len, 0, ilen)
-        iright = binsearch_right_end(intervals, f.end, ileft, ilen)
-        # TODO: if both left and right dists are gt than the last,
-        # then return...
-        # TODO: check k - 1... by keeping distance with feature as in
-        # Genome.knearest
-        1/0
-        while ileft > 0 or iright < ilen:
-            if iright - ileft >= k and distance(f, intervals[iright]) != distance(f, intervals[ileft]):
-                return [ff[1] for ff in sorted([(f, iv) for iv in intervals[ileft:iright]], cmp=_dist_compare)]
-            ileft -= 1
-            iright += 1
-            if ileft == -1: ileft = 0
-            if iright > ilen: iright = ilen
-        return [ff[1] for ff in sorted([(f, iv) for iv in intervals[ileft:iright]], cmp=_dist_compare)]
+        DIST = 10000
+        feats = filter_feats(self.find(f.start - DIST, f.end + DIST, chrom=f.chrom), f)
+        if len(feats) >= k:
+            return feats
+
+        nfeats = k - len(feats)
+        fleft = Feature(f.start - DIST, f.start, chrom=f.chrom)
+        feats.extend(self.left(fleft, n=nfeats))
+
+        fright = Feature(f.end, f.end + DIST, chrom=f.chrom)
+        feats.extend(self.right(fright, n=nfeats))
+        return filter_feats(feats, f)
 
 
 def _dist_compare(a, b):
