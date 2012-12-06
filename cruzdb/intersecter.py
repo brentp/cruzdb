@@ -178,25 +178,24 @@ class Intersecter(object):
         iright = binsearch_left_start(intervals, f.start, 0 , len(intervals)) + 1
         ileft  = binsearch_left_start(intervals, f.start - self.max_len - 1, 0, 0)
 
-        results = [(other, f) for other in intervals[ileft:iright] if other.end < f.start and distance(f, other) != 0]
-        results.sort(cmp=_dist_compare)
-        results = [r[0] for r in results]
-        if len(results) == n: return results
+        results = sorted((distance(other, f), other) for other in intervals[ileft:iright] if other.end < f.start and distance(f, other) != 0)
+        if len(results) == n:
+            return [r[1] for r in results]
 
         # have to do some extra work here since intervals are sorted
         # by starts, and we dont know which end may be around...
         # in this case, we got some extras, just return as many as
         # needed once we see a gap in distances.
         for i in range(n, len(results)):
-            if distance(f, results[i - 1]) != distance(f,  results[i]):
-                return results[:i]
+            if results[i - 1][0] != results[i][0]:
+                return [r[1] for r in results[:i]]
 
-        # here made it all the way to zero.
-        if ileft == 0: return results
+        if ileft == 0:
+            return [r[1] for r in results]
 
         # here, didn't get enough, so move left and try again. 
-        # TODO: add tests for this case..
-        #return results + self.left(Feature(start=f.start - self.max_len - 2, end=f.end), n=n - len(results))
+        1/0
+        results = [r[1] for r in results]
         if len(results) != 0:
             return results + self.left(Feature(start=results[-1].start, end=f.end), n=n - len(results))
         return results + self.left(Feature(start=f.start - 1, end=f.end), n=n - len(results))
@@ -256,20 +255,14 @@ class Intersecter(object):
         k: the number of features to return
         """
 
-        def filter_feats(intervals, f):
-            feats = sorted((distance(f, iv), iv) for iv in intervals)
-            kk = k
-            while kk < len(feats) and feats[k - 1][0] == feats[kk][0]:
-                kk += 1
-            return [f[1] for f in feats[:kk]]
 
         if end is not None:
             f = Feature(f_or_start, end, chrom=chrom)
         else:
             f = f_or_start
 
-        DIST = 10000
-        feats = filter_feats(self.find(f.start - DIST, f.end + DIST, chrom=f.chrom), f)
+        DIST = 20000
+        feats = filter_feats(self.find(f.start - DIST, f.end + DIST, chrom=f.chrom), f, k)
         if len(feats) >= k:
             return feats
 
@@ -279,7 +272,7 @@ class Intersecter(object):
 
         fright = Feature(f.end, f.end + DIST, chrom=f.chrom)
         feats.extend(self.right(fright, n=nfeats))
-        return filter_feats(feats, f)
+        return filter_feats(feats, f, k)
 
 
 def _dist_compare(a, b):
@@ -302,6 +295,13 @@ def distance(f1, f2):
     if f1.end < f2.start: return f2.start - f1.end
     if f2.end < f1.start: return f1.start - f2.end
     return 0
+
+def filter_feats(intervals, f, k):
+    feats = sorted((distance(f, iv), iv) for iv in intervals)
+    kk = k
+    while kk < len(feats) and feats[k - 1][0] == feats[kk][0]:
+        kk += 1
+    return [f[1] for f in feats[:kk]]
 
 if __name__ == "__main__":
     import doctest

@@ -1,8 +1,9 @@
 from cruzdb.models import Feature
 import itertools
-from toolshed import reader
+from toolshed import reader, nopen
+import sys
 
-def annotate(g, fname, tables, feature_strand=False, in_memory=True):
+def annotate(g, fname, tables, feature_strand=False, in_memory=False):
     """
     annotate bed file in fname with tables.
     distances are integers for distance. and intron/exon/utr5 etc for gene-pred
@@ -14,6 +15,8 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=True):
     if in_memory:
         from . intersecter import Intersecter
         intersecters = [Intersecter(list(getattr(g, t).all())) for t in tables]
+    elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 2000:
+        print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
 
     for j, toks in enumerate(reader(fname, header=False)):
         if j == 0 and not (toks[1] + toks[2]).isdigit():
@@ -68,4 +71,4 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=True):
             toks.append(";".join(nd[1] for nd in name_dists))
         print "\t".join(toks)
 
-        if j > 200: break
+        if j > 5000: break
