@@ -8,7 +8,7 @@ class IntervalTree(object):
 
     def __init__(self, intervals, depth=12, minbucket=48, _extent=None, maxbucket=512):
         """
-        `intervals` a list of intervals *with start and stop* attributes.
+        `intervals` a list of intervals *with start and end* attributes.
         `depth`     the depth of the tree
         `minbucket` if any node in the tree has fewer than minbucket
                     elements, make it a leaf node
@@ -38,7 +38,7 @@ class IntervalTree(object):
          [Interval(1, 8), Interval(2, 3), Interval(3, 6)]
 
 
-        any object with start and stop attributes can be used
+        any object with start and end attributes can be used
         in the incoming intervals list.
         """
 
@@ -54,15 +54,15 @@ class IntervalTree(object):
             intervals.sort(key=operator.attrgetter('start'))
 
         left, right = _extent or \
-               (intervals[0].start, max(i.stop for i in intervals))
-        #center = intervals[len(intervals)/ 2].stop
+               (intervals[0].start, max(i.end for i in intervals))
+        #center = intervals[len(intervals)/ 2].end
         center = (left + right) / 2.0
 
         self.intervals = []
         lefts, rights  = [], []
 
         for interval in intervals:
-            if interval.stop < center:
+            if interval.end < center:
                 lefts.append(interval)
             elif interval.start > center:
                 rights.append(interval)
@@ -74,19 +74,19 @@ class IntervalTree(object):
         self.center = center
 
 
-    def find(self, start, stop):
-        """find all elements between (or overlapping) start and stop"""
-        if self.intervals and not stop < self.intervals[0].start:
-            overlapping = [i for i in self.intervals if i.stop >= start
-                                                    and i.start <= stop]
+    def find(self, start, end):
+        """find all elements between (or overlapping) start and end"""
+        if self.intervals and not end < self.intervals[0].start:
+            overlapping = [i for i in self.intervals if i.end >= start
+                                                    and i.start <= end]
         else:
             overlapping = []
 
         if self.left and start <= self.center:
-            overlapping += self.left.find(start, stop)
+            overlapping += self.left.find(start, end)
 
-        if self.right and stop >= self.center:
-            overlapping += self.right.find(start, stop)
+        if self.right and end >= self.center:
+            overlapping += self.right.find(start, end)
 
         return overlapping
 
@@ -100,17 +100,18 @@ class IntervalTree(object):
             for r in self.right: yield r
 
 class Interval(object):
-    __slots__ = ('start', 'stop')
-    def __init__(self, start, stop):
+    __slots__ = ('start', 'end', 'chrom')
+    def __init__(self, start, end, chrom=None):
         self.start = start
-        self.stop  = stop
+        self.end  = end
+        self.chrom = chrom
     def __repr__(self):
-        return "Interval(%i, %i)" % (self.start, self.stop)
+        return "Interval(%i, %i)" % (self.start, self.end)
 
 if __name__ == '__main__':
 
-    def brute_force_find(intervals, start, stop):
-        return [i for i in intervals if i.stop >= start and i.start <= stop]
+    def brute_force_find(intervals, start, end):
+        return [i for i in intervals if i.end >= start and i.start <= end]
 
     import random, time
     def rand():
@@ -133,7 +134,7 @@ if __name__ == '__main__':
     #"""
 
     for i in range(tries):
-        bf = [i for i in intervals if i.stop >= START and i.start <= STOP]
+        bf = [i for i in intervals if i.end >= START and i.start <= STOP]
     btime = time.time() - t
     assert not set(bf).symmetric_difference(res) , (len(bf), len(res), set(bf).difference(res), START, STOP)
     print treetime, btime, btime/treetime
@@ -151,7 +152,7 @@ if __name__ == '__main__':
     assert len(af) == len(bf)
     for a, b in zip(af, bf):
         assert a.start == b.start
-        assert a.stop == b.stop
+        assert a.end == b.end
 
 
     import doctest

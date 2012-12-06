@@ -1,16 +1,17 @@
 import sys
 sys.path.extend([".", "scripts", "cruzdb"])
+import operator
 import random
 from interval_tree import Interval, IntervalTree
-from sorted_search import Intersecter
+from intersecter import Intersecter
 import time
 
 
-N=1000000
-TRIES = 50
+N=500000
+TRIES = 10
 START, STOP = 0, 20000
 
-def rands(n=N, len_range=(200, 1600), start_max=STOP):
+def rands(n=N, len_range=(200, 16000), start_max=STOP):
 
     def rand():
         start = random.randint(1, start_max)
@@ -19,32 +20,31 @@ def rands(n=N, len_range=(200, 1600), start_max=STOP):
     return [rand() for i in xrange(n)]
 
 
-def brute_force_find(intervals, start, stop):
-    return [i for i in intervals if i.stop >= start and i.start <= stop]
+def brute_force_find(intervals, start, end):
+    return [i for i in intervals if i.end >= start and i.start <= end]
 
-def search(tree, start, stop, tries):
+def search(tree, start, end, tries):
 
     t0 = time.time()
     lens = []
     if isinstance(tree, list):
         for i in range(tries):
-            res = brute_force_find(tree, start, stop)
-            #res.sort(key=operator.attrgetter('start'))
-            #lens.append("%i:%s" % (len(res), [x.start for x in res[-1:]]))
-            lens.append(len(res))
+            res = brute_force_find(tree, start, end)
+            res.sort(key=operator.attrgetter('start'))
+            lens.append("%i:%s" % (len(res), [x.start for x in res[-1:]]))
+            #lens.append(len(res))
     else:
         for i in range(tries):
-            res = tree.find(start, stop)
-            #res.sort(key=operator.attrgetter('start'))
-            #lens.append("%i:%s" % (len(res), [x.start for x in res[-1:]]))
-            lens.append(len(res))
+            res = tree.find(start, end)
+            res.sort(key=operator.attrgetter('start'))
+            lens.append("%i:%s" % (len(res), [x.start for x in res[-1:]]))
+            #lens.append(len(res))
     t1 = time.time()
     return res, t1 - t0, lens
 
 
-start_max = 100000000
+start_max = STOP * 3
 while True:
-    start_max *= 2
     intervals = rands(N, start_max = start_max)
     t0 = time.time()
     tree = IntervalTree(intervals)
@@ -67,3 +67,4 @@ while True:
     for tl, bl, il in zip(tree_lens, brute_lens, inter_lens):
         assert tl == bl == il, (tl, bl, il)
     print
+    #start_max *= 2
