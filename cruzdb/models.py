@@ -131,14 +131,14 @@ class ABase(object):
 
     def is_upstream_of(self, other):
         if self.chrom != other.chrom: return None
-        if getattr(other, "strand", None) != "-":
+        if getattr(other, "strand", None) == "+":
             return self.end <= other.start
         # other feature is on - strand, so this must have higher start
         return self.start >= other.end
 
     def is_downstream_of(self, other):
         if self.chrom != other.chrom: return None
-        if getattr(other, "strand", None) != "-":
+        if getattr(other, "strand", None) == "+":
             return self.start >= other.end
         # other feature is on - strand, so this must have higher start
         return self.end <= other.start
@@ -407,10 +407,13 @@ class cpgIslandExt(Feature):
             dist = other_start - self.end
         elif self.start > other_end:
             dist = self.start - other_end
+        assert dist >= 0
 
-        if dist > 0: dist = str(dist) + ("/shore" if dist <= shore_dist else "")
-        else: dist = "0/island"
+        if dist > 0: dist = (dist, "shore" if abs(dist) <= shore_dist else "")
+        else: dist = (0, "island")
         return dist
+
+cpgRafaLab = cpgIslandExt
 
 
 class SNP(ABase):

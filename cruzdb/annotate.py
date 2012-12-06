@@ -29,22 +29,28 @@ def annotate(g, fname, tables, feature_strand=False):
             objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
             gp = objs[0].is_gene_pred
             names = [o.gene_name for o in objs]
-            if not feature_strand and hasattr(objs[0], 'strand'):
+            if feature_strand:
                 strands = [-1 if o.is_upstream_of(f) else 1 for o in objs]
-            elif feature_strand:
-                strands = [-1 if f.is_upstream_of(o) else 1 for o in objs]
             else:
-                strands = [1 for o in objs]
+                strands = [-1 if f.is_upstream_of(o) else 1 for o in objs]
 
+            # dists can be a list of tuples where the 2nd item is something
+            # like 'island' or 'shore'
             dists = [o.distance(f, features=gp) for o in objs]
+            pure_dists = [d[0] if isinstance(d, tuple) else d for d in dists]
 
             # convert to negative if the feature is upstream of the query
             for i, s in enumerate(strands):
                 if s == 1: continue
-                if isinstance(dists[i], basestring): continue
-                dists[i] *= -1
+                if isinstance(pure_dists[i], basestring): continue
+                pure_dists[i] *= -1
 
-
+            for i, (pd, d) in enumerate(zip(pure_dists, dists)):
+                if isinstance(d, tuple):
+                    if d[1] not in ("", None):
+                        dists[i] = "%s/%s" % (pd, d[1])
+                    else:
+                        dists[i] = pd
             # keep uniqe name, dist combinations (occurs because of
             # transcripts)
             name_dists = set(["%s%s%s" % (n, sep, d) \
