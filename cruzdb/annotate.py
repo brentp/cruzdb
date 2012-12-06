@@ -2,7 +2,7 @@ from cruzdb.models import Feature
 import itertools
 from toolshed import reader
 
-def annotate(g, fname, tables, feature_strand=False):
+def annotate(g, fname, tables, feature_strand=False, in_memory=True):
     """
     annotate bed file in fname with tables.
     distances are integers for distance. and intron/exon/utr5 etc for gene-pred
@@ -10,6 +10,10 @@ def annotate(g, fname, tables, feature_strand=False):
     negative if the annotation feature is upstream of the feature in question
     if feature_strand is True, then the distance is negative if t
     """
+
+    if in_memory:
+        from . intersecter import Intersecter
+        intersecters = [Intersecter(list(getattr(g, t).all())) for t in tables]
 
     for j, toks in enumerate(reader(fname, header=False)):
         if j == 0 and not (toks[1] + toks[2]).isdigit():
@@ -25,8 +29,11 @@ def annotate(g, fname, tables, feature_strand=False):
         f.strand = toks[header.index('strand')]
 
         sep = "^*^"
-        for tbl in tables:
-            objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
+        for ti, tbl in enumerate(tables):
+            if in_memory:
+                objs = intersecters[ti].knearest(int(toks[1]), int(toks[2]), chrom=toks[0], k = 1)
+            else:
+                objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
             gp = objs[0].is_gene_pred
             names = [o.gene_name for o in objs]
             if feature_strand:
