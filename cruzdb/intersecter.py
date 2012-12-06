@@ -250,7 +250,7 @@ class Intersecter(object):
         else:
             f = f_or_start
 
-        DIST = 20000
+        DIST = 2000
         feats = filter_feats(self.find(f.start - DIST, f.end + DIST, chrom=f.chrom), f, k)
         if len(feats) >= k:
             return feats
@@ -262,10 +262,6 @@ class Intersecter(object):
         fright = Feature(f.end, f.end + DIST, chrom=f.chrom)
         feats.extend(self.right(fright, n=nfeats))
         return filter_feats(feats, f, k)
-
-
-def _dist_compare(a, b):
-    return cmp(distance(a[0], a[1]), distance(b[0], b[1]))
 
 
 def distance(f1, f2):
