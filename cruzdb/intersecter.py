@@ -5,25 +5,23 @@ class Feature(object):
     """\
     Basic feature, with required integer start and end properties.
     Also accpets optional strand as +1 or -1 (used for up/downstream queries),
-    a name, and any arbitrary data is sent in on the info keyword argument
+    a name
 
     >>> from intersecter import Feature
 
     >>> f1 = Feature(23, 36)
-    >>> f2 = Feature(34, 48, strand=-1, name="fred", info={'chr':12, 'anno':'transposon'})
+    >>> f2 = Feature(34, 48, strand=-1)
     >>> f2
-    Feature(34, 48, strand=-1, name="fred", {'anno': 'transposon', 'chr': 12})
+    Feature(34, 48, strand=-1)
 
     """
-    __slots__ = ("start", "end", "strand", "name", "info", "chrom")
+    __slots__ = ("start", "end", "strand", "chrom")
 
-    def __init__(self, start, end, strand=0, name="", info=None, chrom=None):
+    def __init__(self, start, end, strand=0, chrom=None):
         assert start <= end, "start must be less than end"
         self.start  = start
         self.end   = end
         self.strand = strand
-        self.name   = name
-        self.info   = info
         self.chrom  = chrom
 
     def __repr__(self):
@@ -32,10 +30,6 @@ class Feature(object):
             fstr += ", chrom=%s" % self.chrom
         if self.strand != 0:
             fstr += ", strand=%d" % self.strand
-        if len(self.name):
-            fstr += ', name="' + str(self.name) + '"'
-        if not self.info is None:
-            fstr += ", " + str(self.info)
         fstr += ")"
         return fstr
 
@@ -68,11 +62,11 @@ class Intersecter(object):
     >>> from intersecter import Intersecter, Feature
 
     Add intervals, the only requirement is that the interval have integer
-    start and end attributes. Optional arguments are strand, name, and info.
+    start and end attributes. Optional arguments are strand, and chrom.
 
-    >>> f = Feature(1, 22, strand=-1, name="fred", info={'chr':12, 'anno': 'anything'})
+    >>> f = Feature(1, 22, strand=-1)
     >>> f
-    Feature(1, 22, strand=-1, name="fred", {'anno': 'anything', 'chr': 12})
+    Feature(1, 22, strand=-1)
 
     >>> features = [
     ...            Feature(0, 10, -1),
@@ -141,16 +135,15 @@ class Intersecter(object):
 
     def __init__(self, intervals):
         self.intervals = collections.defaultdict(list)
+        self.max_len = {}
 
         for iv in intervals:
             self.intervals[getattr(iv, "chrom", None)].append(iv)
 
-        self.max_len = 1
         for chrom in self.intervals:
             self.intervals[chrom].sort(key=operator.attrgetter('start'))
+            self.max_len[chrom] = max(1, max([i.end - i.start for i in self.intervals[chrom]]))
 
-        self.max_len = max([i.end - i.start for i in intervals])
-        if self.max_len < 1: self.max_len = 1
 
     def find(self, start, end, chrom=None):
         """Return a object of all stored intervals intersecting between (start, end) inclusive."""
@@ -160,7 +153,7 @@ class Intersecter(object):
         # the query could overlap, we must subtract max_len from the start to get the needed
         # search space. everything else proceeds like a binary search.
         # (but add distance calc for candidates).
-        ileft  = binsearch_left_start(intervals, start - self.max_len, 0, ilen)
+        ileft  = binsearch_left_start(intervals, start - self.max_len[chrom], 0, ilen)
         iright = binsearch_right_end(intervals, end, ileft, ilen)
         query = Feature(start, end)
         # we have to check the distance to make sure we didnt pick up anything 
@@ -176,7 +169,7 @@ class Intersecter(object):
         """
         intervals = self.intervals[f.chrom]
         iright = binsearch_left_start(intervals, f.start, 0 , len(intervals)) + 1
-        ileft  = binsearch_left_start(intervals, f.start - self.max_len - 1, 0, 0)
+        ileft  = binsearch_left_start(intervals, f.start - self.max_len[f.chrom] - 1, 0, 0)
 
         results = sorted((distance(other, f), other) for other in intervals[ileft:iright] if other.end < f.start and distance(f, other) != 0)
         if len(results) == n:
@@ -195,10 +188,6 @@ class Intersecter(object):
 
         # here, didn't get enough, so move left and try again. 
         1/0
-        results = [r[1] for r in results]
-        if len(results) != 0:
-            return results + self.left(Feature(start=results[-1].start, end=f.end), n=n - len(results))
-        return results + self.left(Feature(start=f.start - 1, end=f.end), n=n - len(results))
 
     def right(self, f, n=1):
         """return the nearest n features strictly to the right of a Feature f.
