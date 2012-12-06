@@ -1,4 +1,5 @@
 import operator
+import collections
 
 class Feature(object):
     """\
@@ -14,15 +15,16 @@ class Feature(object):
     Feature(34, 48, strand=-1, name="fred", {'anno': 'transposon', 'chr': 12})
 
     """
-    __slots__ = ("start", "stop", "strand", "name", "info")
+    __slots__ = ("start", "stop", "strand", "name", "info", "chrom")
 
-    def __init__(self, start, stop, strand=0, name="", info=None):
+    def __init__(self, start, stop, strand=0, name="", info=None, chrom=None):
         assert start <= stop, "start must be less than stop"
         self.start  = start
         self.stop   = stop
         self.strand = strand
         self.name   = name
         self.info   = info
+        self.chrom  = chrom
 
     def __repr__(self):
         fstr = "Feature(%d, %d" % (self.start, self.stop)
@@ -121,10 +123,10 @@ class Intersecter(object):
 
     nearest neighbors
     +++++++++++++++++
-    >>> intersecter.nearest_neighbors(Feature(1, 2))
+    >>> intersecter.knearest(Feature(1, 2))
     [Feature(0, 10, strand=-1)]
 
-    >>> intersecter.nearest_neighbors(Feature(1, 2), n=2)
+    >>> intersecter.knearest(Feature(1, 2), k=2)
     [Feature(0, 10, strand=-1), Feature(3, 7, strand=1)]
 
     """
@@ -136,14 +138,21 @@ class Intersecter(object):
     # ---- Basic API --------------------------------------------------
 
     def __init__(self, intervals):
-        self.intervals = intervals
-        self.intervals.sort(key=operator.attrgetter('start'))
+        self.intervals = collections.defaultdict(list)
+
+        for iv in intervals:
+            self.intervals[getattr(iv, "chrom", None)].append(iv)
+
+        self.max_len = 1
+        for chrom in self.intervals:
+            self.intervals[chrom].sort(key=operator.attrgetter('start'))
+
         self.max_len = max([i.stop - i.start for i in intervals])
         if self.max_len < 1: self.max_len = 1
 
-    def find(self, start, stop):
+    def find(self, start, stop, chrom=None):
         """Return a object of all stored intervals intersecting between (start, end) inclusive."""
-        intervals = self.intervals
+        intervals = self.intervals[chrom]
         ilen = len(intervals)
         # NOTE: we only search for starts, since any feature that starts within max_len of
         # the query could overlap, we must subtract max_len from the start to get the needed
@@ -163,7 +172,7 @@ class Intersecter(object):
         f: a Feature object
         n: the number of features to return
         """
-        intervals = self.intervals
+        intervals = self.intervals[f.chrom]
         iright = binsearch_left_start(intervals, f.start, 0 , len(intervals)) + 1
         ileft  = binsearch_left_start(intervals, f.start - self.max_len - 1, 0, iright - 1)
 
@@ -198,7 +207,7 @@ class Intersecter(object):
         f: a Feature object
         n: the number of features to return
         """
-        intervals = self.intervals
+        intervals = self.intervals[f.chrom]
         ilen = len(intervals)
         iright = binsearch_right_stop(intervals, f.stop, 0, ilen)
         results = []
@@ -240,7 +249,7 @@ class Intersecter(object):
             return self.left(f, n)
         return self.right(f, n)
 
-    def nearest_neighbors(self, f, n=1, inclusive=True):
+    def knearest(self, f_or_start, end=None, chrom=None, k=1, inclusive=True):
         """return the n nearest neighbors to the given feature
         f: a Feature object
         n: the number of features to return
@@ -251,7 +260,12 @@ class Intersecter(object):
 
             can nearly always ignore this and leave as True
         """
-        intervals = self.intervals
+        if end is not None:
+            f = Feature(f_or_start, end, chrom=chrom)
+        else:
+            f = f_or_start
+
+        intervals = self.intervals[f.chrom]
         ilen = len(intervals)
         ileft  = binsearch_left_start(intervals, f.start - self.max_len, 0, ilen)
         iright = binsearch_right_stop(intervals, f.stop, ileft, ilen)
@@ -259,7 +273,7 @@ class Intersecter(object):
         # then return...
         # TODO: add tessts for overlaps.
         while ileft > 0 or iright < ilen:
-            if iright - ileft >= n and distance(f, intervals[iright]) != distance(f, intervals[ileft]):
+            if iright - ileft >= k and distance(f, intervals[iright]) != distance(f, intervals[ileft]):
                 return [ff[1] for ff in sorted([(f, iv) for iv in intervals[ileft:iright]], cmp=_dist_compare)]
             ileft -= 1
             iright += 1
