@@ -20,16 +20,36 @@ class CruzException(Exception):
 
 
 class Interval(object):
-    __slots__ = ('chrom', 'start', 'end')
-    def __init__(self, start, end, chrom=None):
+    __slots__ = ('chrom', 'start', 'end', 'name', 'gene_name')
+    def __init__(self, start, end, chrom=None, name=None):
         self.start, self.end = start, end
         self.chrom = chrom
+        self.name = self.gene_name = name
 
     def overlaps(self, other):
         if self.chrom != other.chrom: return False
         if self.start > other.end: return False
         if other.start > self.end: return False
         return True
+
+    def is_upstream_of(self, other):
+        if self.chrom != other.chrom: return None
+        if getattr(other, "strand", None) == "+":
+            return self.end <= other.start
+        # other feature is on - strand, so this must have higher start
+        return self.start >= other.end
+
+    def distance(self, other_or_start=None, end=None, features=False):
+        if end is None:
+            assert other_or_start.chrom == self.chrom
+
+        other_start, other_end = get_start_end(other_or_start, end)
+
+        if other_start > self.end:
+            return other_start - self.end
+        if self.start > other_end:
+            return self.start - other_end
+        return 0
 
 class ABase(object):
     _prefix_chain = ("tx", "chrom")
@@ -38,7 +58,6 @@ class ABase(object):
         return cls.__name__
     __table_args__ = {'autoload': True}
     __mapper_args__= {'always_refresh': False, 'exclude_properties': ['dist', '_dist']}
-
 
     @property
     def is_coding(self):
@@ -425,6 +444,9 @@ class SNP(ABase):
     @property
     def name2(self):
         return self.name + (("-" + self.func) if self.func != "unknown" else "")
+
+    def to_simple(self):
+        return Interval(self.chromStart, self.chromEnd, self.chrom, self.name2)
 
 class chromInfo(ABase):
     def __repr__(self):

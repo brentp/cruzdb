@@ -26,15 +26,14 @@ def quick_mapper(table):
         __table__ = table
     return GenericMapper
 
-def page_query(q, limit=30000):
+def page_query(q, limit=70000):
     offset = 0
     while True:
-        r = False
+        elem = None
         for elem in q.limit(limit).offset(offset):
-           r = True
            yield elem
         offset += limit
-        if not r:
+        if elem is None:
             break
 
 def mirror(genome, tables, connection_string):

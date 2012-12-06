@@ -14,7 +14,13 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
 
     if in_memory:
         from . intersecter import Intersecter
-        intersecters = [Intersecter(list(getattr(g, t).all())) for t in tables]
+        from . mirror import page_query
+        intersecters = []
+        for t in tables:
+            table_iter = page_query(getattr(g, t))
+            intersecters.append(Intersecter(table_iter))
+        #intersecters = [Intersecter(getattr(g, t)) for t in tables]
+
     elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 2000:
         print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
 
@@ -37,7 +43,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
                 objs = intersecters[ti].knearest(int(toks[1]), int(toks[2]), chrom=toks[0], k = 1)
             else:
                 objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
-            gp = objs[0].is_gene_pred
+            gp = hasattr(objs[0], "exonStarts")
             names = [o.gene_name for o in objs]
             if feature_strand:
                 strands = [-1 if o.is_upstream_of(f) else 1 for o in objs]
@@ -71,4 +77,4 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
             toks.append(";".join(nd[1] for nd in name_dists))
         print "\t".join(toks)
 
-        if j > 5000: break
+        if j > 15000: break
