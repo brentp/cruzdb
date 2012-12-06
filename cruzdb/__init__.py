@@ -71,9 +71,10 @@ class Genome(object):
 
         from pandas.io import sql
         import pandas as pa
+        from toolshed import nopen
 
         needs_name = False
-        for i, chunk in enumerate(pa.read_csv(fname, iterator=True, chunksize=20000, sep=sep)):
+        for i, chunk in enumerate(pa.read_csv(nopen(fname), iterator=True, chunksize=20000, sep=sep)):
             chunk.columns = [convs.get(k, k) for k in chunk.columns]
             if not "name" in chunk.columns:
                 needs_name = True
@@ -289,7 +290,9 @@ if __name__ == "__main__":
     #g = Genome(db="hg18", host="localhost")
     g = Genome("sqlite:///hg18.db")
 
-    g.load_file('GSM882245.hg18.bed', bins=True)
+    #g.load_file('GSM882245.hg18.bed', bins=True)
+    g.load_file('http://rafalab.jhsph.edu/CGI/model-based-cpg-islands-hg18.txt',
+            table='cpgRafaLab', bins=True)
 
 
     1/0
