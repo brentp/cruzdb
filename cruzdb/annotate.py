@@ -26,9 +26,11 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
 
     for j, toks in enumerate(reader(fname, header=False)):
         if j == 0 and not (toks[1] + toks[2]).isdigit():
+            header = toks
+            for t in tables:
+                annos = getattr(g, t).first().anno_cols
+                header += ["%s_%s" % (t, a) for a in annos]
 
-            header = toks + ["%s_%s" % nv for nv in itertools.product(tables,
-                                                        ("name", "distance"))]
             print "\t".join(header)
             continue
         f = Feature()
@@ -53,7 +55,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
             # dists can be a list of tuples where the 2nd item is something
             # like 'island' or 'shore'
             dists = [o.distance(f, features=gp) for o in objs]
-            pure_dists = [d[0] if isinstance(d, tuple) else d for d in dists]
+            pure_dists = [d[0] if isinstance(d, (tuple, list)) else d for d in dists]
 
             # convert to negative if the feature is upstream of the query
             for i, s in enumerate(strands):
@@ -63,8 +65,8 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
 
             for i, (pd, d) in enumerate(zip(pure_dists, dists)):
                 if isinstance(d, tuple):
-                    if d[1] not in ("", None):
-                        dists[i] = "%s/%s" % (pd, d[1])
+                    if len(d) > 1:
+                        dists[i] = "%s%s%s" % (pd, sep, sep.join(d[1:]))
                     else:
                         dists[i] = pd
             # keep uniqe name, dist combinations (occurs because of
@@ -73,8 +75,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
                             for (n, d) in zip(names, dists)])
             name_dists = [nd.split(sep) for nd in name_dists]
 
-            toks.append(";".join(nd[0] for nd in name_dists))
-            toks.append(";".join(nd[1] for nd in name_dists))
-        print "\t".join(toks)
+            for i in range(len(name_dists[0])): # iterate over the dist, feature, name cols
 
-        if j > 15000: break
+                toks.append(";".join(nd[i] for nd in name_dists))
+        print "\t".join(toks)

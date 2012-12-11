@@ -18,7 +18,6 @@ do the lifiting.
 class CruzException(Exception):
     pass
 
-
 class Interval(object):
     __slots__ = ('chrom', 'start', 'end', 'name', 'gene_name')
     def __init__(self, start, end, chrom=None, name=None):
@@ -58,6 +57,8 @@ class ABase(object):
         return cls.__name__
     __table_args__ = {'autoload': True}
     __mapper_args__= {'always_refresh': False, 'exclude_properties': ['dist', '_dist']}
+
+    anno_cols = ("name", "distance", "feature")
 
     @property
     def is_coding(self):
@@ -169,6 +170,10 @@ class ABase(object):
         """
         other = Interval(other_start, other_end)
         ovls = []
+        tx = 'txEnd' if self.strand == "-" else 'txStart'
+        if hasattr(self, tx) and other_start <= self.txStart <= other_end and self.txStart != self.txEnd:
+                return ["TSS"]
+        # TODO check txStart == txEnd and return non-coding?
         for ftype in ('introns', 'exons', 'utr5', 'utr3', 'cdss'):
             feats = getattr(self, ftype)
             if not isinstance(feats, list): feats = [feats]
@@ -184,11 +189,11 @@ class ABase(object):
         other_start, other_end = get_start_end(other_or_start, end)
 
         if other_start > self.end:
-            return other_start - self.end
+            return other_start - self.end, "intergenic"
         if self.start > other_end:
-            return self.start - other_end
-        if features: return "+".join(self.features(other_start, other_end))
-        return 0
+            return self.start - other_end, "intergenic"
+        if features: return (0, "+".join(self.features(other_start, other_end)))
+        return (0, "")
 
     def upstream(self, distance):
         """
@@ -414,6 +419,8 @@ class Feature(ABase):
     name = Column(String, unique=True, primary_key=True)
 
 class cpgIslandExt(Feature):
+    anno_cols = ("name", "distance", "feature")
+
     def distance(self, other_or_start=None, end=None, features="unused",
             shore_dist=3000):
         # leave features kwarg to match signature from Feature.distance
@@ -463,6 +470,8 @@ class knownGene(ABase):
     __tablename__ = "knownGene"
 
     __preload_classes__ = ("kgXref",)
+
+    anno_cols = ("name", "distance", "feature")
 
     @declared_attr
     def name(cls):
