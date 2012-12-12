@@ -100,10 +100,8 @@ class ABase(object):
 
     cdss = cds
 
-    @property
-    def cds_sequence(self):
+    def _cds_sequence(self, cds):
         seqs = []
-        cds = self.cds
         if len(cds) == 0: return []
         # grab all the sequences at once to reduce number of requests.
         all_seq = _sequence(self.db, self.chrom, cds[0][0] + 1, cds[-1][1])
@@ -114,6 +112,14 @@ class ABase(object):
         for cstart, cend in cds0:
             seqs.append(all_seq[cstart:cend])
         return seqs
+
+    @property
+    def cds_sequence(self):
+        return self._cds_sequence(self.cds)
+
+    @property
+    def mrna_sequence(self):
+        return self._cds_sequence(self.coding_exons)
 
     @property
     def browser_link(self):
@@ -172,7 +178,7 @@ class ABase(object):
         ovls = []
         tx = 'txEnd' if self.strand == "-" else 'txStart'
         if hasattr(self, tx) and other_start <= self.txStart <= other_end and self.txStart != self.txEnd:
-                return ["TSS"]
+                ovls = ["TSS"]
         # TODO check txStart == txEnd and return non-coding?
         for ftype in ('introns', 'exons', 'utr5', 'utr3', 'cdss'):
             feats = getattr(self, ftype)
@@ -312,12 +318,14 @@ class ABase(object):
         for k in ('chrom', 'start', 'end', 'name', 'score', 'strand'):
             yield str(getattr(self, k, ""))
 
-    def blat(self, db=None, cds_sequence=False):
+    def blat(self, db=None, sequence=None):
         """
         make a request to the genome-browsers BLAT interface
+        sequence is one of None, "mrna", "cds"
         """
         import requests
-        seq = "".join(self.cds_sequence) if cds_sequence else self.sequence()
+        assert sequence in (None, "cds", "mrna")
+        seq = self.sequence() if sequence is None else ("".join(self.cds_sequence if sequence == "cds" else self.mrna_sequence))
         r = requests.post('http://genome.ucsc.edu/cgi-bin/hgBlat',
                 data=dict(db=db or self.db, type="DNA", userSeq=seq, output="html"))
         if "Sorry, no matches found" in r.text:
@@ -336,8 +344,8 @@ class ABase(object):
             f.txEnd = long(hit[8])
             f.strand = hit[6]
             f.identity = float(hit[4].rstrip("%"))
-            f.name = "blat-hit-%i-to-%s" % (i + 1, self.name)
             f.span = int(hit[-1])
+            f.name = "blat-hit-%i-to-%s (%i bases)" % (i + 1, self.gene_name, f.span)
             yield f
 
     @property
@@ -348,11 +356,13 @@ class ABase(object):
         return hasattr(self, "exonStarts")
 
     def bed(self, *attrs, **kwargs):
+        exclude = ("chrom", "start", "end", "txStart", "txEnd", "chromStart",
+                "chromEnd")
         if self.is_gene_pred:
             return self.bed12(**kwargs)
         return "\t".join(map(str, (
-                             [self.chrom, self.start, self.end] +
-                             [getattr(self, attr) for attr in attrs]
+                 [self.chrom, self.start, self.end] +
+                 [getattr(self, attr) for attr in attrs if not attr in exclude]
                          )))
 
 
@@ -479,6 +489,11 @@ class kgXref(ABase):
     __tablename__ = "kgXref"
     kgID = Column(String, primary_key=True)
 
+    def __repr__(self):
+        return "%s(%s/%s)" % (self.__tablename__, self.geneSymbol, self.kgID)
+
+    __str__ = __repr__
+
 
 class Blat(Feature):
 
@@ -493,6 +508,10 @@ class Blat(Feature):
     @property
     def score(self):
         return self.identity
+
+    @property
+    def hit_length(self):
+        return self.span
 
 class knownGene(ABase):
     __tablename__ = "knownGene"
@@ -512,4 +531,6 @@ class knownGene(ABase):
     @property
     def name2(self):
         return self.kgXref.geneSymbol
+
+
 

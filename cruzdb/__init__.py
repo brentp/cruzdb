@@ -248,9 +248,10 @@ class Genome(object):
     def sql(self, query):
         return self.engine.execute(query)
 
-    def annotate(self, fname, tables, feature_strand=False, in_memory=False):
+    def annotate(self, fname, tables, feature_strand=False, in_memory=False,
+            header=None):
         from .annotate import annotate
-        return annotate(self, fname, tables, feature_strand, in_memory)
+        return annotate(self, fname, tables, feature_strand, in_memory, header)
 
     @staticmethod
     def bins(start, end):

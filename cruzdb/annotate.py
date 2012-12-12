@@ -1,9 +1,10 @@
-from cruzdb.models import Feature
+from cruzdb.models import Feature, ABase
 import itertools
 from toolshed import reader, nopen
 import sys
 
-def annotate(g, fname, tables, feature_strand=False, in_memory="auto"):
+def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
+        header=None):
     """
     annotate bed file in fname with tables.
     distances are integers for distance. and intron/exon/utr5 etc for gene-pred
@@ -23,31 +24,34 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto"):
 
     elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 2000:
         print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
+    if header is None:
+        header = []
+    extra_header = []
 
     for j, toks in enumerate(reader(fname, header=False)):
-        if j == 0:
+        if j == 0 and not header:
             if not (toks[1] + toks[2]).isdigit():
                 header = toks
-            else:
-                header = "chrom start end name score strand"
-                print >>sys.stderr, "> assuming feature order is '%s'" % header
-                print >>sys.stderr, "> if not, specify header explicitly"
-                header = header.split()
 
+        if j == 0:
             for t in tables:
                 annos = getattr(g, t).first().anno_cols
-                header += ["%s_%s" % (t, a) for a in annos]
+                extra_header += ["%s_%s" % (t, a) for a in annos]
 
-            print "\t".join(header)
+            print "\t".join(header + extra_header)
 
-            # don't skip if we created our own header.
-            if header == toks:
-                continue
-        f = Feature()
-        f.chrom = toks[0]
-        f.txStart = int(toks[1])
-        f.txEnd = int(toks[2])
-        f.strand = toks[header.index('strand')]
+        if not isinstance(toks, ABase):
+            f = Feature()
+            f.chrom = toks[0]
+            f.txStart = int(toks[1])
+            f.txEnd = int(toks[2])
+            f.strand = toks[header.index('strand')]
+        else:
+            f = toks
+            # for now, use the objects str to get the columns
+            # might want to use getattr on the original cols
+
+            toks = f.bed(*header).split("\t")
 
         sep = "^*^"
         for ti, tbl in enumerate(tables):
