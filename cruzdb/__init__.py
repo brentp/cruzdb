@@ -20,7 +20,8 @@ class Genome(object):
             self.engine = engine
         else:
             if db.startswith(("sqlite://", "mysql://", "postgresql://")):
-                self.url = db
+
+                self.db = self.url = db
                 self.dburl = db
                 self.user = self.host = self.password = ""
             else:
