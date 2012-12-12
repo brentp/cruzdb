@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, Float, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import PrimaryKeyConstraint
@@ -283,7 +283,12 @@ class ABase(object):
         # output something bed-like
         fields = "chrom start end gene_name".split()
         s = "\t".join(map(str, (getattr(self, field) for field in fields)))
-        if hasattr(self, "strand"):
+        if hasattr(self, "score"):
+            s += "\t%.2f" % (self.score)
+            if hasattr(self, "strand"):
+                s += "\t%s" % (self.strand)
+
+        elif hasattr(self, "strand"):
             s += "\t.\t%s" % (self.strand)
         return s
 
@@ -303,27 +308,36 @@ class ABase(object):
                 seqs.append(_sequence(db, self.chrom, start + 1, end))
             return seqs
 
-    def blat(self, db=None):
+    def __iter__(self):
+        for k in ('chrom', 'start', 'end', 'name', 'score', 'strand'):
+            yield str(getattr(self, k, ""))
+
+    def blat(self, db=None, cds_sequence=False):
         """
         make a request to the genome-browsers BLAT interface
         """
         import requests
-        seq = self.sequence()
+        seq = "".join(self.cds_sequence) if cds_sequence else self.sequence()
         r = requests.post('http://genome.ucsc.edu/cgi-bin/hgBlat',
-                data=dict(db=db or self.db, type="DNA", userSeq=seq, output="psl"))
+                data=dict(db=db or self.db, type="DNA", userSeq=seq, output="html"))
         if "Sorry, no matches found" in r.text:
             raise StopIteration
         text = r.text.split("<TT><PRE>")[1].split("</PRE></TT>")[0].strip().split("\n")
         for istart, line in enumerate(text):
             if "-----------" in line: break
         istart += 1
-        for i, hit in enumerate(t.split("\t") for t in text[istart:]):
-            hit = hit[hit.index("YourSeq") + 4:]
-            f = Feature()
-            f.chrom = hit[0]
-            f.txStart = long(hit[2])
-            f.txEnd = long(hit[3])
+        for i, hit in enumerate(t.rstrip("\r\n") for t in text[istart:]):
+            hit = hit.split(" YourSeq ")[1].split()
+            f = Blat()
+            # blat returns results without chr prefix
+            if not hit[5].startswith("chr"): hit[5] = "chr" + hit[5]
+            f.chrom = hit[5]
+            f.txStart = long(hit[7])
+            f.txEnd = long(hit[8])
+            f.strand = hit[6]
+            f.identity = float(hit[4].rstrip("%"))
             f.name = "blat-hit-%i-to-%s" % (i + 1, self.name)
+            f.span = int(hit[-1])
             yield f
 
     @property
@@ -465,6 +479,20 @@ class kgXref(ABase):
     __tablename__ = "kgXref"
     kgID = Column(String, primary_key=True)
 
+
+class Blat(Feature):
+
+    identity = Column(Float)
+    span = Column(Integer)
+
+    def __str__(self):
+        res = Feature.__str__(self).replace("\t.\t", "\t%.1f%%\t" % self.identity)
+        res += "\t%s" % self.span
+        return res
+
+    @property
+    def score(self):
+        return self.identity
 
 class knownGene(ABase):
     __tablename__ = "knownGene"

@@ -3,7 +3,7 @@ import itertools
 from toolshed import reader, nopen
 import sys
 
-def annotate(g, fname, tables, feature_strand=False, in_memory=False):
+def annotate(g, fname, tables, feature_strand=False, in_memory="auto"):
     """
     annotate bed file in fname with tables.
     distances are integers for distance. and intron/exon/utr5 etc for gene-pred
@@ -25,14 +25,24 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False):
         print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
 
     for j, toks in enumerate(reader(fname, header=False)):
-        if j == 0 and not (toks[1] + toks[2]).isdigit():
-            header = toks
+        if j == 0:
+            if not (toks[1] + toks[2]).isdigit():
+                header = toks
+            else:
+                header = "chrom start end name score strand"
+                print >>sys.stderr, "> assuming feature order is '%s'" % header
+                print >>sys.stderr, "> if not, specify header explicitly"
+                header = header.split()
+
             for t in tables:
                 annos = getattr(g, t).first().anno_cols
                 header += ["%s_%s" % (t, a) for a in annos]
 
             print "\t".join(header)
-            continue
+
+            # don't skip if we created our own header.
+            if header == toks:
+                continue
         f = Feature()
         f.chrom = toks[0]
         f.txStart = int(toks[1])
