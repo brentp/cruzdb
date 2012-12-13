@@ -382,7 +382,7 @@ class ABase(object):
                     CMD="Get", ))
         while "Status=WAITING" in r.text:
             print >>sys.stderr, "checking..."
-            time.sleep(4)
+            time.sleep(10)
             r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
                 data=dict(RID=rid, format="Text",
                     CMD="Get", ))
