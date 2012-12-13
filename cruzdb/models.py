@@ -274,7 +274,7 @@ class ABase(object):
         return self.end - self.start
 
     def __cmp__(self, other):
-        if self.chrom != other.chrom: return 0
+        if self.chrom != getattr(other, "chrom", other): return 0
         if self.start < other.start: return -1
         return 1
 
@@ -389,35 +389,18 @@ class ABase(object):
         for rec in _ncbi_parse(r.text):
             yield rec
 
-    def blat(self, db=None, sequence=None):
+    def blat(self, db=None, sequence=None, seq_type="DNA"):
         """
         make a request to the genome-browsers BLAT interface
         sequence is one of None, "mrna", "cds"
         """
-        import requests
+        from . blat_blast import blat, blat_all
         assert sequence in (None, "cds", "mrna")
         seq = self.sequence() if sequence is None else ("".join(self.cds_sequence if sequence == "cds" else self.mrna_sequence))
-        r = requests.post('http://genome.ucsc.edu/cgi-bin/hgBlat',
-                data=dict(db=db or self.db, type="DNA", userSeq=seq, output="html"))
-        if "Sorry, no matches found" in r.text:
-            raise StopIteration
-        text = r.text.split("<TT><PRE>")[1].split("</PRE></TT>")[0].strip().split("\n")
-        for istart, line in enumerate(text):
-            if "-----------" in line: break
-        istart += 1
-        for i, hit in enumerate(t.rstrip("\r\n") for t in text[istart:]):
-            hit = hit.split(" YourSeq ")[1].split()
-            f = Blat()
-            # blat returns results without chr prefix
-            if not hit[5].startswith("chr"): hit[5] = "chr" + hit[5]
-            f.chrom = hit[5]
-            f.txStart = long(hit[7])
-            f.txEnd = long(hit[8])
-            f.strand = hit[6]
-            f.identity = float(hit[4].rstrip("%"))
-            f.span = int(hit[-1])
-            f.name = "blat-hit-%i-to-%s (%i bases)" % (i + 1, self.gene_name, f.span)
-            yield f
+        if isinstance(db, (tuple, list)):
+            return blat_all(seq, self.gene_name, db, seq_type)
+        else:
+            return blat(seq, self.gene_name, db or self.db, seq_type)
 
     @property
     def is_gene_pred(self):
@@ -570,10 +553,11 @@ class Blat(Feature):
 
     identity = Column(Float)
     span = Column(Integer)
+    db = Column(String(6))
 
     def __str__(self):
         res = Feature.__str__(self).replace("\t.\t", "\t%.1f%%\t" % self.identity)
-        res += "\t%s" % self.span
+        res += "\t%s\t%s" % (self.span, self.db)
         return res
 
     @property
