@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, ForeignKey, Float, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import PrimaryKeyConstraint
+import sys
 
 # needed to avoid circular imports
 #CHANGED:from init import Base
@@ -14,6 +15,34 @@ from a UCSC table. It uses sqlalchemy reflection to
 do the lifiting.
 
 """
+
+import re
+from collections import OrderedDict
+
+def _ncbi_parse(html):
+
+    try:
+        info = html.split("Sequences producing significant alignments")[1].split("<tbody>")[1]
+    except IndexError:
+        print >>sys.stderr, html
+        raise
+    info = info.split("</table>")[0]
+    regexp = re.compile(r'<tr>(.+?)(<\/tr>)', re.MULTILINE | re.DOTALL)
+    tdreg = re.compile(r'<td.*?>(.+?)(?:</td>)', re.MULTILINE | re.DOTALL)
+    colnames = ("accession", "org", "description", "max_score", "total_score",
+                    "query_coverage", "e_value", "max_ident", "link")
+    for record in (r.groups(0)[0] for r in regexp.finditer(info)):
+        try:
+            cols = tdreg.findall(record)
+            pcols = [c.split(">")[1].split("<")[0].strip() if "<" in c else c.strip() for c in cols[:-1]]
+            pcols.insert(1, " ".join(pcols[1].replace("PREDICTED: ", "").split(" ")[:2]))
+            try:
+                pcols.append(cols[-1].split("href=")[1].split(">")[0])
+            except IndexError: # no link
+                pcols.append("")
+            yield OrderedDict(zip(colnames, pcols))
+        except:
+            print >>sys.stderr, record
 
 class CruzException(Exception):
     pass
@@ -317,6 +346,48 @@ class ABase(object):
     def __iter__(self):
         for k in ('chrom', 'start', 'end', 'name', 'score', 'strand'):
             yield str(getattr(self, k, ""))
+
+    def ncbi_blast(self, db="nr", megablast=True, sequence=None):
+        import requests
+        requests.defaults.max_retries = 4
+        assert sequence in (None, "cds", "mrna")
+        seq = self.sequence() if sequence is None else ("".join(self.cds_sequence if sequence == "cds" else self.mrna_sequence))
+        r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
+                        timeout=20,
+                        data=dict(
+                            PROGRAM="blastn",
+                            #EXPECT=2,
+                            DESCRIPTIONS=100,
+                            ALIGNMENTS=0,
+                            FILTER="L", # low complexity
+                            CMD="Put",
+                            MEGABLAST=True,
+                            DATABASE=db,
+                            QUERY=">%s\n%s" % (self.name, seq)
+                        )
+                    )
+
+        if not ("RID =" in r.text and "RTOE" in r.text):
+            print >>sys.stderr, "no results"
+            raise StopIteration
+        rid = r.text.split("RID = ")[1].split("\n")[0]
+
+        import time
+        time.sleep(4)
+        print >>sys.stderr, "checking..."
+        r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
+                data=dict(RID=rid, format="Text",
+                    DESCRIPTIONS=100,
+                    DATABASE=db,
+                    CMD="Get", ))
+        while "Status=WAITING" in r.text:
+            print >>sys.stderr, "checking..."
+            time.sleep(4)
+            r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
+                data=dict(RID=rid, format="Text",
+                    CMD="Get", ))
+        for rec in _ncbi_parse(r.text):
+            yield rec
 
     def blat(self, db=None, sequence=None):
         """
