@@ -39,6 +39,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
                 extra_header += ["%s_%s" % (t, a) for a in annos]
 
             print "\t".join(header + extra_header)
+            if header == toks: continue
 
         if not isinstance(toks, ABase):
             f = Feature()
@@ -58,7 +59,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
             if in_memory:
                 objs = intersecters[ti].knearest(int(toks[1]), int(toks[2]), chrom=toks[0], k = 1)
             else:
-                objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k = 1)
+                objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k=1)
             gp = hasattr(objs[0], "exonStarts")
             names = [o.gene_name for o in objs]
             if feature_strand:
