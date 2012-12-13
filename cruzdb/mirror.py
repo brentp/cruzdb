@@ -86,6 +86,7 @@ def mirror(genome, tables, connection_string):
                 records = []
                 print >>sys.stderr, "processing record %i" % i
                 destination.commit()
+        destination.execute(ins, records)
         destination.commit()
 
     from . import Genome
