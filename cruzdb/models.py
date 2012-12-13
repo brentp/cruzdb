@@ -587,5 +587,17 @@ class knownGene(ABase):
     def name2(self):
         return self.kgXref.geneSymbol
 
+    def link(self):
+        l = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_gene=%s&db=%s"
+        return l % (self.name, self.db)
+
+    @property
+    def protein(self):
+        from toolshed import nopen
+        l = "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_do_getProteinSeq=1&hgg_gene="
+        url = l + self.name
+        seq = [x.strip() for x in nopen(url) if x.strip() and
+                not ">" in x]
+        return "".join(seq)
 
 

@@ -155,6 +155,14 @@ class TestDb(unittest.TestCase):
         self.dba = Genome('hg18', host="localhost", user="brentp")
         #self.dbb = Genome('hg19', host="localhost", user="brentp")
 
+    def test_protein(self):
+
+        g = self.dba.knownGene.filter_by(name="uc010ntk.1").first()
+        prot = g.protein
+
+        self.assert_(prot.startswith("MIITQTSHCYMTSLGILFLINILPGTTGQGESRRQEPGDFVKQDIG"), prot)
+        self.assert_(prot.endswith("SAIKGMIRKQ"), prot)
+
     def test_ok(self):
         ga = self.dba.refGene.filter_by(name2="MUC5B").first()
         self.assert_(ga is not None)
