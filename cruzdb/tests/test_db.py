@@ -83,8 +83,8 @@ class TestFeature(unittest.TestCase):
         f.txStart = 135646802
         f.txEnd = 135646832
         r = list(f.blat())
-        self.assert_(str(f.txStart) in repr(r))
-        self.assert_(str(f.txEnd) in repr(r))
+        self.assert_(str(f.txStart) in repr(r), r)
+        self.assert_(str(f.txEnd) in repr(r), r)
 
     def test_downstream(self):
         f = self.f
@@ -114,6 +114,14 @@ class TestBasic(unittest.TestCase):
             self.assert_(len(toks) == 12)
             self.assert_(int(toks[1]) > 10000)
             self.assert_(int(toks[2]) < 20000)
+
+    def test_link(self):
+        feat = self.db.knownGene.first()
+        l = feat.link()
+
+        self.assert_(l == "asdf", l)
+
+
 
     def test_bed_other(self):
         g = self.db
@@ -155,6 +163,9 @@ class TestDb(unittest.TestCase):
         bins = Genome.bins(12345, 56779)
         expected = set([0, 1, 9, 73, 585])
         self.assertEqual(bins, expected)
+
+    def test_tables(self):
+        self.assert_("refGene" in self.dba.tables)
 
     def test_nearest(self):
         from cruzdb.models import Feature

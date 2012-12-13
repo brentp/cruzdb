@@ -1,6 +1,5 @@
 from init import initialize_sql
 from sqlalchemy import create_engine
-from sqlalchemy import func
 import sys
 
 from tests import test
@@ -59,6 +58,11 @@ class Genome(object):
         cols = [c.name for c in table.table().columns]
         return DataFrame.from_records(records, columns=cols)
 
+    @property
+    def tables(self):
+        self.Base.metadata.reflect()
+        return self.Base.metadata.tables.keys()
+
     def load_file(self, fname, table=None, sep="\t", bins=False):
         """
         use some of the machinery in pandas to load a file into a table
@@ -74,6 +78,7 @@ class Genome(object):
         import pandas as pa
         from toolshed import nopen
 
+
         needs_name = False
         for i, chunk in enumerate(pa.read_csv(nopen(fname), iterator=True, chunksize=20000, sep=sep)):
             chunk.columns = [convs.get(k, k) for k in chunk.columns]
@@ -82,7 +87,7 @@ class Genome(object):
                 chunk['name'] = chunk['chrom']
             if bins:
                 chunk['bin'] = 1
-            if i == 0 and [] == self.engine.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='%s'" % table).fetchall():
+            if i == 0 and not table in self.tables:
                 schema = sql.get_sqlite_schema(chunk, table)
                 print schema
                 self.engine.execute(schema)
