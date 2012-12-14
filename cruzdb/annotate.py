@@ -4,7 +4,7 @@ from toolshed import reader, nopen
 import sys
 
 def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
-        header=None):
+        header=None, out=sys.stdout):
     """
     annotate bed file in fname with tables.
     distances are integers for distance. and intron/exon/utr5 etc for gene-pred
@@ -38,7 +38,8 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
                 annos = getattr(g, t).first().anno_cols
                 extra_header += ["%s_%s" % (t, a) for a in annos]
 
-            print "\t".join(header + extra_header)
+            if not header[0].startswith("#"): header[0] = "#" + header[0]
+            print >>out, "\t".join(header + extra_header)
             if header == toks: continue
 
         if not isinstance(toks, ABase):
@@ -46,7 +47,10 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
             f.chrom = toks[0]
             f.txStart = int(toks[1])
             f.txEnd = int(toks[2])
-            f.strand = toks[header.index('strand')]
+            try:
+                f.strand = toks[header.index('strand')]
+            except ValueError:
+                pass
         else:
             f = toks
             # for now, use the objects str to get the columns
@@ -93,4 +97,4 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
             for i in range(len(name_dists[0])): # iterate over the dist, feature, name cols
 
                 toks.append(";".join(nd[i] for nd in name_dists))
-        print "\t".join(toks)
+        print >>out, "\t".join(toks)

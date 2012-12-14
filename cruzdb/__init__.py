@@ -63,7 +63,7 @@ class Genome(object):
         self.Base.metadata.reflect()
         return self.Base.metadata.tables.keys()
 
-    def load_file(self, fname, table=None, sep="\t", bins=False):
+    def load_file(self, fname, table=None, sep="\t", bins=False, indexes=None):
         """
         use some of the machinery in pandas to load a file into a table
         """
@@ -78,13 +78,13 @@ class Genome(object):
         import pandas as pa
         from toolshed import nopen
 
-
         needs_name = False
-        for i, chunk in enumerate(pa.read_csv(nopen(fname), iterator=True, chunksize=20000, sep=sep)):
+        for i, chunk in enumerate(pa.read_csv(nopen(fname), iterator=True,
+            chunksize=20000, sep=sep, encoding="latin-1")):
             chunk.columns = [convs.get(k, k) for k in chunk.columns]
             if not "name" in chunk.columns:
                 needs_name = True
-                chunk['name'] = chunk['chrom']
+                chunk['name'] = chunk.get('chrom', chunk[chunk.columns[0]])
             if bins:
                 chunk['bin'] = 1
             if i == 0 and not table in self.tables:
@@ -95,11 +95,7 @@ class Genome(object):
                 print >>sys.stderr,\
                         """adding to existing table, you may want to drop first"""
 
-
-
             tbl = getattr(self, table).table()
-            #wildcards = ','.join(['?'] * len(chunk.columns))
-            #insert_sql = 'INSERT INTO %s VALUES (%s)' % (table, wildcards)
             cols = chunk.columns
             data = list(dict(zip(cols, x)) for x in chunk.values)
             if needs_name:
@@ -119,6 +115,11 @@ class Genome(object):
                 ssql = """CREATE INDEX "%s.txStart" ON "%s" (txStart)""" % (table, table)
 
             self.engine.execute(ssql)
+        for index in (indexes or []):
+            ssql = """CREATE INDEX "%s.%s" ON "%s" (%s)""" % (table,
+                                index, table, index)
+            self.engine.execute(ssql)
+
         if bins:
             ssql = """CREATE INDEX "%s.chrom_bin" ON "%s" (chrom, bin)""" % (table, table)
             self.engine.execute(ssql)
@@ -254,9 +255,10 @@ class Genome(object):
         return self.engine.execute(query)
 
     def annotate(self, fname, tables, feature_strand=False, in_memory=False,
-            header=None):
+            header=None, out=sys.stdout):
         from .annotate import annotate
-        return annotate(self, fname, tables, feature_strand, in_memory, header)
+        return annotate(self, fname, tables, feature_strand, in_memory, header,
+                out)
 
     @staticmethod
     def bins(start, end):
