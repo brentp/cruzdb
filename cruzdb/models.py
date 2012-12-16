@@ -96,6 +96,14 @@ class ABase(object):
         except AttributeError:
             return False
 
+    def _repr_html_(self):
+        info = dict(db=self.db, start=self.start, end=self.end,
+                chrom=self.chrom)
+
+        info['name'] = self.__class__.name
+        url = "http://genome.ucsc.edu/cgi-bin/hgTracks?position=%(chrom)s:%(start)s-%(end)s&db=%(db)s&%(name)s=full"  % info
+        return "<iframe src='%s' style='margin:0px; border:0; height:500px; width:100%%' ></iframe>" % url
+
     @property
     def exons(self):
         # drop the trailing comma
