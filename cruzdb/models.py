@@ -547,14 +547,6 @@ class chromInfo(ABase):
 
     __str__ = __repr__
 
-class kgXref(ABase):
-    __tablename__ = "kgXref"
-    kgID = Column(String, primary_key=True)
-
-    def __repr__(self):
-        return "%s(%s/%s)" % (self.__tablename__, self.geneSymbol, self.kgID)
-
-    __str__ = __repr__
 
 
 class Blat(Feature):
@@ -576,8 +568,26 @@ class Blat(Feature):
     def hit_length(self):
         return self.span
 
+class kgXref(ABase):
+    __tablename__ = "kgXref"
+
+    kgID = Column(String, primary_key=True)
+
+#    @declared_attr
+#    def kgID(self):
+#        return Column(String, ForeignKey('knownGene.name'), primary_key=True)
+
+
+    def __repr__(self):
+        return "%s(%s/%s)" % (self.__tablename__, self.geneSymbol, self.kgID)
+
+    __str__ = __repr__
+
 class knownGene(ABase):
     __tablename__ = "knownGene"
+
+    __mapper_args__= {'always_refresh': False, 'exclude_properties': ['dist',
+        '_dist']}
 
     __preload_classes__ = ("kgXref",)
 
@@ -585,11 +595,16 @@ class knownGene(ABase):
 
     @declared_attr
     def name(cls):
-        return Column(String, ForeignKey('kgXref.kgID'), primary_key=True)
+        return Column(ForeignKey('kgXref.kgID'), primary_key=True)
 
-    @declared_attr
-    def kgXref(cls):
-        return relationship("kgXref", backref=backref("knownGene"), lazy="subquery")
+    #@declared_attr
+    #def kgXref(cls):
+    #    #return relationship("kgXref", backref=backref("knownGene"), lazy="subquery")
+#
+#        return relationship(lambda: kgXref,
+#                primaryjoin=lambda: knownGene.name==kgXref.kgID,
+#            lazy="subquery")
+            #viewonly=True)
 
     @property
     def name2(self):
