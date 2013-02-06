@@ -17,9 +17,9 @@ do the lifiting.
 """
 
 import re
-from collections import OrderedDict
 
 def _ncbi_parse(html):
+    from collections import OrderedDict
 
     try:
         info = html.split("Sequences producing significant alignments")[1].split("<tbody>")[1]
