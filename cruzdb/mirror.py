@@ -47,14 +47,14 @@ def set_table(genome, table, table_name, connection_string, metadata):
     cols = []
     for i, col in enumerate(table.columns):
         # convert mysql-specific types to varchar
-        print col.name, col.type, isinstance(col.type, ENUM)
+        #print col.name, col.type, isinstance(col.type, ENUM)
         if isinstance(col.type, (LONGBLOB, ENUM)):
 
             if 'sqlite' in connection_string:
                 col.type = VARCHAR()
             elif 'postgres' in connection_string:
                 if isinstance(col.type, ENUM):
-                    print dir(col)
+                    #print dir(col)
                     col.type = PG_ENUM(*col.type.enums, name=col.name,
                         create_type=True)
                 else:
