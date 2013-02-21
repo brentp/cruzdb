@@ -32,13 +32,13 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         if j == 0 and not header:
             if not (toks[1] + toks[2]).isdigit():
                 header = toks
-
         if j == 0:
             for t in tables:
                 annos = getattr(g, t).first().anno_cols
                 extra_header += ["%s_%s" % (t, a) for a in annos]
 
-            if not header[0].startswith("#"): header[0] = "#" + header[0]
+            if 0 != len(header) and not header[0].startswith("#"):
+                header[0] = "#" + header[0]
             print >>out, "\t".join(header + extra_header)
             if header == toks: continue
 
