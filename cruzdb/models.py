@@ -112,6 +112,19 @@ class ABase(object):
         ends = (long(s) for s in self.exonEnds[:-1].split(","))
         return zip(starts, ends)
 
+    def tss(self, up=0, down=0):
+        if not self.is_gene_pred: return None
+        tss = self.txEnd if self.strand == '-' else self.txStart
+        start, end = tss, tss
+        if self.strand == '+':
+            start -= up
+            end += down
+        else:
+            start += up
+            end -= down
+            start, end = end, start
+        return start, end
+
     @property
     def coding_exons(self):
         """
