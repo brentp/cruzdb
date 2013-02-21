@@ -119,7 +119,7 @@ class TestBasic(unittest.TestCase):
         feat = self.db.knownGene.first()
         l = feat.link()
 
-        self.assert_(l == "asdf", l)
+        self.assert_(l == "http://genome.ucsc.edu/cgi-bin/hgGene?hgg_gene=uc001aaa.2&db=hg18", l)
 
 
 
@@ -169,7 +169,7 @@ class TestDb(unittest.TestCase):
 
     def test_bins(self):
         bins = Genome.bins(12345, 56779)
-        expected = set([0, 1, 9, 73, 585])
+        expected = set([1, 9, 73, 585])
         self.assertEqual(bins, expected)
 
     def test_tables(self):

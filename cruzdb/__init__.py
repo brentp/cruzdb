@@ -17,6 +17,10 @@ class Genome(object):
 
         if engine is not None:
             self.engine = engine
+            self.db = db
+            self.host = host
+            self.user = user
+            self.password = password
         else:
             if db.startswith(("sqlite://", "mysql://", "postgresql://")):
 
@@ -264,7 +268,7 @@ class Genome(object):
     @staticmethod
     def bins(start, end):
         if end - start < 536870912:
-            offsets = [585, 73, 9, 1, 0]
+            offsets = [585, 73, 9, 1]
         else:
             raise Exception("not implemented")
             offsets = [4681, 585, 73, 9, 1, 0]
