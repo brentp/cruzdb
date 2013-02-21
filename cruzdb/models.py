@@ -505,7 +505,7 @@ def get_start_end(other_or_start, end):
     return other_start, other_end
 
 class Feature(ABase):
-    name = Column(String, unique=True, primary_key=True)
+    name = Column(String, unique=False, primary_key=True)
 
 class cpgIslandExt(Feature):
     anno_cols = ("name", "distance", "feature")
