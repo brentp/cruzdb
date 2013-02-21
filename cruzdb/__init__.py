@@ -257,8 +257,8 @@ class Genome(object):
     def annotate(self, fname, tables, feature_strand=False, in_memory=False,
             header=None, out=sys.stdout):
         from .annotate import annotate
-        return annotate(self, fname, tables, feature_strand, in_memory, header,
-                out)
+        return annotate(self, fname, tables, feature_strand, in_memory, header=header,
+                out=out)
 
     @staticmethod
     def bins(start, end):
