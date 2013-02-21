@@ -81,7 +81,7 @@ class Genome(object):
 
         needs_name = False
         for i, chunk in enumerate(pa.read_csv(nopen(fname), iterator=True,
-            chunksize=20000, sep=sep, encoding="latin-1")):
+            chunksize=100000, sep=sep, encoding="latin-1")):
             chunk.columns = [convs.get(k, k) for k in chunk.columns]
             if not "name" in chunk.columns:
                 needs_name = True
@@ -108,7 +108,7 @@ class Genome(object):
             self.engine.execute(tbl.insert(), data)
             self.session.commit()
             if i > 0:
-                print >>sys.stderr, "writing row:", i * 20000
+                print >>sys.stderr, "writing row:", i * 100000
         if "txStart" in chunk.columns:
             if "chrom" in chunk.columns:
                 ssql = """CREATE INDEX "%s.chrom_txStart" ON "%s" (chrom, txStart)""" % (table, table)
