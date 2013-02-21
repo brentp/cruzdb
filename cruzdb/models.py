@@ -224,10 +224,13 @@ class ABase(object):
         return e.g. "intron;exon" if the other_start, end overlap introns and
         exons
         """
+        # completely encases gene.
+        if other_start <= self.start and other_end >= self.end:
+            return ['gene']
         other = Interval(other_start, other_end)
         ovls = []
         tx = 'txEnd' if self.strand == "-" else 'txStart'
-        if hasattr(self, tx) and other_start <= self.txStart <= other_end and self.txStart != self.txEnd:
+        if hasattr(self, tx) and other_start <= getattr(self, tx) <= other_end and self.txStart != self.txEnd:
                 ovls = ["TSS"]
         # TODO check txStart == txEnd and return non-coding?
         for ftype in ('introns', 'exons', 'utr5', 'utr3', 'cdss'):
@@ -515,7 +518,7 @@ def get_start_end(other_or_start, end):
     return other_start, other_end
 
 class Feature(ABase):
-    name = Column(String, unique=True, primary_key=True)
+    name = Column(String, unique=False, primary_key=True)
 
 class cpgIslandExt(Feature):
     anno_cols = ("name", "distance", "feature")
