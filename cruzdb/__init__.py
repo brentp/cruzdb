@@ -68,7 +68,8 @@ class Genome(object):
         use some of the machinery in pandas to load a file into a table
         """
         convs = {"#chr": "chrom", "start": "txStart", "end": "txEnd", "chr":
-                "chrom", "pos": "start", "POS": "start"}
+                "chrom", "pos": "start", "POS": "start", "chromStart": "txStart",
+                "chromEnd": "txEnd"}
         if table is None:
             import os.path as op
             table = op.basename(op.splitext(fname)[0]).replace(".", "_")
@@ -100,7 +101,7 @@ class Genome(object):
             data = list(dict(zip(cols, x)) for x in chunk.values)
             if needs_name:
                 for d in data:
-                    d['name'] = "%s:%s" % (d.get("chrom"), d.get("txStart"))
+                    d['name'] = "%s:%s" % (d.get("chrom"), d.get("txStart", d.get("chromStart")))
             if bins:
                 for d in data:
                     d['bin'] = max(Genome.bins(int(d["txStart"]), int(d["txEnd"])))
