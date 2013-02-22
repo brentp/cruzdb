@@ -108,8 +108,15 @@ class ABase(object):
     def exons(self):
         # drop the trailing comma
         if not self.is_gene_pred: return []
-        starts = (long(s) for s in self.exonStarts[:-1].split(","))
-        ends = (long(s) for s in self.exonEnds[:-1].split(","))
+        if hasattr(self, "exonStarts"):
+            starts = (long(s) for s in self.exonStarts[:-1].split(","))
+            ends = (long(s) for s in self.exonEnds[:-1].split(","))
+        else: # it is bed12
+            starts = [self.start + long(s) for s in self.chromStarts[:-1].split(",")]
+            ends = [starts[i] + long(size) for i, size \
+                    in enumerate(self.blockSizes[:-1].split(","))]
+
+
         return zip(starts, ends)
 
     def tss(self, up=0, down=0):
@@ -434,7 +441,7 @@ class ABase(object):
         """
         http://genome.ucsc.edu/FAQ/FAQformat.html#format9
         """
-        return hasattr(self, "exonStarts")
+        return hasattr(self, "exonStarts") or hasattr(self, 'chromStarts')
 
     def bed(self, *attrs, **kwargs):
         exclude = ("chrom", "start", "end", "txStart", "txEnd", "chromStart",
