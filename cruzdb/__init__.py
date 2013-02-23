@@ -2,6 +2,8 @@ from init import initialize_sql
 from sqlalchemy import create_engine
 import sys
 
+class BigException(Exception): pass
+
 from tests import test
 
 def _open(filelike, mode='r'):
@@ -170,7 +172,8 @@ class Genome(object):
         q = table.filter(tbl.c.chrom == chrom)
         if hasattr(tbl.c, "bin"):
             bins = Genome.bins(start, end)
-            q = q.filter(tbl.c.bin.in_(bins))
+            if len(bins) < 100:
+                q = q.filter(tbl.c.bin.in_(bins))
 
         if hasattr(tbl.c, "txStart"):
             return q.filter(tbl.c.txStart <= end).filter(tbl.c.txEnd >= start)
@@ -217,15 +220,18 @@ class Genome(object):
         res = self.bin_query(table, chrom, qstart, qend)
 
         i, change = 1, 350
-        while res.count() < k:
-            if _direction in (None, "up"):
-                if qstart == 0 and _direction == "up": break
-                qstart = max(0, qstart - change)
-            if _direction in (None, "down"):
-                qend += change
-            i += 1
-            change *= (i + 5)
-            res = self.bin_query(table, chrom, qstart, qend)
+        try:
+            while res.count() < k:
+                if _direction in (None, "up"):
+                    if qstart == 0 and _direction == "up": break
+                    qstart = max(0, qstart - change)
+                if _direction in (None, "down"):
+                    qend += change
+                i += 1
+                change *= (i + 5)
+                res = self.bin_query(table, chrom, qstart, qend)
+        except BigException:
+            return []
 
         def dist(f):
             d = 0
@@ -270,8 +276,8 @@ class Genome(object):
         if end - start < 536870912:
             offsets = [585, 73, 9, 1]
         else:
-            raise Exception("not implemented")
-            offsets = [4681, 585, 73, 9, 1, 0]
+            raise BigException
+            offsets = [4681, 585, 73, 9, 1]
         binFirstShift = 17
         binNextShift = 3
 
