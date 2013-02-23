@@ -35,6 +35,12 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
     negative if the annotation feature is upstream of the feature in question
     if feature_strand is True, then the distance is negative if t
     """
+    close = False
+    if isinstance(out, basestring):
+        out = nopen(out, "w")
+        close = True
+
+
     if parallel:
         import multiprocessing
         import signal
@@ -59,17 +65,10 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         p.join()
         return out.name
 
-    close = False
-    if isinstance(out, basestring):
-        out = nopen(out, "w")
-        close = True
-
-
     if isinstance(g, basestring):
         from . import Genome
         g = Genome(g)
     if in_memory:
-        print >>sys.stderr, "reading tables in to memory"
         from . intersecter import Intersecter
         from . mirror import page_query
         intersecters = [] # 1 per table.
