@@ -48,7 +48,8 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
                     print >>out, "\t".join(d.keys())
                     written[0] = True
                 print >>out, "\t".join(d.values())
-
+            os.unlink(fanno)
+            os.unlink(fanno.replace(".anno", ""))
 
         for fchrom, (fout, fanno) in chroms:
             p.apply_async(annotate, args=(g.db, fout.name, tables, feature_strand, True,
