@@ -5,6 +5,7 @@ from cruzdb.models import Feature, ABase
 from toolshed import reader, nopen
 
 def _annotate(args):
+    print args
     try:
         return annotate(*args)
     except:
@@ -26,7 +27,7 @@ def _split_chroms(fname):
     return chroms.items()
 
 def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
-        header=None, out=sys.stdout, parallel=False):
+        header=None, out=sys.stdout, _chrom=None, parallel=False):
     """
     annotate bed file in fname with tables.
     distances are integers for distance. and intron/exon/utr5 etc for gene-pred
@@ -40,17 +41,22 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         p = multiprocessing.Pool(initializer=lambda:
                                 signal.signal(signal.SIGINT, signal.SIG_IGN))
         chroms = _split_chroms(fname)
-        p.map(_annotate, [(g.db, fout.name, tables, feature_strand, True,
-                                 header, fanno) for fchrom, (fout, fanno) in chroms])
-        # iterate over the files and return the value
-        for j, (chrom, (fin, fanno)) in enumerate(chroms):
-            #fanno.close()
-            assert os.path.exists(fanno)
+
+        def write_result(fanno, written=[False]):
             for i, d in enumerate(reader(fanno, header="ordered")):
-                if i == 0 == j: print >>out, "\t".join(d.keys())
+                if i == 0 and written[0] == False:
+                    print >>out, "\t".join(d.keys())
+                    written[0] = True
                 print >>out, "\t".join(d.values())
-            #os.unlink(fanno.name)
-        return
+
+
+        for fchrom, (fout, fanno) in chroms:
+            p.apply_async(annotate, args=(g.db, fout.name, tables, feature_strand, True,
+                                 header, fanno, fchrom),
+                                 callback=write_result)
+        p.close()
+        p.join()
+        return out.name
 
     close = False
     if isinstance(out, basestring):
@@ -66,11 +72,14 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         from . mirror import page_query
         intersecters = [] # 1 per table.
         for t in tables:
-            table_iter = page_query(getattr(g, t))
+            q = getattr(g, t)
+            if _chrom is not None:
+                q = q.filter_by(chrom=_chrom)
+            table_iter = page_query(q)
             intersecters.append(Intersecter(table_iter))
         #intersecters = [Intersecter(getattr(g, t)) for t in tables]
 
-    elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 2000:
+    elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 25000:
         print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
     if header is None:
         header = []
@@ -148,3 +157,4 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
 
     if close:
         out.close()
+    return out.name
