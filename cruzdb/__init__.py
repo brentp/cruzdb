@@ -168,9 +168,9 @@ class Genome(object):
         tbl = table.table()
 
         q = table.filter(tbl.c.chrom == chrom)
-        if hasattr(tbl.c, "bin"):
-            bins = Genome.bins(start, end)
-            q = q.filter(tbl.c.bin.in_(bins))
+        #if hasattr(tbl.c, "bin"):
+        #    bins = Genome.bins(start, end)
+        #    q = q.filter(tbl.c.bin.in_(bins))
 
         if hasattr(tbl.c, "txStart"):
             return q.filter(tbl.c.txStart <= end).filter(tbl.c.txEnd >= start)
@@ -260,10 +260,10 @@ class Genome(object):
         return self.engine.execute(query)
 
     def annotate(self, fname, tables, feature_strand=False, in_memory=False,
-            header=None, out=sys.stdout):
+            header=None, out=sys.stdout, parallel=False):
         from .annotate import annotate
         return annotate(self, fname, tables, feature_strand, in_memory, header=header,
-                out=out)
+                out=out, parallel=parallel)
 
     @staticmethod
     def bins(start, end):
