@@ -69,6 +69,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         from . import Genome
         g = Genome(g)
     if in_memory:
+        print >>sys.stderr, "reading tables in to memory"
         from . intersecter import Intersecter
         from . mirror import page_query
         intersecters = [] # 1 per table.
@@ -121,6 +122,10 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
                 objs = intersecters[ti].knearest(int(toks[1]), int(toks[2]), chrom=toks[0], k = 1)
             else:
                 objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k=1)
+            if len(objs) == 0:
+                print >>out, "\t".join(toks + ["", "", ""])
+                continue
+
             gp = hasattr(objs[0], "exonStarts")
             names = [o.gene_name for o in objs]
             if feature_strand:
