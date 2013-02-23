@@ -156,6 +156,7 @@ class Intersecter(object):
         # the query could overlap, we must subtract max_len from the start to get the needed
         # search space. everything else proceeds like a binary search.
         # (but add distance calc for candidates).
+        if not chrom in self.max_len: return []
         ileft  = binsearch_left_start(intervals, start - self.max_len[chrom], 0, ilen)
         iright = binsearch_right_end(intervals, end, ileft, ilen)
         query = Feature(start, end)
@@ -171,6 +172,8 @@ class Intersecter(object):
         n: the number of features to return
         """
         intervals = self.intervals[f.chrom]
+        if intervals == []: return []
+
         iright = binsearch_left_start(intervals, f.start, 0 , len(intervals)) + 1
         ileft  = binsearch_left_start(intervals, f.start - self.max_len[f.chrom] - 1, 0, 0)
 
@@ -285,7 +288,7 @@ def distance(f1, f2):
     return 0
 
 def filter_feats(intervals, f, k):
-    feats = sorted((distance(f, iv), iv) for iv in intervals)
+    feats = sorted((distance(f, iv), iv) for iv in intervals if iv is not None)
     kk = k
     while kk < len(feats) and feats[k - 1][0] == feats[kk][0]:
         kk += 1
