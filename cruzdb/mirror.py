@@ -21,7 +21,7 @@ def make_session(connection_string):
     engine.connect()
     return Session(), engine
 
-def page_query(q, limit=70000):
+def page_query(q, limit=60000):
     offset = 0
     while True:
         elem = None
@@ -77,6 +77,7 @@ def mirror(genome, tables, connection_string):
     destination, dengine = make_session(connection_string)
     dmeta = MetaData(bind=dengine)
 
+    orig_counts = []
     for table_name in tables:
         # cause it ot be mapped
         table = genome.table(table_name)
@@ -95,7 +96,6 @@ def mirror(genome, tables, connection_string):
         columns = table.columns.keys()
         records = []
         for i, record in enumerate(page_query(getattr(genome, table_name))):
-            #print i, "before"
             data = dict(
                 (str(column), getattr(record, column)) for column in columns
             )
@@ -107,9 +107,15 @@ def mirror(genome, tables, connection_string):
                 destination.commit()
         destination.execute(ins, records)
         destination.commit()
+        orig_counts.append(getattr(genome, table_name).count())
 
     from . import Genome
-    return Genome(engine=dengine)
+    newg = Genome(engine=dengine)
+    new_counts = [getattr(newg, table_name).count() for table_name in tables]
+    for tbl, oc, nc in zip(tables, orig_counts, new_counts):
+        if oc != nc: print >>sys.stderr, "ERROR: mirrored table '%s' has %i \
+            rows while the original had %i" % (tbl, nc, oc)
+    return newg
 
 if __name__ == "__main__":
     if False:
