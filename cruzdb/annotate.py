@@ -73,7 +73,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         from . mirror import page_query
         intersecters = [] # 1 per table.
         for t in tables:
-            q = getattr(g, t)
+            q = getattr(g, t) if isinstance(t, basestring) else t
             if _chrom is not None:
                 q = q.filter_by(chrom=_chrom)
             table_iter = page_query(q)
@@ -91,8 +91,9 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
                 header = toks
         if j == 0:
             for t in tables:
-                annos = getattr(g, t).first().anno_cols
-                extra_header += ["%s_%s" % (t, a) for a in annos]
+                annos = (getattr(g, t) if isinstance(t, basestring) else t).first().anno_cols
+                h = t if isinstance(t, basestring) else t.table().name
+                extra_header += ["%s_%s" % (h, a) for a in annos]
 
             if 0 != len(header) and not header[0].startswith("#"):
                 header[0] = "#" + header[0]
