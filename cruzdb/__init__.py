@@ -133,6 +133,13 @@ class Genome(object):
 
         self.session.commit()
 
+    @staticmethod
+    def david_go(refseq_list, annot=('SP_PIR_KEYWORDS', 'GOTERM_BP_FAT',
+                                        'GOTERM_CC_FAT', 'GOTERM_MF_FAT')):
+        URL = "http://david.abcc.ncifcrf.gov/api.jsp?type=REFSEQ_MRNA&ids=%s&tool=term2term&annot="
+        import webbrowser
+        webbrowser.open(URL % ",".join(set(refseq_list)) + ",".join(annot))
+
     def _map(self, table):
         # if the table hasn't been mapped, do so here.
         #if not table in self.__tables:
