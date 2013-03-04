@@ -62,6 +62,7 @@ DataFrames
 
    >>> df = g.dataframe('knownGene', limit=20) 
    >>> df.columns #doctest: +ELLIPSIS
+   Index([name, chrom, strand, txStart, txEnd, cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, proteinID, alignID], dtype=object)
 
 
 

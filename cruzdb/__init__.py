@@ -1,11 +1,4 @@
-from sqlalchemy.orm import scoped_session, sessionmaker
 import soup
-
-
-msessionmaker = sessionmaker(autoflush=True, expire_on_commit=False, autocommit=False)
-
-from init import initialize_sql
-from sqlalchemy import create_engine
 import sys
 
 class BigException(Exception): pass
