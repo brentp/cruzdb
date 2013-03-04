@@ -17,16 +17,19 @@ def make_session(connection_string):
         connection_string.startswith("sqlite"):
             print >>sys.stderr, "attempting to add to existing sqlite database"
     engine = create_engine(connection_string, echo=False, convert_unicode=True)
-    Session = sessionmaker(bind=engine)
+    Session = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False,
+            autocommit=False)
     engine.connect()
     return Session(), engine
 
-def page_query(q, limit=60000):
+def page_query(q, session, limit=8000):
+    #if q.count() < 80000:
+    #    for rn q.all()
     offset = 0
     while True:
         elem = None
-        for elem in q.limit(limit).offset(offset):
-           yield elem
+        for elem in session.execute(q.offset(offset).limit(limit)):
+            yield elem
         offset += limit
         if elem is None:
             break
@@ -68,6 +71,7 @@ def set_table(genome, table, table_name, connection_string, metadata):
             if str(col.type).lower().startswith("set("):
                 col.type = VARCHAR(15)
         cols.append(col)
+
     table = Table(table_name, genome.Base.metadata, *cols,
             autoload_replace=True, extend_existing=True)
 
@@ -81,7 +85,7 @@ def mirror(genome, tables, connection_string):
     for table_name in tables:
         # cause it ot be mapped
         table = genome.table(table_name)
-        print >>sys.stderr, 'Processing', table_name
+        print >>sys.stderr, 'Mirroring', table_name
 
         table = set_table(genome, table, table_name,
                 connection_string, dmeta)
@@ -95,20 +99,23 @@ def mirror(genome, tables, connection_string):
 
         columns = table.columns.keys()
         records = []
-        for i, record in enumerate(page_query(getattr(genome, table_name))):
+        table_obj = getattr(genome, table_name).table()
+        t = getattr(genome, table_name)
+        for ii, record in enumerate(page_query(table_obj.select(), t.session)):
             data = dict(
                 (str(column), getattr(record, column)) for column in columns
             )
             records.append(data)
-            if 0 == i % 30000:
+            if ii % 20000 == 0 and ii > 0:
                 destination.execute(ins, records)
-                records = []
-                print >>sys.stderr, "processing record %i" % i
+                print >>sys.stderr, "processing record %i" % ii
                 destination.commit()
+                records = []
         destination.execute(ins, records)
         destination.commit()
         orig_counts.append(getattr(genome, table_name).count())
 
+    destination, dengine = make_session(connection_string)
     from . import Genome
     newg = Genome(engine=dengine)
     new_counts = [getattr(newg, table_name).count() for table_name in tables]
