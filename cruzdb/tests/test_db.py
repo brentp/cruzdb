@@ -105,7 +105,7 @@ class TestBasic(unittest.TestCase):
         g = Genome('hg19', host="localhost", user="brentp")
         from sqlalchemy import and_
         from cStringIO import StringIO
-        query = g.knownGene.filter(and_(g.table('knownGene').c.txStart > 10000, g.table('knownGene').c.txEnd < 20000))
+        query = g.knownGene.filter(and_(g.knownGene.txStart > 10000, g.knownGene.txEnd < 20000))
         c = StringIO()
         Genome.save_bed(query, c)
         c.seek(0)
@@ -153,7 +153,7 @@ class TestGene(unittest.TestCase):
 class TestDb(unittest.TestCase):
     def setUp(self):
         self.dba = Genome('hg18', host="localhost", user="brentp")
-        #self.dbb = Genome('hg19', host="localhost", user="brentp")
+        self.dbb = Genome('hg19', host="localhost", user="brentp")
 
     def test_protein(self):
 
@@ -173,7 +173,8 @@ class TestDb(unittest.TestCase):
         self.assertEqual(bins, expected)
 
     def test_tables(self):
-        self.assert_("refGene" in self.dba.tables)
+        self.dba.refGene
+        self.assert_("refGene" in self.dba.tables, self.dba.tables)
 
     def test_nearest(self):
         from cruzdb.models import Feature
@@ -199,7 +200,7 @@ class TestDb(unittest.TestCase):
                     (res, f))
 
 
-        f = db.refGene.order_by(db.refGene.table().c.txStart).filter(db.refGene.table().c.strand == "+").first()
+        f = db.refGene.order_by(db.refGene.txStart).filter(db.refGene.c.strand == "+").first()
         assert f in db.upstream(db.refGene, f)
 
         down = db.downstream(db.refGene, f, k=10)
@@ -210,7 +211,7 @@ class TestDb(unittest.TestCase):
 
     def test_down_neg(self):
         db = self.dba
-        fm = db.refGene.filter(db.refGene.table().c.strand == "-").first()
+        fm = db.refGene.filter(db.refGene.c.strand == "-").first()
         down = db.downstream(db.refGene, fm, k=10)
 
         self.assert_(all(d.start <= fm.start for d in down))

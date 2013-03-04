@@ -60,10 +60,9 @@ DataFrames
 ----------
 ... are so in. We can get one from a table as::
 
-   >>> g.dataframe('knownGene', limit=20) #doctest: +ELLIPSIS
-   <class 'pandas.core.frame.DataFrame'>
-   Int64Index: 20 entries, 0 to 19
-   ...
+   >>> df = g.dataframe('knownGene', limit=20) 
+   >>> df.columns #doctest: +ELLIPSIS
+
 
 
 All of the above can be repeated using knownGene annotations by changing 'refGene' to 
@@ -96,11 +95,11 @@ any tables from UCSC to a local sqlite database via:
 
 
    >>> gs = g.mirror(['chromInfo'], 'sqlite:////tmp/u.db')
-   Processing chromInfo
 
 and then use as:
 
-   >>> gs = Genome('sqlite:////tmp/u.db')
+   >>> gs.chromInfo
+   <class 'cruzdb.sqlsoup.chromInfo'>
 
 
 Code
@@ -150,8 +149,6 @@ TODO
  + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
  + simple name lookup/conversion ens -> hugo, etc.
  + histone, cpg, other informative tracks
-
- + ipython \_repr_html
 
 
 .. _`Genomes Database`: http://genome.ucsc.edu/cgi-bin/hgTables

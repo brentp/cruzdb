@@ -1,3 +1,9 @@
+from sqlalchemy.orm import scoped_session, sessionmaker
+import soup
+
+
+msessionmaker = sessionmaker(autoflush=True, expire_on_commit=False, autocommit=False)
+
 from init import initialize_sql
 from sqlalchemy import create_engine
 import sys
@@ -10,42 +16,35 @@ def _open(filelike, mode='r'):
     if hasattr(filelike, 'read'): return filelike
     return open(filelike, mode)
 
-class Genome(object):
+class Genome(soup.Genome):
     url = "mysql://%(user)s%(password)s@%(host)s/%(db)s"
-    __tables = {}
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
             password="", engine=None):
 
-        if engine is not None:
-            self.engine = engine
+        self.create_url(db, user, host, password)
+        soup.Genome.__init__(self, self.dburl)
+        self.session.autoflush = False
+
+    def create_url(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
+        password=""):
+
+        if db.startswith(("sqlite://", "mysql://", "postgresql://")):
+
+            self.db = self.url = db
+            self.dburl = db
+            self.user = self.host = self.password = ""
+        else:
             self.db = db
+            if user == "genome" and host != "genome-mysql.cse.ucsc.edu":
+                import getpass
+                user = getpass.getuser()
             self.host = host
             self.user = user
-            self.password = password
-        else:
-            if db.startswith(("sqlite://", "mysql://", "postgresql://")):
+            self.password = (":" + password) if password else ""
+            self.dburl = self.url % dict(db=self.db, user=self.user,
+                host=self.host, password=self.password)
 
-                self.db = self.url = db
-                self.dburl = db
-                self.user = self.host = self.password = ""
-            else:
-                self.db = db
-                if user == "genome" and host != "genome-mysql.cse.ucsc.edu":
-                    import getpass
-                    user = getpass.getuser()
-                self.host = host
-                self.user = user
-                self.password = (":" + password) if password else ""
-                self.dburl = self.url % dict(db=self.db, user=self.user,
-                    host=self.host, password=self.password)
-
-            self.engine = create_engine(self.dburl)
-
-
-        self.session, self.Base = initialize_sql(self.engine)
-        self.models = __import__("cruzdb.models", globals(), locals(),
-                [], -1).models
 
     def mirror(self, tables, dest_url):
         from mirror import mirror
@@ -55,19 +54,18 @@ class Genome(object):
         from pandas import DataFrame
         if isinstance(table, basestring):
             table = getattr(self, table)
-        records = table.table().select()
+        records = table._table.select()
         if not limit is None:
             records = records.limit(limit)
         if not offset is None:
             records = records.offset(offset)
         records = list(records.execute())
-        cols = [c.name for c in table.table().columns]
+        cols = [c.name for c in table._table.columns]
         return DataFrame.from_records(records, columns=cols)
 
     @property
     def tables(self):
-        self.Base.metadata.reflect()
-        return self.Base.metadata.tables.keys()
+        return self._cache.keys()
 
     def load_file(self, fname, table=None, sep="\t", bins=False, indexes=None):
         """
@@ -102,7 +100,7 @@ class Genome(object):
                 print >>sys.stderr,\
                         """adding to existing table, you may want to drop first"""
 
-            tbl = getattr(self, table).table()
+            tbl = getattr(self, table)._table
             cols = chunk.columns
             data = list(dict(zip(cols, x)) for x in chunk.values)
             if needs_name:
@@ -140,41 +138,10 @@ class Genome(object):
         import webbrowser
         webbrowser.open(URL % ",".join(set(refseq_list)) + ",".join(annot))
 
-    def _map(self, table):
-        # if the table hasn't been mapped, do so here.
-        #if not table in self.__tables:
-        if not table in self.Base.metadata.tables:
-            # make a new class
-            try:
-                klass = getattr(self.models, table, None)
-                for k in getattr(klass, "__preload_classes__", []):
-                    self._map(k)
-                self.__tables[table] = type(table, (self.Base, getattr(self.models, table)), {})
-            except Exception:
-                if klass is not None:
-                    raise
-                if table.startswith('snp'):
-                    self.__tables[table] = type(table, (self.Base, getattr(self.models, 'SNP')), {})
-                else:
-                    self.__tables[table] = type(table, (self.Base,
-                        self.models.Feature), {})
-        return self.__tables[table]
-
-    def __getattr__(self, table):
-        self._map(table)
-        mapped = self.session.query(self.__tables[table])
-        mapped.table = lambda : self.table(table)
-        mapped.orm = lambda : self._map(table)
-        return mapped
-
-    def table(self, table):
-        self._map(table)
-        return self.Base.metadata.tables[table]
-
     def bin_query(self, table, chrom, start, end):
         if isinstance(table, basestring):
             table = getattr(self, table)
-        tbl = table.table()
+        tbl = table._table
 
         q = table.filter(tbl.c.chrom == chrom)
 
@@ -319,16 +286,17 @@ if __name__ == "__main__":
     g = Genome("sqlite:///hg18.db")
 
     #g.load_file('GSM882245.hg18.bed', bins=True)
-    g.load_file('http://rafalab.jhsph.edu/CGI/model-based-cpg-islands-hg18.txt',
-            table='cpgRafaLab', bins=True)
+    #g.load_file('http://rafalab.jhsph.edu/CGI/model-based-cpg-islands-hg18.txt',
+    #        table='cpgRafaLab', bins=True)
 
 
-    1/0
+    #1/0
     print g.cpgIslandExt[12].bed()
     print g.cpgIslandExt[12].bed('length', 'perCpg')
 
     #sys.exit()
 
+    print "refGene"
     f = g.refGene[19]
     print f.bed12()
     f = g.refGene[19]
@@ -347,41 +315,37 @@ if __name__ == "__main__":
     #print f.cds_sequence
     import time
     from sqlalchemy import and_
-    query = g.refGene.filter(and_(g.table('refGene').c.txStart > 10000, g.table('refGene').c.txEnd < 40000))
+    query = g.refGene.filter(and_(g.refGene.txStart > 10000, g.refGene.txEnd < 40000))
     t = time.time()
+    print query
     query.all()
     print time.time() - t
 
-    query = g.refGene.filter(and_(g.table('refGene').c.txStart > 10000, g.table('refGene').c.txEnd < 40000))
-    query = query.filter(g.table('refGene').c.bin.in_(Genome.bins(10000,
-        40000)))
+    query = g.refGene.filter(and_(g.refGene.txStart > 10000, g.refGene.txEnd < 40000))
+    query = query.filter(g.refGene.bin.in_(Genome.bins(10000, 40000)))
 
     t = time.time()
     query = g.bin_query(g.refGene, "chr1", 10000, 40000)
 
     query.all()
     print time.time() - t
-    1/0
 
 
     g = Genome('hg19')
     t = time.time()
     q = g.snp135Common
-    q = q.filter(q.table.c.bin.in_(Genome.bins(1000, 2000)))
+    q = q.filter(q.bin.in_(Genome.bins(1000, 2000)))
     print q
     q.first()
     print time.time() - t
 
-    #Genome.save_bed(query)
-    1/0
+    Genome.save_bed(query)
 
-    """
     for transcript in g.refGene:
         print transcript, transcript.sequence()[:100] + "..."
         if transcript.txEnd > 8000: break
-    """
 
-    kg = g.table('refGene')
+    kg = g.refGene._table
     q = kg.select(kg.c.txStart < 5000)
 
     print list(g.session.execute(q))

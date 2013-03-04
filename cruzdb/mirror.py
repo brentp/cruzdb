@@ -39,10 +39,10 @@ def set_table(genome, table, table_name, connection_string, metadata):
     alter the table to work between different
     dialects
     """
-    table = Table(table_name, genome.Base.metadata, autoload=True,
-                    autoload_with=genome.engine, extend_existing=True)
+    table = Table(table_name, genome._metadata, autoload=True,
+                    autoload_with=genome.bind, extend_existing=True)
 
-    print "\t".join([c.name for c in table.columns])
+    #print "\t".join([c.name for c in table.columns])
     # need to prefix the indexes with the table name to avoid collisions
     for i, idx in enumerate(table.indexes):
         idx.name = table_name + "." + idx.name + "_ix" + str(i)
@@ -72,7 +72,7 @@ def set_table(genome, table, table_name, connection_string, metadata):
                 col.type = VARCHAR(15)
         cols.append(col)
 
-    table = Table(table_name, genome.Base.metadata, *cols,
+    table = Table(table_name, genome._metadata, *cols,
             autoload_replace=True, extend_existing=True)
 
     return table
@@ -84,7 +84,7 @@ def mirror(genome, tables, connection_string):
     orig_counts = []
     for table_name in tables:
         # cause it ot be mapped
-        table = genome.table(table_name)
+        table = getattr(genome, table_name)._table
         print >>sys.stderr, 'Mirroring', table_name
 
         table = set_table(genome, table, table_name,
@@ -99,7 +99,7 @@ def mirror(genome, tables, connection_string):
 
         columns = table.columns.keys()
         records = []
-        table_obj = getattr(genome, table_name).table()
+        table_obj = getattr(genome, table_name)._table
         t = getattr(genome, table_name)
         for ii, record in enumerate(page_query(table_obj.select(), t.session)):
             data = dict(
@@ -117,7 +117,7 @@ def mirror(genome, tables, connection_string):
 
     destination, dengine = make_session(connection_string)
     from . import Genome
-    newg = Genome(engine=dengine)
+    newg = Genome(connection_string)
     new_counts = [getattr(newg, table_name).count() for table_name in tables]
     for tbl, oc, nc in zip(tables, orig_counts, new_counts):
         if oc != nc: print >>sys.stderr, "ERROR: mirrored table '%s' has %i \
@@ -125,10 +125,8 @@ def mirror(genome, tables, connection_string):
     return newg
 
 if __name__ == "__main__":
-    if False:
+    if True:
         from cruzdb import Genome
-        g = Genome('hg18', host="localhost", user="brentp")
-        #print g.chromInfo
-        #print g.table('chromInfo')
+        g = Genome('hg18')
 
-        mirror(g, ['chromInfo', 'cpgIslandExt', 'refGene'], 'sqlite:////tmp/u.db')
+        mirror(g, ['chromInfo'], 'sqlite:////tmp/u.db')

@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, ForeignKey, Float, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import PrimaryKeyConstraint
+
 import sys
 
 # needed to avoid circular imports
@@ -346,7 +347,7 @@ class ABase(object):
     def db(self):
         # grab the database name from the current row
         # e.g. hg18
-        return self.metadata.bind.url.database
+        return self._table.bind.url.database
 
     def __str__(self):
         # output something bed-like
