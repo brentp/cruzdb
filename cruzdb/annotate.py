@@ -26,7 +26,7 @@ def _split_chroms(fname):
         chroms[k] = (chroms[k], chroms[k].name + ".anno")
     return chroms.items()
 
-def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
+def annotate(g, fname, tables, feature_strand=False, in_memory=False,
         header=None, out=sys.stdout, _chrom=None, parallel=False):
     """
     annotate bed file in fname with tables.
@@ -70,15 +70,13 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
         g = Genome(g)
     if in_memory:
         from . intersecter import Intersecter
-        from . mirror import page_query
         intersecters = [] # 1 per table.
         for t in tables:
             q = getattr(g, t) if isinstance(t, basestring) else t
             if _chrom is not None:
                 q = q.filter_by(chrom=_chrom)
-            table_iter = page_query(q)
+            table_iter = q #page_query(q, g.session)
             intersecters.append(Intersecter(table_iter))
-        #intersecters = [Intersecter(getattr(g, t)) for t in tables]
 
     elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 25000:
         print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
@@ -115,7 +113,6 @@ def annotate(g, fname, tables, feature_strand=False, in_memory="auto",
             # might want to use getattr on the original cols
 
             toks = f.bed(*header).split("\t")
-
         sep = "^*^"
         for ti, tbl in enumerate(tables):
             if in_memory:

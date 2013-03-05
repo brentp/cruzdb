@@ -137,12 +137,8 @@ class Intersecter(object):
         self.intervals = collections.defaultdict(list)
         self.max_len = {}
 
-        to_simple = False
         for i, iv in enumerate(intervals):
-            if i == 0:
-                to_simple = hasattr(iv, "to_simple")
-            self.intervals[iv.chrom].append(iv.to_simple() if to_simple else iv)
-
+            self.intervals[iv.chrom].append(iv)
         for chrom in self.intervals:
             self.intervals[chrom].sort(key=operator.attrgetter('start'))
             self.max_len[chrom] = max(1, max([i.end - i.start for i in self.intervals[chrom]]))
