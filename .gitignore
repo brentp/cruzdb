@@ -1,5 +1,6 @@
 *.pyc
 *.egg-info
+*.db
 build/
 dist/
 MANIFEST

@@ -1,0 +1,139 @@
+Central corneal thickness	0.666666666667	9	6
+Treatment response for severe sepsis	0.625	8	5
+Alcoholism (heaviness of drinking)	0.625	8	5
+Economic and political preferences (environmentalism)	0.619047619048	21	13
+Inattentive symptoms	0.6	15	9
+Stroke (ischemic)	0.6	10	6
+RR interval (heart rate)	0.56	25	14
+Autism	0.555555555556	9	5
+Insomnia (caffeine-induced)	0.555555555556	9	5
+Economic and political preferences (feminism/equality)	0.5	12	6
+Endometriosis	0.5	14	7
+Brain imaging	0.5	10	5
+Epilepsy (generalized)	0.5	10	5
+Lentiform nucleus volume	0.5	14	7
+Attention deficit hyperactivity disorder and conduct disorder	0.5	26	13
+Heart failure	0.470588235294	17	8
+Non-alcoholic fatty liver disease histology (other)	0.466666666667	15	7
+Response to citalopram treatment	0.458333333333	24	11
+Response to antidepressant treatment	0.454545454545	22	10
+Capecitabine sensitivity	0.44	25	11
+HIV-1 viral setpoint	0.428571428571	14	6
+Cognitive test performance	0.428571428571	14	6
+Response to amphetamines	0.406593406593	91	37
+Hemostatic factors and hematological phenotypes	0.4	30	12
+Bone mineral density (hip)	0.392857142857	28	11
+Dupuytren's disease	0.384615384615	13	5
+Atrial fibrillation	0.380952380952	21	8
+Visceral adipose tissue/subcutaneous adipose tissue ratio	0.380952380952	42	16
+Pancreatic cancer	0.375	32	12
+Periodontal microbiota	0.375	16	6
+Response to taxane treatment (docetaxel)	0.375	16	6
+Sudden cardiac arrest	0.372549019608	51	19
+Select biomarker traits	0.368421052632	19	7
+Information processing speed	0.36	25	9
+Response to statin therapy	0.358974358974	39	14
+Hyperactive-impulsive symptoms	0.357142857143	14	5
+Eosinophilic esophagitis (pediatric)	0.357142857143	14	5
+Conduct disorder (symptom count)	0.357142857143	14	5
+Immune reponse to smallpox (secreted IL-2)	0.352941176471	17	6
+Fasting insulin-related traits (interaction with BMI)	0.35	20	7
+Erectile dysfunction and prostate cancer treatment	0.347826086957	23	8
+D-dimer levels	0.333333333333	15	5
+Economic and political preferences (immigration/crime)	0.333333333333	15	5
+HIV-1 susceptibility	0.333333333333	15	5
+Response to antipsychotic therapy (extrapyramidal side effects)	0.333333333333	18	6
+Adiponectin levels	0.333333333333	48	16
+Sphingolipid levels	0.333333333333	15	5
+Conduct disorder (interaction)	0.333333333333	15	5
+Bone mineral density	0.321428571429	28	9
+Prostate cancer (gene x gene interaction)	0.321428571429	56	18
+Myopia (pathological)	0.319444444444	72	23
+Major depressive disorder	0.3125	32	10
+Bipolar disorder (mood-incongruent)	0.3125	16	5
+Orofacial clefts	0.310344827586	58	18
+Pulmonary function decline	0.307692307692	39	12
+Cardiac hypertrophy	0.307692307692	26	8
+Subcutaneous adipose tissue	0.307692307692	39	12
+Prostate cancer	0.307692307692	117	36
+Response to antipsychotic treatment	0.301886792453	53	16
+Waist circumference	0.294117647059	17	5
+Panic disorder	0.294117647059	17	5
+Body mass index	0.290909090909	110	32
+Sex hormone-binding globulin levels	0.289473684211	38	11
+Immune response to smallpox vaccine (IL-6)	0.282608695652	46	13
+Response to angiotensin II receptor blocker therapy	0.28	25	7
+Bone mineral density (spine)	0.27027027027	37	10
+Colorectal cancer	0.266666666667	30	8
+Amyotrophic lateral sclerosis	0.266666666667	60	16
+Total ventricular volume	0.263157894737	19	5
+Intelligence	0.263157894737	57	15
+Visceral fat	0.260869565217	46	12
+Smoking behavior	0.260869565217	46	12
+Menarche (age at onset)	0.260869565217	46	12
+Obesity	0.259259259259	27	7
+Hippocampal atrophy	0.258064516129	31	8
+Breast size	0.258064516129	31	8
+Alcohol dependence	0.25	20	5
+Breast cancer	0.25	72	18
+Visceral adipose tissue adjusted for BMI	0.244897959184	49	12
+Cognitive performance	0.244094488189	127	31
+Bipolar disorder and schizophrenia	0.238805970149	134	32
+Brain structure	0.238095238095	21	5
+Hypertension	0.234042553191	47	11
+Airflow obstruction	0.233333333333	30	7
+Bipolar disorder	0.233082706767	133	31
+Antineutrophil cytoplasmic antibody-associated vasculitis	0.230769230769	26	6
+Neutrophil count	0.227272727273	22	5
+Disc degeneration (lumbar)	0.223214285714	112	25
+Chronic lymphocytic leukemia	0.222222222222	36	8
+Dental caries	0.222222222222	36	8
+Uric acid levels	0.21875	32	7
+Response to tocilizumab in rheumatoid arthritis	0.214285714286	28	6
+Waist-hip ratio	0.208333333333	24	5
+Schizophrenia	0.206896551724	116	24
+Weight	0.205128205128	39	8
+QT interval	0.202702702703	74	15
+Ventricular conduction	0.2	25	5
+Ankylosing spondylitis	0.2	35	7
+Bilirubin levels	0.2	25	5
+Iron status biomarkers	0.194444444444	36	7
+Alzheimer's disease (late onset)	0.193548387097	31	6
+Inflammatory biomarkers	0.192307692308	26	5
+Longevity	0.190476190476	42	8
+Crohn's disease	0.183035714286	224	41
+Quantitative traits	0.181818181818	33	6
+Attention deficit hyperactivity disorder	0.181818181818	66	12
+Chronic kidney disease	0.172413793103	29	5
+Alzheimer's disease	0.168831168831	77	13
+Parkinson's disease	0.166666666667	96	16
+Acute lymphoblastic leukemia (childhood)	0.157894736842	38	6
+Metabolite levels	0.157303370787	89	14
+Blood pressure	0.152777777778	72	11
+Ulcerative colitis	0.15	160	24
+Inflammatory bowel disease	0.147058823529	34	5
+Height	0.135667396061	457	62
+Coronary heart disease	0.135294117647	170	23
+Platelet counts	0.12987012987	77	10
+Phospholipid levels (plasma)	0.119047619048	84	10
+Atopic dermatitis	0.117647058824	51	6
+Mean platelet volume	0.114754098361	61	7
+Rheumatoid arthritis	0.114130434783	184	21
+Multiple sclerosis	0.109649122807	228	25
+Protein quantitative trait loci	0.109090909091	55	6
+Type 2 diabetes	0.108808290155	193	21
+Triglycerides	0.105769230769	104	11
+Metabolic traits	0.104166666667	48	5
+HIV-1 control	0.103658536585	164	17
+Metabolic syndrome	0.0980392156863	51	5
+Celiac disease	0.0967741935484	62	6
+Chronic obstructive pulmonary disease-related biomarkers	0.0909090909091	55	5
+Systemic lupus erythematosus	0.0859375	128	11
+Systemic sclerosis	0.0795454545455	88	7
+LDL cholesterol	0.0782608695652	115	9
+Pulmonary function	0.0736842105263	95	7
+Vitiligo	0.0724637681159	69	5
+Type 1 diabetes	0.0661157024793	121	8
+Asthma	0.0655737704918	122	8
+Primary biliary cirrhosis	0.0636363636364	110	7
+HDL cholesterol	0.0593220338983	118	7

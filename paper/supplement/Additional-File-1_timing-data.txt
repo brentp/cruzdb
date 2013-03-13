@@ -1,0 +1,7 @@
+loc	instance	parallel	time
+local	sqlite	True	29.7
+remote	mysql	True	33.9
+local	mysql	True	36.7
+local	sqlite	False	36.3
+remote	mysql	False	712.8
+local	mysql	False	112.2

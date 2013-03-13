@@ -1,0 +1,16 @@
+Sex hormone-binding globulin levels	0.131578947368	38	5
+Response to amphetamines	0.10989010989	91	10
+Menarche (age at onset)	0.108695652174	46	5
+Orofacial clefts	0.103448275862	58	6
+Prostate cancer	0.102564102564	117	12
+Attention deficit hyperactivity disorder	0.0909090909091	66	6
+Intelligence	0.0877192982456	57	5
+Myopia (pathological)	0.0833333333333	72	6
+Bipolar disorder	0.0676691729323	133	9
+Metabolite levels	0.0561797752809	89	5
+Cognitive performance	0.0551181102362	127	7
+Bipolar disorder and schizophrenia	0.0373134328358	134	5
+Rheumatoid arthritis	0.0326086956522	184	6
+Crohn's disease	0.03125	224	7
+Coronary heart disease	0.0294117647059	170	5
+Height	0.0175054704595	457	8
