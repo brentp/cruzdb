@@ -90,7 +90,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
         if j == 0:
             for t in tables:
                 annos = (getattr(g, t) if isinstance(t, basestring) else t).first().anno_cols
-                h = t if isinstance(t, basestring) else t.table().name
+                h = t if isinstance(t, basestring) else t._table.name if hasattr(t, "_table") else t.first()._table.name
                 extra_header += ["%s_%s" % (h, a) for a in annos]
 
             if 0 != len(header) and not header[0].startswith("#"):

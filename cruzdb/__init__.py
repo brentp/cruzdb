@@ -134,7 +134,11 @@ class Genome(soup.Genome):
     def bin_query(self, table, chrom, start, end):
         if isinstance(table, basestring):
             table = getattr(self, table)
-        tbl = table._table
+
+        try:
+            tbl = table._table
+        except AttributeError:
+            tbl = table.column_descriptions[0]['type']._table
 
         q = table.filter(tbl.c.chrom == chrom)
 
