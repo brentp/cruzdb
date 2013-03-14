@@ -1,0 +1,60 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{[#1]}
+\providecommand{\urlprefix}{}
+
+\bibitem{Dreszer}
+Dreszer TR, Karolchik D, Zweig AS, Hinrichs AS, Raney BJ, Kuhn RM, Meyer LR, Wong M, Sloan CA, Rosenbloom KR, Roe G, Rhead B, Pohl A, Malladi VS, Li CH, Learned K, Kirkup V, Hsu F, Harte RA, Guruvadoo L, Goldman M, Giardine BM, Fujita PA, Diekhans M, Cline MS, Clawson H, Barber GP, Haussler D, Kent WJ: \textbf{The UCSC genome Browser database: extensions and updates 2011}. \emph{Nucleic Acids Res} 2012, \textbf{40}(Database issue):D918--23.
+
+\bibitem{KentBrowser}
+    Kent WJ, Sugnet CW, Furey TS, Roskin KM, Pringle TH, Zahler AM, Haussler D: \textbf{The human genome browser at UCSC}. \emph{Genome Res.} 2002, \textbf{12}(6):996--1006.
+
+\bibitem{KentBLAT}
+    Kent WJ: \textbf{BLAT--the BLAST-like alignment tool.}
+\emph{Genome Research} 2002, \textbf{12}(4):656-64.
+
+\bibitem{Grimson}
+    Grimson A, Farh KK, Johnston WK, Garrett-Engele P, Lim LP, Bartel DP: \textbf{MicroRNA targeting specificity in mammals: determinants beyond seed pairing.} \emph{Molecular Cell} 2007, \textbf{27}:91-105.
+
+\bibitem{Huang}
+    Huang DW, Sherman BT, Lempicki RA: \textbf{Bioinformatics enrichment tools: paths toward the comprehensive functional analysis of large gene lists.} \emph{Nucleic Acids Res.} 2009, \textbf{37}(1):1-13.
+
+
+\bibitem{Mencia}
+    Mencía A, Modamio-Høybjør S, Redshaw N, Morín M, Mayo-Merino F, Olavarrieta L, Aguirre LA, et al: \textbf{Mutations in the seed region of human miR-96 are responsible for nonsyndromic progressive hearing loss.} \emph{Nature genetics} 2009, \textbf{41}(5):609-613.
+
+\bibitem{Martinez}    
+    Martínez AD, Acuña R, Figueroa V, Maripillan J, Nicholson B\textbf{Gap-junction channels dysfunction in deafness and hearing loss.} \emph{Antioxidants \& redox signaling} 2009, \textbf{11}(2): 309-322
+
+\bibitem{Hansen}
+    Hansen RS, Thomas S, Sandstrom R, Canfield TK, Thurman RE, Weaver M, Dorschner MO, Gartler SM, Stamatoyannopoulos JA: \textbf{Sequencing newly replicated DNA reveals widespread plasticity in human replication timing.} \emph{Proc Natl Acad Sci USA} 2010, \textbf{107}:139-144.
+
+\bibitem{Lee}
+    Lee JT: \textbf{Epigenetic Regulation by Long Noncoding RNAs.} \emph{Science} 2012, \textbf{338}(6113):1435-1439.
+
+\bibitem{Cabili}
+    Cabili MN, Trapnell C, Goff L, Koziol M, Tazon-Vega B, Regev A, Rinn JL: \textbf{Integrative annotation of human large intergenic noncoding RNAs reveals global properties and specific subclasses.} \emph{Genes and Development} 2011,\textbf{25}:1915-1927.
+
+\bibitem{Hindorff}
+    Hindorff LA, Sethupathy P, Junkins HA, Ramos EM, Mehta JP, Collins FS, Manolio TA: \textbf{Potential etiologic and functional implications of genome-wide association loci for human diseases and traits.} \emph{PNAS} 2009, \textbf{106}(23):9362-9367.
+
+\bibitem{Chen}
+    Chen G, Qiu C, Zhang Q, Liu B, Cui: \textbf{Genome-Wide Analysis of Human SNPs at Long Intergenic Noncoding RNAs.} \emph{Human Mutation} 2013, \textbf{34}:338-344.
+
+\bibitem{Guelen}
+    Guelen L, Pagie L, Brasset E, Meuleman W, Faza MB, Talhout W, van Steensel B: \textbf{Domain organization of human chromosomes revealed by mapping of nuclear lamina interactions.} \emph{Nature} 2008, \textbf{453}(7197), 948-951.
+
+\bibitem{Clowney}
+    Clowney EJ, LeGros MA, Mosley CP, Markenskoff-Papadimitriou EC, Myllys M, Barnea G, Larabell CA, Lomvardas S: \textbf{Nuclear aggregation of olfactory receptor genes governs their monogenic expression.} \emph{Cell} 2012,\textbf{151}:724-737.
+
+
+
+
+
+\end{thebibliography}
+
+\newcommand{\BMCxmlcomment}[1]{}
+
+\BMCxmlcomment{
+} % end of \BMCxmlcomment
