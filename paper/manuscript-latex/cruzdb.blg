@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2012/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: cruzdb.aux
+The style file: bmc_article.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: cruzdb.bib
+You've used 17 entries,
+            3603 wiz_defined-function locations,
+            821 strings with 8437 characters,
+and the built_in function-call counts, 43154 in all, are:
+= -- 3885
+> -- 338
+< -- 124
++ -- 372
+- -- 107
+* -- 5166
+:= -- 7236
+add.period$ -- 35
+call.type$ -- 17
+change.case$ -- 125
+chr.to.int$ -- 0
+cite$ -- 17
+duplicate$ -- 2954
+empty$ -- 3338
+format.name$ -- 441
+if$ -- 8436
+int.to.chr$ -- 0
+int.to.str$ -- 34
+missing$ -- 967
+newline$ -- 368
+num.names$ -- 34
+pop$ -- 624
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 34
+skip$ -- 313
+stack$ -- 0
+substring$ -- 6439
+swap$ -- 701
+text.length$ -- 34
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 226
+width$ -- 19
+write$ -- 769

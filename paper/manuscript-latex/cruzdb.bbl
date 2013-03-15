@@ -4,68 +4,415 @@
 \providecommand{\url}[1]{[#1]}
 \providecommand{\urlprefix}{}
 
-
 \bibitem{ENCODE}
-ENCODE Project Consortium, Dunham I, Kundaje A, Aldred SF, Collins PJ, Davis CA, Doyle F, Epstein CB, Frietze S, Harrow J, Kaul R, Khatun J, Lajoie BR, Landt SG, Lee BK, Pauli F, Rosenbloom KR, Sabo P, Safi A, Sanyal A, Shoresh N, Simon JM, Song L, Trinklein ND, Altshuler RC, Birney E, Brown JB, Cheng C, Djebali S, Dong X, Dunham I, Ernst J, Furey TS, Gerstein M, Giardine B, Greven M, Hardison RC, Harris RS, Herrero J, Hoffman MM, Iyer S, Kelllis M, Khatun J, Kheradpour P, Kundaje A, Lassman T, Li Q, Lin X, Marinov GK, Merkel A, Mortazavi A, Parker SC, Reddy TE, Rozowsky J, Schlesinger F, Thurman RE, Wang J, Ward LD, Whitfield TW, Wilder SP, Wu W, Xi HS, Yip KY, Zhuang J, Bernstein BE, Birney E, Dunham I, Green ED, Gunter C, Snyder M, Pazin MJ, Lowdon RF, Dillon LA, Adams LB, Kelly CJ, Zhang J, Wexler JR, Green ED, Good PJ, Feingold EA, Bernstein BE, Birney E, Crawford GE, Dekker J, Elinitski L, Farnham PJ, Gerstein M, Giddings MC, Gingeras TR, Green ED, Guigó R, Hardison RC, Hubbard TJ, Kellis M, Kent WJ, Lieb JD, Margulies EH, Myers RM, Snyder M, Starnatoyannopoulos JA, Tennebaum SA, Weng Z, White KP, Wold B, Khatun J, Yu Y, Wrobel J, Risk BA, Gunawardena HP, Kuiper HC, Maier CW, Xie L, Chen X, Giddings MC, Bernstein BE, Epstein CB, Shoresh N, Ernst J, Kheradpour P, Mikkelsen TS, Gillespie S, Goren A, Ram O, Zhang X, Wang L, Issner R, Coyne MJ, Durham T, Ku M, Truong T, Ward LD, Altshuler RC, Eaton ML, Kellis M, Djebali S, Davis CA, Merkel A, Dobin A, Lassmann T, Mortazavi A, Tanzer A, Lagarde J, Lin W, Schlesinger F, Xue C, Marinov GK, Khatun J, Williams BA, Zaleski C, Rozowsky J, Röder M, Kokocinski F, Abdelhamid RF, Alioto T, Antoshechkin I, Baer MT, Batut P, Bell I, Bell K, Chakrabortty S, Chen X, Chrast J, Curado J, Derrien T, Drenkow J, Dumais E, Dumais J, Duttagupta R, Fastuca M, Fejes-Toth K, Ferreira P, Foissac S, Fullwood MJ, Gao H, Gonzalez D, Gordon A, Gunawardena HP, Howald C, Jha S, Johnson R, Kapranov P, King B, Kingswood C, Li G, Luo OJ, Park E, Preall JB, Presaud K, Ribeca P, Risk BA, Robyr D, Ruan X, Sammeth M, Sandu KS, Schaeffer L, See LH, Shahab A, Skancke J, Suzuki AM, Takahashi H, Tilgner H, Trout D, Walters N, Wang H, Wrobel J, Yu Y, Hayashizaki Y, Harrow J, Gerstein M, Hubbard TJ, Reymond A, Antonarakis SE, Hannon GJ, Giddings MC, Ruan Y, Wold B, Carninci P, Guigó R, Gingeras TR, Rosenbloom KR, Sloan CA, Learned K, Malladi VS, Wong MC, Barber GP, Cline MS, Dreszer TR, Heitner SG, Karolchik D, Kent WJ, Kirkup VM, Meyer LR, Long JC, Maddren M, Raney BJ, Furey TS, Song L, Grasfeder LL, Giresi PG, Lee BK, Battenhouse A, Sheffield NC, Simon JM, Showers KA, Safi A, London D, Bhinge AA, Shestak C, Schaner MR, Kim SK, Zhang ZZ, Mieczkowski PA, Mieczkowska JO, Liu Z, McDaniell RM, Ni Y, Rashid NU, Kim MJ, Adar S, Zhang Z, Wang T, Winter D, Keefe D, Birney E, Iyer VR, Lieb JD, Crawford GE, Li G, Sandhu KS, Zheng M, Wang P, Luo OJ, Shahab A, Fullwood MJ, Ruan X, Ruan Y, Myers RM, Pauli F, Williams BA, Gertz J, Marinov GK, Reddy TE, Vielmetter J, Partridge EC, Trout D, Varley KE, Gasper C, Bansal A, Pepke S, Jain P, Amrhein H, Bowling KM, Anaya M, Cross MK, King B, Muratet MA, Antoshechkin I, Newberry KM, McCue K, Nesmith AS, Fisher-Aylor KI, Pusey B, DeSalvo G, Parker SL, Balasubramanian S, Davis NS, Meadows SK, Eggleston T, Gunter C, Newberry JS, Levy SE, Absher DM, Mortazavi A, Wong WH, Wold B, Blow MJ, Visel A, Pennachio LA, Elnitski L, Margulies EH, Parker SC, Petrykowska HM, Abyzov A, Aken B, Barrell D, Barson G, Berry A, Bignell A, Boychenko V, Bussotti G, Chrast J, Davidson C, Derrien T, Despacio-Reyes G, Diekhans M, Ezkurdia I, Frankish A, Gilbert J, Gonzalez JM, Griffiths E, Harte R, Hendrix DA, Howald C, Hunt T, Jungreis I, Kay M, Khurana E, Kokocinski F, Leng J, Lin MF, Loveland J, Lu Z, Manthravadi D, Mariotti M, Mudge J, Mukherjee G, Notredame C, Pei B, Rodriguez JM, Saunders G, Sboner A, Searle S, Sisu C, Snow C, Steward C, Tanzer A, Tapanari E, Tress ML, van Baren MJ, Walters N, Washieti S, Wilming L, Zadissa A, Zhengdong Z, Brent M, Haussler D, Kellis M, Valencia A, Gerstein M, Raymond A, Guigó R, Harrow J, Hubbard TJ, Landt SG, Frietze S, Abyzov A, Addleman N, Alexander RP, Auerbach RK, Balasubramanian S, Bettinger K, Bhardwaj N, Boyle AP, Cao AR, Cayting P, Charos A, Cheng Y, Cheng C, Eastman C, Euskirchen G, Fleming JD, Grubert F, Habegger L, Hariharan M, Harmanci A, Iyenger S, Jin VX, Karczewski KJ, Kasowski M, Lacroute P, Lam H, Larnarre-Vincent N, Leng J, Lian J, Lindahl-Allen M, Min R, Miotto B, Monahan H, Moqtaderi Z, Mu XJ, O'Geen H, Ouyang Z, Patacsil D, Pei B, Raha D, Ramirez L, Reed B, Rozowsky J, Sboner A, Shi M, Sisu C, Slifer T, Witt H, Wu L, Xu X, Yan KK, Yang X, Yip KY, Zhang Z, Struhl K, Weissman SM, Gerstein M, Farnham PJ, Snyder M, Tenebaum SA, Penalva LO, Doyle F, Karmakar S, Landt SG, Bhanvadia RR, Choudhury A, Domanus M, Ma L, Moran J, Patacsil D, Slifer T, Victorsen A, Yang X, Snyder M, White KP, Auer T, Centarin L, Eichenlaub M, Gruhl F, Heerman S, Hoeckendorf B, Inoue D, Kellner T, Kirchmaier S, Mueller C, Reinhardt R, Schertel L, Schneider S, Sinn R, Wittbrodt B, Wittbrodt J, Weng Z, Whitfield TW, Wang J, Collins PJ, Aldred SF, Trinklein ND, Partridge EC, Myers RM, Dekker J, Jain G, Lajoie BR, Sanyal A, Balasundaram G, Bates DL, Byron R, Canfield TK, Diegel MJ, Dunn D, Ebersol AK, Ebersol AK, Frum T, Garg K, Gist E, Hansen RS, Boatman L, Haugen E, Humbert R, Jain G, Johnson AK, Johnson EM, Kutyavin TM, Lajoie BR, Lee K, Lotakis D, Maurano MT, Neph SJ, Neri FV, Nguyen ED, Qu H, Reynolds AP, Roach V, Rynes E, Sabo P, Sanchez ME, Sandstrom RS, Sanyal A, Shafer AO, Stergachis AB, Thomas S, Thurman RE, Vernot B, Vierstra J, Vong S, Wang H, Weaver MA, Yan Y, Zhang M, Akey JA, Bender M, Dorschner MO, Groudine M, MacCoss MJ, Navas P, Stamatoyannopoulos G, Kaul R, Dekker J, Stamatoyannopoulos JA, Dunham I, Beal K, Brazma A, Flicek P, Herrero J, Johnson N, Keefe D, Lukk M, Luscombe NM, Sobral D, Vaquerizas JM, Wilder SP, Batzoglou S, Sidow A, Hussami N, Kyriazopoulou-Panagiotopoulou S, Libbrecht MW, Schaub MA, Kundaje A, Hardison RC, Miller W, Giardine B, Harris RS, Wu W, Bickel PJ, Banfai B, Boley NP, Brown JB, Huang H, Li Q, Li JJ, Noble WS, Bilmes JA, Buske OJ, Hoffman MM, Sahu AO, Kharchenko PV, Park PJ, Baker D, Taylor J, Weng Z, Iyer S, Dong X, Greven M, Lin X, Wang J, Xi HS, Zhuang J, Gerstein M, Alexander RP, Balasubramanian S, Cheng C, Harmanci A, Lochovsky L, Min R, Mu XJ, Rozowsky J, Yan KK, Yip KY, Birney E. 
-\textbf{An integrated encyclopedia of DNA elements in the human genome}. \emph{Nature} 2012, \textbf{489}:57-74.
+ENCODE Project Consortium: \textbf{An integrated encyclopedia of DNA elements in the human
+  genome}. \emph{Nature} 2012, \textbf{489}:57--74.
 
 \bibitem{KentBrowser}
-    Kent WJ, Sugnet CW, Furey TS, Roskin KM, Pringle TH, Zahler AM, Haussler D: \textbf{The human genome browser at UCSC}. \emph{Genome Res.} 2002, \textbf{12}(6):996--1006.
+Kent W, Sugnet C, Furey T, Roskin K, Pringle T, Zahler A, Haussler D:
+  \textbf{The UCSC genome browser at UCSC}. \emph{Genome Res.} 2002,
+  \textbf{12}(6):996--1006.
 
 \bibitem{Dreszer}
-Dreszer TR, Karolchik D, Zweig AS, Hinrichs AS, Raney BJ, Kuhn RM, Meyer LR, Wong M, Sloan CA, Rosenbloom KR, Roe G, Rhead B, Pohl A, Malladi VS, Li CH, Learned K, Kirkup V, Hsu F, Harte RA, Guruvadoo L, Goldman M, Giardine BM, Fujita PA, Diekhans M, Cline MS, Clawson H, Barber GP, Haussler D, Kent WJ: \textbf{The UCSC genome Browser database: extensions and updates 2011}. \emph{Nucleic Acids Res} 2012, \textbf{40}(Database issue):D918--23.
+Dreszer T, Karolchik D, Zweig A, Hinrichs A, Raney B, Kuhn R, Meyer L, Wong M,
+  Sloan C, Rosenbloom K, Roe G, Rhead B, Pohl A, Malladi V, Li C, Learned K,
+  Kirkup V, Hsu F, Harte R, Guruvadoo L, Goldman M, Giardine B, Fujita P,
+  Diekhans M, Cline M, Clawson H, Barber G, Haussler D, Kent W: \textbf{The
+  UCSC genome Browser database: extensions and updates 2011}. \emph{Nucleic
+  Acids Research} 2012, \textbf{40}:918--23. [Database Issue].
 
 \bibitem{Mardis}
-    Mardis ER: \textbf{The \$1,000 genome, the \$100,000 analysis?}. \emph{Genome Medicine}, 2010 \textbf{26}:84.
+ER M: \textbf{The \$1,000 genome, the \$100,000 analysis?} \emph{Genome
+  Medicine} 2010, \textbf{26}:84.
 
 \bibitem{KentBLAT}
-    Kent WJ: \textbf{BLAT--the BLAST-like alignment tool.}
-\emph{Genome Research} 2002, \textbf{12}(4):656-64.
+WJ K: \textbf{BLAT--the BLAST-like alignment tool}. \emph{Genome Research}
+  2002, \textbf{12}(4):656--664.
 
 \bibitem{Grimson}
-    Grimson A, Farh KK, Johnston WK, Garrett-Engele P, Lim LP, Bartel DP: \textbf{MicroRNA targeting specificity in mammals: determinants beyond seed pairing.} \emph{Molecular Cell} 2007, \textbf{27}:91-105.
+Grimson A, Farh K, Johnston W, Garrett-Engele P, Lim L, Bartel D:
+  \textbf{MicroRNA targeting specificity in mammals: determinants beyond seed
+  pairing}. \emph{Molecular Cell} 2007, \textbf{27}:91--105.
 
 \bibitem{Huang}
-    Huang DW, Sherman BT, Lempicki RA: \textbf{Bioinformatics enrichment tools: paths toward the comprehensive functional analysis of large gene lists.} \emph{Nucleic Acids Res.} 2009, \textbf{37}(1):1-13.
-
+Huang D, Sherman B, Lempicki R: \textbf{Bioinformatics enrichment tools: paths
+  toward the comprehensive functional analysis of large gene lists}.
+  \emph{Nucleic Acids Research} 2009, \textbf{27}:1--13.
 
 \bibitem{Mencia}
-    Mencía A, Modamio-Høybjør S, Redshaw N, Morín M, Mayo-Merino F, Olavarrieta L, Aguirre LA, et al: \textbf{Mutations in the seed region of human miR-96 are responsible for nonsyndromic progressive hearing loss.} \emph{Nature genetics} 2009, \textbf{41}(5):609-613.
+Mencía A, Modamio-Høybjør S, Redshaw N, Morín M, Mayo-Merino F, Olavarrieta
+  L, Aguirre L, et~al: \textbf{Mutations in the seed region of human miR-96 are
+  responsible for nonsyndromic progressive hearing loss}. \emph{Nature
+  Genetics} 2009, \textbf{41}(5):609--613.
 
-\bibitem{Martinez}    
-    Martínez AD, Acuña R, Figueroa V, Maripillan J, Nicholson B\textbf{Gap-junction channels dysfunction in deafness and hearing loss.} \emph{Antioxidants \& redox signaling} 2009, \textbf{11}(2): 309-322
+\bibitem{Martinez}
+Martínez A, Acuña R, Figueroa V, Maripillan J, Nicholson B:
+  \textbf{Gap-junction channels dysfunction in deafness and hearing loss}.
+  \emph{Antioxidants \& redox signaling} 2009, \textbf{11}:309--322.
 
 \bibitem{Hansen}
-    Hansen RS, Thomas S, Sandstrom R, Canfield TK, Thurman RE, Weaver M, Dorschner MO, Gartler SM, Stamatoyannopoulos JA: \textbf{Sequencing newly replicated DNA reveals widespread plasticity in human replication timing.} \emph{Proc Natl Acad Sci USA} 2010, \textbf{107}:139-144.
+Hansen R, Thomas S, Sandstrom R, Canfield T, Thurman R, Weaver M, Dorschner M,
+  Gartler S, Stamatoyannopoulos J: \textbf{Sequencing newly replicated DNA
+  reveals widespread plasticity in human replication timing}. \emph{Proc Natl
+  Acad Sci USA} 2010, \textbf{107}:139--144.
 
 \bibitem{Lee}
-    Lee JT: \textbf{Epigenetic Regulation by Long Noncoding RNAs.} \emph{Science} 2012, \textbf{338}(6113):1435-1439.
+JT L: \textbf{Epigenetic Regulation by Long Noncoding RNAs}. \emph{Science}
+  2012, \textbf{338}(6113):1435--1439.
 
 \bibitem{Cabili}
-    Cabili MN, Trapnell C, Goff L, Koziol M, Tazon-Vega B, Regev A, Rinn JL: \textbf{Integrative annotation of human large intergenic noncoding RNAs reveals global properties and specific subclasses.} \emph{Genes and Development} 2011,\textbf{25}:1915-1927.
+Cabili M, Trapnell C, Goff L, Koziol M, Tazon-Vega B, Regev A, Rinn J:
+  \textbf{Integrative annotation of human large intergenic noncoding RNAs
+  reveals global properties and specific subclasses}. \emph{Genes and
+  Development} 2011, \textbf{25}:1915--1927.
 
 \bibitem{Hindorff}
-    Hindorff LA, Sethupathy P, Junkins HA, Ramos EM, Mehta JP, Collins FS, Manolio TA: \textbf{Potential etiologic and functional implications of genome-wide association loci for human diseases and traits.} \emph{PNAS} 2009, \textbf{106}(23):9362-9367.
+Hindorff L, Sethupathy P, Junkins H, Ramos E, Mehta J, Collins F, Manolio T:
+  \textbf{Potential etiologic and functional implications of genome-wide
+  association loci for human diseases and traits}. \emph{PNAS} 2009,
+  \textbf{106}(23):9362--9367.
 
 \bibitem{Chen}
-    Chen G, Qiu C, Zhang Q, Liu B, Cui: \textbf{Genome-Wide Analysis of Human SNPs at Long Intergenic Noncoding RNAs.} \emph{Human Mutation} 2013, \textbf{34}:338-344.
+Chen G, Qiu C, Zhang Q, Liu B, Cui B: \textbf{Genome-Wide Analysis of Human
+  SNPs at Long Intergenic Noncoding RNAs}. \emph{Human Mutation} 2013,
+  \textbf{34}:338--344.
 
 \bibitem{Guelen}
-    Guelen L, Pagie L, Brasset E, Meuleman W, Faza MB, Talhout W, van Steensel B: \textbf{Domain organization of human chromosomes revealed by mapping of nuclear lamina interactions.} \emph{Nature} 2008, \textbf{453}(7197): 948-951.
+Guelen L, Pagie L, Brasset E, Meuleman W, Faza M, Talhout W, van Steensel B:
+  \textbf{Domain organization of human chromosomes revealed by mapping of
+  nuclear lamina interactions}. \emph{Nature} 2008,
+  \textbf{453}(7197):948--951.
 
 \bibitem{Dittmer}
-    Dittmer TA, Mistelli T: \textbf{The lamin protein family}. \emph{Genome Biology} 2011, \textbf{12}:222
+Dittmer T, Mistelli T: \textbf{The lamin protein family}. \emph{Genome Biology}
+  2011, \textbf{12}:222.
 
 \bibitem{Clowney}
-    Clowney EJ, LeGros MA, Mosley CP, Markenskoff-Papadimitriou EC, Myllys M, Barnea G, Larabell CA, Lomvardas S: \textbf{Nuclear aggregation of olfactory receptor genes governs their monogenic expression.} \emph{Cell} 2012,\textbf{151}:724-737.
-
-
-
-
+Clowney E, LeGros M, Mosley C, Markenskoff-Papadimitriou E, Myllys M, Barnea G,
+  Larabell C, Lomvardas S: \textbf{Nuclear aggregation of olfactory receptor
+  genes governs their monogenic expression}. \emph{Cell} 2012,
+  \textbf{151}:724--737.
 
 \end{thebibliography}
 
 \newcommand{\BMCxmlcomment}[1]{}
 
 \BMCxmlcomment{
+
+<refgrp>
+
+<bibl id="B1">
+  <title><p>An integrated encyclopedia of DNA elements in the human
+  genome</p></title>
+  <aug>
+    <au><snm>Consortium</snm><fnm>EP</fnm></au>
+  </aug>
+  <source>Nature</source>
+  <pubdate>2012</pubdate>
+  <volume>489</volume>
+  <fpage>57</fpage>
+  <lpage>74</lpage>
+</bibl>
+
+<bibl id="B2">
+  <title><p>The UCSC genome browser at UCSC</p></title>
+  <aug>
+    <au><snm>Kent</snm><fnm>WJ</fnm></au>
+    <au><snm>Sugnet</snm><fnm>CW</fnm></au>
+    <au><snm>Furey</snm><fnm>TS</fnm></au>
+    <au><snm>Roskin</snm><fnm>KM</fnm></au>
+    <au><snm>Pringle</snm><fnm>TH</fnm></au>
+    <au><snm>Zahler</snm><fnm>AM</fnm></au>
+    <au><snm>Haussler</snm><fnm>D</fnm></au>
+  </aug>
+  <source>Genome Res.</source>
+  <pubdate>2002</pubdate>
+  <volume>12</volume>
+  <issue>6</issue>
+  <fpage>996</fpage>
+  <lpage>1006</lpage>
+</bibl>
+
+<bibl id="B3">
+  <title><p>The UCSC genome Browser database: extensions and updates
+  2011</p></title>
+  <aug>
+    <au><snm>Dreszer</snm><fnm>TR</fnm></au>
+    <au><snm>Karolchik</snm><fnm>D</fnm></au>
+    <au><snm>Zweig</snm><fnm>AS</fnm></au>
+    <au><snm>Hinrichs</snm><fnm>AS</fnm></au>
+    <au><snm>Raney</snm><fnm>BJ</fnm></au>
+    <au><snm>Kuhn</snm><fnm>RM</fnm></au>
+    <au><snm>Meyer</snm><fnm>LR</fnm></au>
+    <au><snm>Wong</snm><fnm>M</fnm></au>
+    <au><snm>Sloan</snm><fnm>CA</fnm></au>
+    <au><snm>Rosenbloom</snm><fnm>KR</fnm></au>
+    <au><snm>Roe</snm><fnm>G</fnm></au>
+    <au><snm>Rhead</snm><fnm>B</fnm></au>
+    <au><snm>Pohl</snm><fnm>A</fnm></au>
+    <au><snm>Malladi</snm><fnm>VS</fnm></au>
+    <au><snm>Li</snm><fnm>CH</fnm></au>
+    <au><snm>Learned</snm><fnm>K</fnm></au>
+    <au><snm>Kirkup</snm><fnm>V</fnm></au>
+    <au><snm>Hsu</snm><fnm>F</fnm></au>
+    <au><snm>Harte</snm><fnm>RA</fnm></au>
+    <au><snm>Guruvadoo</snm><fnm>L</fnm></au>
+    <au><snm>Goldman</snm><fnm>M</fnm></au>
+    <au><snm>Giardine</snm><fnm>BM</fnm></au>
+    <au><snm>Fujita</snm><fnm>PA</fnm></au>
+    <au><snm>Diekhans</snm><fnm>M</fnm></au>
+    <au><snm>Cline</snm><fnm>MS</fnm></au>
+    <au><snm>Clawson</snm><fnm>H</fnm></au>
+    <au><snm>Barber</snm><fnm>GP</fnm></au>
+    <au><snm>Haussler</snm><fnm>D</fnm></au>
+    <au><snm>Kent</snm><fnm>WJ</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2012</pubdate>
+  <volume>40</volume>
+  <fpage>918</fpage>
+  <lpage>23</lpage>
+  <note>Database Issue</note>
+</bibl>
+
+<bibl id="B4">
+  <title><p>The \$1,000 genome, the \$100,000 analysis?</p></title>
+  <aug>
+    <au><snm>ER</snm><fnm>M</fnm></au>
+  </aug>
+  <source>Genome Medicine</source>
+  <pubdate>2010</pubdate>
+  <volume>26</volume>
+  <fpage>84</fpage>
+</bibl>
+
+<bibl id="B5">
+  <title><p>BLAT--the BLAST-like alignment tool</p></title>
+  <aug>
+    <au><snm>WJ</snm><fnm>K</fnm></au>
+  </aug>
+  <source>Genome Research</source>
+  <pubdate>2002</pubdate>
+  <volume>12</volume>
+  <issue>4</issue>
+  <fpage>656</fpage>
+  <lpage>664</lpage>
+</bibl>
+
+<bibl id="B6">
+  <title><p>MicroRNA targeting specificity in mammals: determinants beyond seed
+  pairing</p></title>
+  <aug>
+    <au><snm>Grimson</snm><fnm>A</fnm></au>
+    <au><snm>Farh</snm><fnm>KK</fnm></au>
+    <au><snm>Johnston</snm><fnm>WK</fnm></au>
+    <au><snm>Garrett Engele</snm><fnm>P</fnm></au>
+    <au><snm>Lim</snm><fnm>LP</fnm></au>
+    <au><snm>Bartel</snm><fnm>DP</fnm></au>
+  </aug>
+  <source>Molecular Cell</source>
+  <pubdate>2007</pubdate>
+  <volume>27</volume>
+  <fpage>91</fpage>
+  <lpage>105</lpage>
+</bibl>
+
+<bibl id="B7">
+  <title><p>Bioinformatics enrichment tools: paths toward the comprehensive
+  functional analysis of large gene lists</p></title>
+  <aug>
+    <au><snm>Huang</snm><fnm>DW</fnm></au>
+    <au><snm>Sherman</snm><fnm>BT</fnm></au>
+    <au><snm>Lempicki</snm><fnm>RA</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2009</pubdate>
+  <volume>27</volume>
+  <issue>1</issue>
+  <fpage>1</fpage>
+  <lpage>13</lpage>
+</bibl>
+
+<bibl id="B8">
+  <title><p>Mutations in the seed region of human miR-96 are responsible for
+  nonsyndromic progressive hearing loss</p></title>
+  <aug>
+    <au><snm>Mencía</snm><fnm>A</fnm></au>
+    <au><snm>Modamio Høybjør</snm><fnm>S</fnm></au>
+    <au><snm>Redshaw</snm><fnm>N</fnm></au>
+    <au><snm>Morín</snm><fnm>M</fnm></au>
+    <au><snm>Mayo Merino</snm><fnm>F</fnm></au>
+    <au><snm>Olavarrieta</snm><fnm>L</fnm></au>
+    <au><snm>Aguirre</snm><fnm>LA</fnm></au>
+    <au><cnm>al</cnm></au>
+  </aug>
+  <source>Nature Genetics</source>
+  <pubdate>2009</pubdate>
+  <volume>41</volume>
+  <issue>5</issue>
+  <fpage>609</fpage>
+  <lpage>613</lpage>
+</bibl>
+
+<bibl id="B9">
+  <title><p>Gap-junction channels dysfunction in deafness and hearing
+  loss</p></title>
+  <aug>
+    <au><snm>Martínez</snm><fnm>AD</fnm></au>
+    <au><snm>Acuña</snm><fnm>R</fnm></au>
+    <au><snm>Figueroa</snm><fnm>V</fnm></au>
+    <au><snm>Maripillan</snm><fnm>J</fnm></au>
+    <au><snm>Nicholson</snm><fnm>B</fnm></au>
+  </aug>
+  <source>Antioxidants \& redox signaling</source>
+  <pubdate>2009</pubdate>
+  <volume>11</volume>
+  <issue>1</issue>
+  <fpage>309</fpage>
+  <lpage>322</lpage>
+</bibl>
+
+<bibl id="B10">
+  <title><p>Sequencing newly replicated DNA reveals widespread plasticity in
+  human replication timing</p></title>
+  <aug>
+    <au><snm>Hansen</snm><fnm>RS</fnm></au>
+    <au><snm>Thomas</snm><fnm>S</fnm></au>
+    <au><snm>Sandstrom</snm><fnm>R</fnm></au>
+    <au><snm>Canfield</snm><fnm>TK</fnm></au>
+    <au><snm>Thurman</snm><fnm>RE</fnm></au>
+    <au><snm>Weaver</snm><fnm>M</fnm></au>
+    <au><snm>Dorschner</snm><fnm>MO</fnm></au>
+    <au><snm>Gartler</snm><fnm>SM</fnm></au>
+    <au><snm>Stamatoyannopoulos</snm><fnm>JA</fnm></au>
+  </aug>
+  <source>Proc Natl Acad Sci USA</source>
+  <pubdate>2010</pubdate>
+  <volume>107</volume>
+  <fpage>139</fpage>
+  <lpage>144</lpage>
+</bibl>
+
+<bibl id="B11">
+  <title><p>Epigenetic Regulation by Long Noncoding RNAs</p></title>
+  <aug>
+    <au><snm>JT</snm><fnm>L</fnm></au>
+  </aug>
+  <source>Science</source>
+  <pubdate>2012</pubdate>
+  <volume>338</volume>
+  <issue>6113</issue>
+  <fpage>1435</fpage>
+  <lpage>1439</lpage>
+</bibl>
+
+<bibl id="B12">
+  <title><p>Integrative annotation of human large intergenic noncoding RNAs
+  reveals global properties and specific subclasses</p></title>
+  <aug>
+    <au><snm>Cabili</snm><fnm>MN</fnm></au>
+    <au><snm>Trapnell</snm><fnm>C</fnm></au>
+    <au><snm>Goff</snm><fnm>L</fnm></au>
+    <au><snm>Koziol</snm><fnm>M</fnm></au>
+    <au><snm>Tazon Vega</snm><fnm>B</fnm></au>
+    <au><snm>Regev</snm><fnm>A</fnm></au>
+    <au><snm>Rinn</snm><fnm>JL</fnm></au>
+  </aug>
+  <source>Genes and Development</source>
+  <pubdate>2011</pubdate>
+  <volume>25</volume>
+  <fpage>1915</fpage>
+  <lpage>1927</lpage>
+</bibl>
+
+<bibl id="B13">
+  <title><p>Potential etiologic and functional implications of genome-wide
+  association loci for human diseases and traits</p></title>
+  <aug>
+    <au><snm>Hindorff</snm><fnm>LA</fnm></au>
+    <au><snm>Sethupathy</snm><fnm>P</fnm></au>
+    <au><snm>Junkins</snm><fnm>HA</fnm></au>
+    <au><snm>Ramos</snm><fnm>EM</fnm></au>
+    <au><snm>Mehta</snm><fnm>JP</fnm></au>
+    <au><snm>Collins</snm><fnm>FS</fnm></au>
+    <au><snm>Manolio</snm><fnm>TA</fnm></au>
+  </aug>
+  <source>PNAS</source>
+  <pubdate>2009</pubdate>
+  <volume>106</volume>
+  <issue>23</issue>
+  <fpage>9362</fpage>
+  <lpage>9367</lpage>
+</bibl>
+
+<bibl id="B14">
+  <title><p>Genome-Wide Analysis of Human SNPs at Long Intergenic Noncoding
+  RNAs</p></title>
+  <aug>
+    <au><snm>Chen</snm><fnm>G</fnm></au>
+    <au><snm>Qiu</snm><fnm>C</fnm></au>
+    <au><snm>Zhang</snm><fnm>Q</fnm></au>
+    <au><snm>Liu</snm><fnm>B</fnm></au>
+    <au><snm>Cui</snm><fnm>B</fnm></au>
+  </aug>
+  <source>Human Mutation</source>
+  <pubdate>2013</pubdate>
+  <volume>34</volume>
+  <fpage>338</fpage>
+  <lpage>344</lpage>
+</bibl>
+
+<bibl id="B15">
+  <title><p>Domain organization of human chromosomes revealed by mapping of
+  nuclear lamina interactions</p></title>
+  <aug>
+    <au><snm>Guelen</snm><fnm>L</fnm></au>
+    <au><snm>Pagie</snm><fnm>L</fnm></au>
+    <au><snm>Brasset</snm><fnm>E</fnm></au>
+    <au><snm>Meuleman</snm><fnm>W</fnm></au>
+    <au><snm>Faza</snm><fnm>MB</fnm></au>
+    <au><snm>Talhout</snm><fnm>W</fnm></au>
+    <au><snm>Steensel</snm><fnm>B</fnm></au>
+  </aug>
+  <source>Nature</source>
+  <pubdate>2008</pubdate>
+  <volume>453</volume>
+  <issue>7197</issue>
+  <fpage>948</fpage>
+  <lpage>951</lpage>
+</bibl>
+
+<bibl id="B16">
+  <title><p>The lamin protein family</p></title>
+  <aug>
+    <au><snm>Dittmer</snm><fnm>TA</fnm></au>
+    <au><snm>Mistelli</snm><fnm>T</fnm></au>
+  </aug>
+  <source>Genome Biology</source>
+  <pubdate>2011</pubdate>
+  <volume>12</volume>
+  <fpage>222</fpage>
+</bibl>
+
+<bibl id="B17">
+  <title><p>Nuclear aggregation of olfactory receptor genes governs their
+  monogenic expression</p></title>
+  <aug>
+    <au><snm>Clowney</snm><fnm>EJ</fnm></au>
+    <au><snm>LeGros</snm><fnm>MA</fnm></au>
+    <au><snm>Mosley</snm><fnm>CP</fnm></au>
+    <au><snm>Markenskoff Papadimitriou</snm><fnm>EC</fnm></au>
+    <au><snm>Myllys</snm><fnm>M</fnm></au>
+    <au><snm>Barnea</snm><fnm>G</fnm></au>
+    <au><snm>Larabell</snm><fnm>CA</fnm></au>
+    <au><snm>Lomvardas</snm><fnm>S</fnm></au>
+  </aug>
+  <source>Cell</source>
+  <pubdate>2012</pubdate>
+  <volume>151</volume>
+  <fpage>724</fpage>
+  <lpage>737</lpage>
+</bibl>
+
+</refgrp>
 } % end of \BMCxmlcomment
