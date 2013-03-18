@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.schema import PrimaryKeyConstraint
 
 import sys
+from operator import itemgetter
 
 # needed to avoid circular imports
 #CHANGED:from init import Base
@@ -120,6 +121,25 @@ class ABase(object):
 
         return zip(starts, ends)
 
+    @property
+    def gene_features(self):
+        nm, strand = self.gene_name, self.strand
+        feats = [(self.chrom, self.start, self.end, nm, strand, 'gene')]
+        for feat in ('introns', 'exons', 'utr5', 'utr3', 'cdss'):
+            fname = feat[:-1] if feat[-1] == 's' else feat
+            res = getattr(self, feat)
+            if res is None or all(r is None for r in res): continue
+            if not isinstance(res, list): res = [res]
+            feats.extend((self.chrom, s, e, nm, strand, fname) for s, e in res)
+
+        tss = self.tss(down=1)
+        if tss is not None:
+            feats.append((self.chrom, tss[0], tss[1], nm, strand, 'tss'))
+            prom = self.promoter()
+            feats.append((self.chrom, prom[0], prom[1], nm, strand, 'promoter'))
+
+        return sorted(feats, key=itemgetter(1))
+
     def tss(self, up=0, down=0):
         if not self.is_gene_pred: return None
         tss = self.txEnd if self.strand == '-' else self.txStart
@@ -131,7 +151,11 @@ class ABase(object):
             start += up
             end -= down
             start, end = end, start
-        return start, end
+        return max(0, start), max(end, start, 0)
+
+    def promoter(self, up=2000, down=0):
+        if not self.is_gene_pred: return None
+        return self.tss(up=up, down=down)
 
     @property
     def coding_exons(self):
