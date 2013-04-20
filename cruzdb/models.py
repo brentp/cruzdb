@@ -317,17 +317,21 @@ class ABase(object):
     def utr5(self):
         if not self.is_coding or len(self.exons) < 2: return (None, None)
         if self.strand == "+":
-            return (self.txStart, self.cdsStart)
+            s, e = (self.txStart, self.cdsStart)
         else:
-            return (self.cdsEnd, self.txEnd)
+            s, e = (self.cdsEnd, self.txEnd)
+        if s == e: return (None, None)
+        return s, e
 
     @property
     def utr3(self):
         if not self.is_coding or len(self.exons) < 2: return (None, None)
         if self.strand == "-":
-            return (self.txStart, self.cdsStart)
+            s, e (self.txStart, self.cdsStart)
         else:
-            return (self.cdsEnd, self.txEnd)
+            s, e (self.cdsEnd, self.txEnd)
+        if s == e: return (None, None)
+        return s, e
 
     def __len__(self):
         return self.end - self.start
