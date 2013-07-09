@@ -23,8 +23,9 @@ rects1 = ax.bar(x[:len(pf.time)] + width + 0.03, 3327. / pf.time, width,
 
 ax.set_xticks(x + width)
 ax.set_ylim(0, (3327. / min(pf.time)) + 50)
-ax.set_xticklabels(["%s %s" % tup for tup in zip(pt.loc, pt.instance)])
+ax.set_xticklabels(["%s %s" % tup for tup in zip(pt['loc'], pt.instance)])
 
 ax.legend((rects0[0], rects1[0]), ('parallel', 'not-parallel'))
 
+plt.savefig('manuscript-latex/figure1.eps')
 plt.savefig('figure1.pdf')
