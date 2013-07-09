@@ -72,6 +72,14 @@ In order to further speed up large numbers of queries, we provide a memory-effic
 The most common use-case has been to annotate a list of intervals with any table from the UCSC genome-browser database. We provide an interface, by which, with a single command, a user can annotate a file of intervals with a list of tables present in the database. For gene-like tables, the output lists the nearest gene, and whether the interval overlaps an exon, intron, untranslated region, or other gene feature.
 \end{methods}
 
+\begin{figure}[!tpb]%figure1
+\centerline{\includegraphics{figure1.eps}}
+\caption{Intervals annoted per second for a set of about 3,300 intervals using a local SQLite,
+local MySQL or remote (UCSC) MySQL instances for parallel SQL queries (red) or traditional, 
+serial queries (blue).
+}\label{fig:01}
+\end{figure}
+
 \section{Examples}
 
 
@@ -144,11 +152,6 @@ Within the nucleus, different genomic regions occupy distinct nuclear territorie
 Furthermore, when we filter to genes that are strictly contained within a LAD (not merely overlapping) with a score \textgreater 0.9, and send that stricter subset of 2,570 genes to DAVID, we find even stronger enrichment of olfaction and related terms (adjusted p \textless  1e-106), g-protein coupled recepter (adjusted p \textless  1e-95) (Supplementary File 13).
 
 
-
-%\begin{figure}[!tpb]%figure1
-%\centerline{\includegraphics{fig01.eps}}
-%\caption{Caption, caption.}\label{fig:01}
-%\end{figure}
 
 %\begin{figure}[!tpb]%figure2
 %\centerline{\includegraphics{fig02.eps}}

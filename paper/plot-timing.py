@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 plt.close()
-f, ax = plt.subplots(1, figsize=(5,3))
+f, ax = plt.subplots(1, figsize=(3, 3))
 
 df = pa.read_table(sys.argv[1])
 
@@ -23,9 +23,15 @@ rects1 = ax.bar(x[:len(pf.time)] + width + 0.03, 3327. / pf.time, width,
 
 ax.set_xticks(x + width)
 ax.set_ylim(0, (3327. / min(pf.time)) + 50)
-ax.set_xticklabels(["%s %s" % tup for tup in zip(pt['loc'], pt.instance)])
+ax.set_xticklabels(["%s\n%s" % tup for tup in zip(pt['loc'], pt.instance)], 
+        fontsize='x-small')
 
-ax.legend((rects0[0], rects1[0]), ('parallel', 'not-parallel'))
+legend = ax.legend((rects0[0], rects1[0]), ('parallel', 'not-parallel'))
+
+
+plt.setp(legend.get_texts(), fontsize='x-small')
+plt.setp(ax.get_yticklabels(), fontsize='x-small')
+plt.subplots_adjust(right=0.98, left=0.17, top=0.98, bottom=0.12)
 
 plt.savefig('manuscript-latex/figure1.eps')
 plt.savefig('figure1.pdf')
