@@ -1,6 +1,15 @@
 *.pyc
 *.egg-info
 *.db
+*.bbl
+*.sty
+doc/autodoc
+doc/build
+*.aux
+*.dvi
+*.bst
+*.eps
+*.pdf
 build/
 dist/
 MANIFEST

@@ -1,5 +1,5 @@
-cruzdb
-======
+cruzdb overview
+===============
 
 The UCSC `Genomes Database`_ is a great resource for annoations, regulation
 and variation and all kinds of data for a growing number of taxa.
