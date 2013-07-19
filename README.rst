@@ -75,7 +75,7 @@ Spatial
 k-nearest neighbors, upstream, and downstream searches are available.
 Up and downstream searches use the strand of the query feature to determine the direction:
 
-    #>>> nearest = g.knearest("refGene", "chr1", 9444, 9555, k=6)
+    >>> nearest = g.knearest("refGene", "chr1", 9444, 9555, k=6)
     >>> up_list = g.upstream("refGene", "chr1", 9444, 9555, k=6)
     >>> down_list = g.downstream("refGene", "chr1", 9444, 9555, k=6)
 
@@ -88,6 +88,7 @@ The above uses the mysql interface from UCSC. It is now possible to mirror
 any tables from UCSC to a local sqlite database via:
 
    # cleanup
+
    >>> import os
    >>> if os.path.exists("/tmp/u.db"): os.unlink('/tmp/u.db')
 
@@ -139,17 +140,6 @@ Then the connection would be something like::
 
 If you have a feature you like to use/implement, open a ticket on github for
 discussion. Below are some ideas.
-
-
-TODO
-----
-
- + examples / THINGS this should make easy:
- + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026941.html
- + https://lists.soe.ucsc.edu/pipermail/genome/2011-August/026899.html
- + https://lists.soe.ucsc.edu/pipermail/genome/2011-September/027053.html
- + simple name lookup/conversion ens -> hugo, etc.
- + histone, cpg, other informative tracks
 
 
 .. _`Genomes Database`: http://genome.ucsc.edu/cgi-bin/hgTables
