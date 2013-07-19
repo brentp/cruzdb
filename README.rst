@@ -1,3 +1,5 @@
+A rendered version of the docs is available at: http://pythonhosted.org/cruzdb/
+
 cruzdb overview
 ===============
 

@@ -6,10 +6,7 @@
 cruzdb documentation
 ====================
 
-A rendered version of the docs is available at: http://pythonhosted.org/cruzdb/
-
 Contents:
-
 
 These contain the API documentation with methods and functions for the
 objects in the `cruzdb` library
