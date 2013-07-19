@@ -1,5 +1,8 @@
 import pandas as pa
 import sys
+import matplotlib
+matplotlib.rc('font', **{'family': 'serif', 'serif': ['Times']})
+matplotlib.rc('text', **{'usetex': 'true'})
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -34,4 +37,5 @@ plt.setp(ax.get_yticklabels(), fontsize='x-small')
 plt.subplots_adjust(right=0.98, left=0.17, top=0.98, bottom=0.12)
 
 plt.savefig('manuscript-latex/figure1.eps')
+plt.savefig('manuscript-latex/figure1.pdf')
 plt.savefig('figure1.pdf')

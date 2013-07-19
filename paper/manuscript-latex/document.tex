@@ -70,15 +70,15 @@ Using CruzDB, it is possible to mirror a subset of tables from UC Santa Cruz to 
 In order to further speed up large numbers of queries, we provide a memory-efficient implementation of an interval tree that can be much faster than performing repeated SQL queries. Because all features must be read into memory to create an interval tree, there is a trade-off between the time to read all features into memory vs the time spent querying. That trade-off depends on the number of intervals. Figure 1 shows the comparison between local and remote instances and whether or not parallelization is used when annotating about 3,300 intervals (timing data is available in Supplementary File 1). Note that SQLite is quite fast, even without parallelization, however, the time for repeated queries to the remote (UCSC) MySQL instance can be greatly reduced by reading the entire table into a local interval tree to reduce network back-and-forth. As the number of intervals to annotate increases, so does the speed improvement from reading the intervals into a tree. Some speed improvement may be achieved by modifying MySQL settings, here we have used the default.
 
 The most common use-case has been to annotate a list of intervals with any table from the UCSC genome-browser database. We provide an interface, by which, with a single command, a user can annotate a file of intervals with a list of tables present in the database. For gene-like tables, the output lists the nearest gene, and whether the interval overlaps an exon, intron, untranslated region, or other gene feature.
-\end{methods}
 
 \begin{figure}[!tpb]%figure1
-\centerline{\includegraphics{figure1.eps}}
+\centerline{\includegraphics[bb=0 0 216 216]{figure_1.eps}}
 \caption{Intervals annoted per second for a set of about 3,300 intervals using a local SQLite,
 local MySQL or remote (UCSC) MySQL instances for parallel SQL queries (red) or traditional, 
 serial queries (blue).
 }\label{fig:01}
 \end{figure}
+\end{methods}
 
 \section{Examples}
 
@@ -93,11 +93,12 @@ from cruzdb.sequence import sequence
 \end{verbatim}
 
 Then, we mirror the refGene and targetScanS tables from UCSC (version hg19) to a local SQLite database:
-
 \begin{verbatim}
-local = Genome('hg19').mirror(
-    ('refGene', 'targetScanS'), 
-     'sqlite:///hg19.mirna.db')
+
+
+local = Genome("hg19")\
+    .mirror(("refGene", "targetScanS"),
+            "sqlite:///hg19.mirna.db")
 \end{verbatim}
 
 Now that we have mirrored these tables from the remote UCSC server, they will always be available in the local SQLite database as long as we keep the hg19.mirna.db file. We then iterate over the rows of refGene, where each row is a python object with methods such as "is\_coding".
@@ -153,7 +154,7 @@ Furthermore, when we filter to genes that are strictly contained within a LAD (n
 
 
 
-%\begin{figure}[!tpb]%figure2
+%\begin{figure}[!tpb]%figure1
 %\centerline{\includegraphics{fig02.eps}}
 %\caption{Caption, caption.}\label{fig:02}
 %\end{figure}
@@ -177,7 +178,7 @@ Further work needs to be done to validate this work and to demonstrate the broad
 
 
 \section{Conclusion}
-We have introduced CruzDB, a parallelizable and intuitive syntax-based programmatic interface with UCSC genome browser that allows integrative context-dependent analyses of diverse local and remotely hosted datasets, as well as annotation and spatial-querying. Some of the functions that make CruzDB a library of broad and general utility are the feature extraction, fast queries, and simple syntax.
+We have introduced CruzDB, a parallelizable and intuitive programmatic interface with UCSC genome browser that allows integrative context-dependent analyses of diverse local and remotely hosted datasets, as well as annotation and spatial-querying. Some of the functions that make CruzDB a library of broad and general utility are the feature extraction, fast queries, and simple syntax.
 Using the library, one can mirror the UCSC databases to a local SQLite or MySQL database, perform location-based queries, and perform integrative analyses combining local and remotely hosted features. We have shown how to create a local copy of selected tables is a single line of code and how having that local copy improves the speed of later analyses.
 
 
