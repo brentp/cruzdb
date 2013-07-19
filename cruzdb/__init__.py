@@ -1,3 +1,6 @@
+"""
+cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
+"""
 import soup
 import sys
 
@@ -10,6 +13,34 @@ def _open(filelike, mode='r'):
     return open(filelike, mode)
 
 class Genome(soup.Genome):
+    """
+    Connect to a particular database
+
+    Returns a new Genome object
+
+    Parameters
+    ----------
+
+    db : str
+        either an sqlalchemy dburl, or just the database name.
+
+    user : str
+        if `db` is a dburl, this is not needed. otherwise it's
+        the database user
+
+    host : str
+        if `db` is a dburl, this is not needed. otherwise it's
+        the database host
+
+    password : str
+        if `db` is a dburl, this is not needed. otherwise it's
+        the database password
+
+    engine : sqlalchemy.engine
+        if specified, all other parameters must be unused. just forces
+            use of an existing engine
+
+    """
     url = "mysql://%(user)s%(password)s@%(host)s/%(db)s"
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
@@ -21,6 +52,10 @@ class Genome(soup.Genome):
 
     def create_url(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
         password=""):
+        """
+        internal: create a dburl from a set of parameters or the defaults on
+        this object
+        """
 
         if db.startswith(("sqlite://", "mysql://", "postgresql://")):
 
@@ -40,10 +75,39 @@ class Genome(soup.Genome):
 
 
     def mirror(self, tables, dest_url):
+        """
+        miror a set of `tables` from `dest_url`
+
+        Returns a new Genome object
+
+        Parameters
+        ----------
+
+        tables : list
+            an iterable of tables
+
+        dest_url: str
+            a dburl string, e.g. 'sqlite:///local.db'
+        """
         from mirror import mirror
         return mirror(self, tables, dest_url)
 
     def dataframe(self, table, limit=None, offset=None):
+        """
+        create a pandas dataframe from a table or query
+
+        Parameters
+        ----------
+
+        table : table
+            a table in this database or a query
+
+        limit: integer
+            an integer limit on the query
+
+        offset: integer
+            an offset for the query
+        """
         from pandas import DataFrame
         if isinstance(table, basestring):
             table = getattr(self, table)
@@ -63,6 +127,25 @@ class Genome(soup.Genome):
     def load_file(self, fname, table=None, sep="\t", bins=False, indexes=None):
         """
         use some of the machinery in pandas to load a file into a table
+
+        Parameters
+        ----------
+
+        fname : str
+            filename or filehandle to load
+
+        table : str
+            table to load the file to
+
+        sep : str
+            CSV separator
+
+        bins : bool
+            add a "bin" column for efficient spatial queries.
+
+        indexes : list[str]
+            list of columns to index
+
         """
         convs = {"#chr": "chrom", "start": "txStart", "end": "txEnd", "chr":
                 "chrom", "pos": "start", "POS": "start", "chromStart": "txStart",
@@ -127,11 +210,45 @@ class Genome(soup.Genome):
     @staticmethod
     def david_go(refseq_list, annot=('SP_PIR_KEYWORDS', 'GOTERM_BP_FAT',
                                         'GOTERM_CC_FAT', 'GOTERM_MF_FAT')):
+
+        """
+        open a web-browser to the DAVID online enrichment tool
+
+        Parameters
+        ----------
+
+        refseq_list : list
+           list of refseq names to check for enrichment
+
+        annot : list
+           iterable of DAVID annotations to check for enrichment
+        """
         URL = "http://david.abcc.ncifcrf.gov/api.jsp?type=REFSEQ_MRNA&ids=%s&tool=term2term&annot="
         import webbrowser
         webbrowser.open(URL % ",".join(set(refseq_list)) + ",".join(annot))
 
     def bin_query(self, table, chrom, start, end):
+        """
+        perform an efficient spatial query using the bin column if available.
+        The possible bins are calculated from the `start` and `end` sent to
+        this function.
+
+        Parameters
+        ----------
+
+        table : str or table
+           table to query
+
+        chrom : str
+           chromosome for the query
+
+        start : int
+           0-based start postion
+
+        end : int
+            0-based end position
+
+        """
         if isinstance(table, basestring):
             table = getattr(self, table)
 
@@ -152,6 +269,28 @@ class Genome(soup.Genome):
         return q.filter(tbl.c.chromStart <= end).filter(tbl.c.chromEnd >= start)
 
     def upstream(self, table, chrom_or_feat, start=None, end=None, k=1):
+        """
+        Return k-nearest upstream features
+
+        Parameters
+        ----------
+
+        table : str or table
+            table against which to query
+
+        chrom_or_feat : str or feat
+            either a chromosome, e.g. 'chr3' or a feature with .chrom, .start,
+            .end attributes
+
+        start : int
+            if `chrom_or_feat` is a chrom, then this must be the integer start
+
+        end : int
+            if `chrom_or_feat` is a chrom, then this must be the integer end
+
+        k : int
+            number of upstream neighbors to return
+        """
         res = self.knearest(table, chrom_or_feat, start, end, k, "up")
         end = getattr(chrom_or_feat, "end", end)
         start = getattr(chrom_or_feat, "start", start)
@@ -162,6 +301,28 @@ class Genome(soup.Genome):
             return [x for x in res if x.start < end]
 
     def downstream(self, table, chrom_or_feat, start=None, end=None, k=1):
+        """
+        Return k-nearest downstream features
+
+        Parameters
+        ----------
+
+        table : str or table
+            table against which to query
+
+        chrom_or_feat : str or feat
+            either a chromosome, e.g. 'chr3' or a feature with .chrom, .start,
+            .end attributes
+
+        start : int
+            if `chrom_or_feat` is a chrom, then this must be the integer start
+
+        end : int
+            if `chrom_or_feat` is a chrom, then this must be the integer end
+
+        k : int
+            number of downstream neighbors to return
+        """
         res = self.knearest(table, chrom_or_feat, start, end, k, "down")
         end = getattr(chrom_or_feat, "end", end)
         start = getattr(chrom_or_feat, "start", start)
@@ -173,6 +334,31 @@ class Genome(soup.Genome):
 
     def knearest(self, table, chrom_or_feat, start=None, end=None, k=1,
             _direction=None):
+        """
+        Return k-nearest features
+
+        Parameters
+        ----------
+
+        table : str or table
+            table against which to query
+
+        chrom_or_feat : str or feat
+            either a chromosome, e.g. 'chr3' or a feature with .chrom, .start,
+            .end attributes
+
+        start : int
+            if `chrom_or_feat` is a chrom, then this must be the integer start
+
+        end : int
+            if `chrom_or_feat` is a chrom, then this must be the integer end
+
+        k : int
+            number of downstream neighbors to return
+
+        _direction : (None, "up", "down")
+            internal (don't use this)
+        """
         assert _direction in (None, "up", "down")
 
         # they sent in a feature
@@ -235,16 +421,54 @@ class Genome(soup.Genome):
         return res[:k]
 
     def sql(self, query):
+        """
+        show the sql of a query
+        """
         return self.engine.execute(query)
 
     def annotate(self, fname, tables, feature_strand=False, in_memory=False,
             header=None, out=sys.stdout, parallel=False):
+        """
+        annotate a file with a number of tables
+
+        Parameters
+        ----------
+
+        fname : str or file
+           file name or file-handle
+
+        tables : list
+            list of tables with which to annotate `fname`
+
+        feature_strand : bool
+            if this is True, then the up/downstream designations are based on
+            the features in `tables` rather than the features in `fname`
+
+        in_memoory : bool
+            if True, then tables are read into memory. This usually makes the
+            annotation much faster if there are more than 500 features in
+            `fname` and the number of features in the table is less than 100K.
+
+        header : str
+            header to print out (if True, use existing header)
+
+        out : file
+            where to print output
+
+        parallel : bool
+            if True, use multiprocessing library to execute the annotation of
+            each chromosome in parallel. Uses more memory.
+        """
         from .annotate import annotate
         return annotate(self, fname, tables, feature_strand, in_memory, header=header,
                 out=out, parallel=parallel)
 
     @staticmethod
     def bins(start, end):
+        """
+        Get all the bin numbers for a particular interval defined by
+        (start, end]
+        """
         if end - start < 536870912:
             offsets = [585, 73, 9, 1]
         else:
@@ -270,7 +494,17 @@ class Genome(soup.Genome):
 
     @classmethod
     def save_bed(cls, query, filename=sys.stdout):
-        # write a bed12 file of the query.
+        """
+        write a bed12 file of the query.
+        Parameters
+        ----------
+
+        query : query
+            a table or query to save to file
+        filename : file
+            string or filehandle to write output
+
+        """
         out = _open(filename, 'w')
         for o in query:
             out.write(o.bed() + '\n')

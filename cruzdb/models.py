@@ -1,3 +1,9 @@
+"""
+This is used to create a Model with the appropriate methods
+from a UCSC table. It uses sqlalchemy reflection to
+do the lifiting.
+
+"""
 from sqlalchemy import Column, String, ForeignKey, Float, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
@@ -11,12 +17,6 @@ from operator import itemgetter
 from sequence import sequence as _sequence
 from __init__ import Genome
 
-"""
-This is used to create a Model with the appropriate methods
-from a UCSC table. It uses sqlalchemy reflection to
-do the lifiting.
-
-"""
 
 import re
 
@@ -50,6 +50,22 @@ class CruzException(Exception):
     pass
 
 class Interval(object):
+    """
+    Interval class for convenience
+
+    Parameters
+    ----------
+
+    start : int
+    
+    end : int
+
+    chrom : str
+
+    name : str
+        optional name for the interval
+    """
+
     __slots__ = ('chrom', 'start', 'end', 'name', 'gene_name')
     def __init__(self, start, end, chrom=None, name=None):
         self.start, self.end = start, end
@@ -57,12 +73,19 @@ class Interval(object):
         self.name = self.gene_name = name
 
     def overlaps(self, other):
+        """
+        check for overlap with the other interval
+        """
         if self.chrom != other.chrom: return False
         if self.start > other.end: return False
         if other.start > self.end: return False
         return True
 
     def is_upstream_of(self, other):
+        """
+        check if this is upstream of the `other` interval taking the strand of
+        the other interval into account
+        """
         if self.chrom != other.chrom: return None
         if getattr(other, "strand", None) == "+":
             return self.end <= other.start
@@ -70,6 +93,23 @@ class Interval(object):
         return self.start >= other.end
 
     def distance(self, other_or_start=None, end=None, features=False):
+        """
+        check the distance between this an another interval
+        Parameters
+        ----------
+
+        other_or_start : Interval or int
+            either an integer or an Interval with a start attribute indicating
+            the start of the interval
+
+        end : int
+            if `other_or_start` is an integer, this must be an integer
+            indicating the end of the interval
+
+        features : bool
+            if True, the features, such as CDS, intron, etc. that this feature
+            overlaps are returned.
+        """
         if end is None:
             assert other_or_start.chrom == self.chrom
 
@@ -82,6 +122,10 @@ class Interval(object):
         return 0
 
 class ABase(object):
+    """
+    Base object that wraps returned database rows
+    """
+
     _prefix_chain = ("tx", "chrom")
     @declared_attr
     def __tablename__(cls):
@@ -108,6 +152,9 @@ class ABase(object):
 
     @property
     def exons(self):
+        """
+        return a list of exons [(start, stop)] for this object if appropriate
+        """
         # drop the trailing comma
         if not self.is_gene_pred: return []
         if hasattr(self, "exonStarts"):
@@ -123,6 +170,10 @@ class ABase(object):
 
     @property
     def gene_features(self):
+        """
+        return a list of features for the gene features of this object.
+        This would include exons, introns, utrs, etc.
+        """
         nm, strand = self.gene_name, self.strand
         feats = [(self.chrom, self.start, self.end, nm, strand, 'gene')]
         for feat in ('introns', 'exons', 'utr5', 'utr3', 'cdss'):
@@ -141,6 +192,21 @@ class ABase(object):
         return sorted(feats, key=itemgetter(1))
 
     def tss(self, up=0, down=0):
+        """
+        Return a start, end tuple of positions around the transcription-start
+        site
+
+        Parameters
+        ----------
+
+        up : int
+           if greature than 0, the strand is used to add this many upstream
+           bases in the appropriate direction
+
+        down : int
+           if greature than 0, the strand is used to add this many downstream
+           bases into the gene.
+        """
         if not self.is_gene_pred: return None
         tss = self.txEnd if self.strand == '-' else self.txStart
         start, end = tss, tss
@@ -154,6 +220,19 @@ class ABase(object):
         return max(0, start), max(end, start, 0)
 
     def promoter(self, up=2000, down=0):
+        """
+        Return a start, end tuple of positions for the promoter region of this
+        gene
+
+        Parameters
+        ----------
+
+        up : int
+           this distance upstream that is considered the promoter
+
+        down : int
+           the strand is used to add this many downstream bases into the gene.
+        """
         if not self.is_gene_pred: return None
         return self.tss(up=up, down=down)
 
@@ -197,10 +276,16 @@ class ABase(object):
 
     @property
     def cds_sequence(self):
+        """
+        a list of genomic sequences for the CDS's
+        """
         return self._cds_sequence(self.cds)
 
     @property
     def mrna_sequence(self):
+        """
+        a list of genomic sequences for the mRNA's
+        """
         return self._cds_sequence(self.coding_exons)
 
     @property
@@ -209,6 +294,7 @@ class ABase(object):
 
     @property
     def position(self):
+        " a chrom:start-stop representation of this feature"
         return "%s:%i-%i" % (self.chrom, self.start, self.end)
 
     @property
@@ -238,6 +324,10 @@ class ABase(object):
         return f
 
     def is_upstream_of(self, other):
+        """
+        return a boolean indicating whether this feature is upstream of `other`
+        taking the strand of other into account
+        """
         if self.chrom != other.chrom: return None
         if getattr(other, "strand", None) == "+":
             return self.end <= other.start
@@ -245,6 +335,10 @@ class ABase(object):
         return self.start >= other.end
 
     def is_downstream_of(self, other):
+        """
+        return a boolean indicating whether this feature is downstream of
+        `other` taking the strand of other into account
+        """
         if self.chrom != other.chrom: return None
         if getattr(other, "strand", None) == "+":
             return self.start >= other.end
@@ -277,6 +371,23 @@ class ABase(object):
         return ovls
 
     def distance(self, other_or_start=None, end=None, features=False):
+        """
+        check the distance between this an another interval
+        Parameters
+        ----------
+
+        other_or_start : Interval or int
+            either an integer or an Interval with a start attribute indicating
+            the start of the interval
+
+        end : int
+            if `other_or_start` is an integer, this must be an integer
+            indicating the end of the interval
+
+        features : bool
+            if True, the features, such as CDS, intron, etc. that this feature
+            overlaps are returned.
+        """
         if end is None:
             assert other_or_start.chrom == self.chrom
 
@@ -315,6 +426,9 @@ class ABase(object):
 
     @property
     def utr5(self):
+        """
+        return the 5' UTR if appropriate
+        """
         if not self.is_coding or len(self.exons) < 2: return (None, None)
         if self.strand == "+":
             s, e = (self.txStart, self.cdsStart)
@@ -325,6 +439,9 @@ class ABase(object):
 
     @property
     def utr3(self):
+        """
+        return the 3' UTR if appropriate
+        """
         if not self.is_coding or len(self.exons) < 2: return (None, None)
         if self.strand == "-":
             s, e = (self.txStart, self.cdsStart)
@@ -392,8 +509,9 @@ class ABase(object):
 
     def sequence(self, per_exon=False):
         """
+        Return the sequence for this feature.
         if per-exon is True, return an array of exon sequences
-        NOTE: this is never reverse-complemented. TODO??
+        This sequence is never reverse complemented
         """
         db = self.db
         if not per_exon:
@@ -411,6 +529,9 @@ class ABase(object):
             yield str(getattr(self, k, ""))
 
     def ncbi_blast(self, db="nr", megablast=True, sequence=None):
+        """
+        perform an NCBI blast against the sequence of this feature
+        """
         import requests
         requests.defaults.max_retries = 4
         assert sequence in (None, "cds", "mrna")
@@ -456,6 +577,7 @@ class ABase(object):
         """
         make a request to the genome-browsers BLAT interface
         sequence is one of None, "mrna", "cds"
+        returns a list of features that are hits to this sequence.
         """
         from . blat_blast import blat, blat_all
         assert sequence in (None, "cds", "mrna")
@@ -473,6 +595,9 @@ class ABase(object):
         return hasattr(self, "exonStarts") or hasattr(self, 'chromStarts')
 
     def bed(self, *attrs, **kwargs):
+        """
+        return a bed formatted string of this feature
+        """
         exclude = ("chrom", "start", "end", "txStart", "txEnd", "chromStart",
                 "chromEnd")
         if self.is_gene_pred:
@@ -484,11 +609,9 @@ class ABase(object):
 
 
     def bed12(self, score="0", rgb="."):
-        """convert the exon stuff into bed12
-        http://genome.ucsc.edu/FAQ/FAQformat.html#format1
-        # TODO: all name_fn kwarg like:
-            name_fn = lambda feat: feat.name + "," feat.name2
-        in case we want to show gene name and transcript name.
+        """
+        return a bed12 (http://genome.ucsc.edu/FAQ/FAQformat.html#format1)
+        representation of this interval
         """
         if not self.is_gene_pred:
             raise CruzException("can't create bed12 from non genepred feature")
@@ -502,6 +625,25 @@ class ABase(object):
             self.chrom, self.txStart, self.txEnd, name,
             score, self.strand, self.cdsStart, self.cdsEnd, rgb,
             len(exons), sizes, starts)))
+
+    def globalize(self, position, cdna=True):
+        1/0
+        start, end = (self.cdsStart, self.cdsEnd) if cdna else \
+                                        (self.start, self.end)
+        exons = self.exons or None
+        pos = position + start
+        if exons is None:
+            return pos
+
+        subtract = 0
+        print >>sys.stderr, "exon lengths:", sum((ie - ib) for ib, ie in self.exons)
+        for estart, eend in exons:
+            if iend < pos:
+                subtract += (iend - istart)
+            elif istart < pos and iend > pos:
+                subtract += (pos - istart)
+            print >>sys.stderr, subtract, (istart, iend), pos
+        return pos - subtract
 
     def localize(self, *positions, **kwargs):
         """
@@ -531,6 +673,7 @@ class ABase(object):
         for original_p in positions:
             subtract = 0
             p = original_p
+            print >>sys.stderr, p, l
             if p < 0 or p >= l: # outside of transcript
                 local_ps.append(None)
                 continue
@@ -564,6 +707,23 @@ class cpgIslandExt(Feature):
 
     def distance(self, other_or_start=None, end=None, features="unused",
             shore_dist=3000):
+        """
+        check the distance between this an another interval
+        Parameters
+        ----------
+
+        other_or_start : Interval or int
+            either an integer or an Interval with a start attribute indicating
+            the start of the interval
+
+        end : int
+            if `other_or_start` is an integer, this must be an integer
+            indicating the end of the interval
+
+        features : bool
+            if True, the features, such as CDS, intron, etc. that this feature
+            overlaps are returned.
+        """
         # leave features kwarg to match signature from Feature.distance
         if end is None:
             assert other_or_start.chrom == self.chrom
