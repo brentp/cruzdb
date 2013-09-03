@@ -39,7 +39,7 @@ existing, external data can provide insight into function.
 We present CruzDB, a fast and intuitive programmatic interface to the UCSC genome browser that facilitates integrative analyses of diverse local and remotely hosted datasets. We showcase the syntax of CruzDB using miRNA-binding sites as examples, and further demonstrate its utility with 3 biological discoveries. First, DNA replication timing is stratified in gene regions – exons tend to replicate early, and introns late during S phase. Second, several non-coding variants associated with cognitive functions map to lincRNA transcripts of relevant function, suggesting potential function of these regulatory RNAs in neuronal diseases. Third, lamina-associated genomic regions are highly enriched in olfaction-related genes, indicating a role of nuclear organization in their regulation.
 
 \section{Availability:}
-CruzDB is available at https://github.com/brentp/cruzdb
+CruzDB is available at https://github.com/brentp/cruzdb under the MIT open-source license.
 
 \section{Contact:} \href{bpederse@gmail.com}{bpederse@gmail.com}, \href{subhajyoti.de@ucdenver.edu}{subhajyoti.de@ucdenver.edu}
 \end{abstract}
@@ -56,7 +56,7 @@ We present example code from the library and then describe four diverse findings
 
 \section{Approach}
 
-CruzDB utilizes the python programming language and sqlalchemy (SQL-alchemy) library to access publicly available data hosted at the UCSC genome browser database\citep{Dreszer} . By using sqlalchemy, we are able to wrap the database tables dynamically rather than requiring explicit code for each of the thousands of available tables (10,076 in the hg19 database). 
+CruzDB utilizes the python programming language and sqlalchemy (SQL-alchemy) library to access publicly available data hosted at the UCSC genome browser database\citep{Dreszer} . By using sqlalchemy, we are able to wrap the database tables dynamically rather than requiring explicit code for each of the thousands of available tables (10,076 in the hg19 database) for each organism and version-specific database. 
 
 Although CruzDB can function using only the remote data from UCSC's MySQL instance, we show that  substantial improvements in speed can be achieved from having a local mirror, and utilizing built-in parallelization (described in next section). The library contains a suite of tests to ensure correctness. CruzDB requires python 2.6 or 2.7, the MySQL client libraries and the python sqlalchemy library. Installation is available using standard python tools from http://pypi.python.org/pypi/cruzdb or from the source repository at https://github.com/brentp/cruzdb/.
 
@@ -162,7 +162,7 @@ Furthermore, when we filter to genes that are strictly contained within a LAD (n
 \section{Discussion}
 
 We have showcased the programmatic interface of CruzDB using miRNA-binding sites as motivation, and further demonstrated its utility using 3 biological examples.
-The biological examples and their CruzDB code demonstrate the simple syntax, and the potential of this utility to facilitate hypothesis-driven studies.
+The biological examples and their CruzDB code demonstrate the simple syntax, and the potential of this utility to facilitate hypothesis-driven studies. Although the examples we have shown are in human version \textit{hg19}, CruzDB can be used for any organism and version available in the UCSC database by using, for example '\textit{dm3}' as the initializer.
 
 While previous studies have demonstrated higher order organization of DNA replication timing patterns in the human genome, our observation that replication timing patterns correlate with intron-exon structures reveals a finer-scale stratification of DNA replication patterns within gene regions. LincRNAs play major regulatory roles in different biological processes in neuronal and other tissue types, but their role in complex cognitive traits and diseases have not been systematically assessed yet. We report several instances where disease-associated variants overlap with lincRNAs with relevant biological functions. Our findings, combined with the recent study showing a lower incidence of SNPs within lincRNAs \citep{Chen}, highlight the importance of examining GWAS hits in this context. Finally, integrating data on lamina-associated domains and protein-coding regions, we find that olfactory receptor genes are highly enriched in the lamina-associated domains. Our findings are consistent with a recent report that nuclear clustering of olfactory receptor genes governs their monogenic expression, and that laminB receptor-induced changes in nuclear architecture influence singular transcription pattern of the olfactory receptor genes \citep{Clowney}. 
 
