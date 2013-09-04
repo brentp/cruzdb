@@ -71,10 +71,10 @@ In order to further speed up large numbers of queries, we provide a memory-effic
 The most common use-case has been to annotate a list of intervals with any table from the UCSC genome-browser database. We provide an interface, by which, with a single command, a user can annotate a file of intervals with a list of tables present in the database. For gene-like tables, the output lists the nearest gene, and whether the interval overlaps an exon, intron, untranslated region, or other gene feature.
 
 \begin{figure}[!tpb]%figure1
-\centerline{\includegraphics[bb=0 0 216 216]{figure_1.eps}}
+\centerline{\includegraphics[bb=0 0 216 216]{figure1.eps}}
 \caption{Intervals annoted per second for a set of about 3,300 intervals using a local SQLite,
-local MySQL or remote (UCSC) MySQL instances for parallel SQL queries (red) or traditional, 
-serial queries (blue).
+local MySQL or remote (UCSC) MySQL instances for parallel SQL queries (light) or traditional, 
+serial queries (dark).
 }\label{fig:01}
 \end{figure}
 \end{methods}
