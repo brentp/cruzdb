@@ -329,10 +329,10 @@ class ABase(object):
         taking the strand of other into account
         """
         if self.chrom != other.chrom: return None
-        if getattr(other, "strand", None) == "+":
-            return self.end <= other.start
-        # other feature is on - strand, so this must have higher start
-        return self.start >= other.end
+        if getattr(other, "strand", None) == "-":
+            # other feature is on - strand, so this must have higher start
+            return self.start >= other.end
+        return self.end <= other.start
 
     def is_downstream_of(self, other):
         """
@@ -340,10 +340,10 @@ class ABase(object):
         `other` taking the strand of other into account
         """
         if self.chrom != other.chrom: return None
-        if getattr(other, "strand", None) == "+":
-            return self.start >= other.end
-        # other feature is on - strand, so this must have higher start
-        return self.end <= other.start
+        if getattr(other, "strand", None) == "-":
+            # other feature is on - strand, so this must have higher start
+            return self.end <= other.start
+        return self.start >= other.end
 
     def features(self, other_start, other_end):
         """

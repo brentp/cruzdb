@@ -126,9 +126,9 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             gp = hasattr(objs[0], "exonStarts")
             names = [o.gene_name for o in objs]
             if feature_strand:
-                strands = [-1 if o.is_upstream_of(f) else 1 for o in objs]
-            else:
                 strands = [-1 if f.is_upstream_of(o) else 1 for o in objs]
+            else:
+                strands = [-1 if o.is_upstream_of(f) else 1 for o in objs]
 
             # dists can be a list of tuples where the 2nd item is something
             # like 'island' or 'shore'
