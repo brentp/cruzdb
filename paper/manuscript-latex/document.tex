@@ -9,7 +9,7 @@
 intervals with UCSC genome-browser database}
 
 
-\author[Pedersen \textit{et~al}]{Brent S Pedersen\,$^{1,*}\footnote{to whom correspondence should be addressed}$,
+\author[Pedersen \textit{et~al}]{Brent S Pedersen\,$^{1}\footnote{to whom correspondence should be addressed}$,
         
          Ivana V Yang\,$^{1}$
          and
@@ -19,9 +19,8 @@ intervals with UCSC genome-browser database}
 
 
 
-\address{$^{1}$University of Colorado, Anshutz Medical Campus, Department of Medicine 
-        12700 East 19th Avenue, 8611 Aurora, CO 80045\\
-$^{2}$University of Colorado Cancer Center. 13001 E 17th Pl, Aurora, CO 80045}
+\address{$^{1}$Department of Medicine, University of Colorado Denver, School of Medicine, Denver, Colorado, USA.\\
+$^{2}$Molecular Oncology Program, University of Colorado Cancer Center, Aurora, CO, USA}
 
 \history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
 
@@ -39,7 +38,7 @@ existing, external data can provide insight into function.
 We present CruzDB, a fast and intuitive programmatic interface to the UCSC genome browser that facilitates integrative analyses of diverse local and remotely hosted datasets. We showcase the syntax of CruzDB using miRNA-binding sites as examples, and further demonstrate its utility with 3 biological discoveries. First, DNA replication timing is stratified in gene regions – exons tend to replicate early, and introns late during S phase. Second, several non-coding variants associated with cognitive functions map to lincRNA transcripts of relevant function, suggesting potential function of these regulatory RNAs in neuronal diseases. Third, lamina-associated genomic regions are highly enriched in olfaction-related genes, indicating a role of nuclear organization in their regulation.
 
 \section{Availability:}
-CruzDB is available at https://github.com/brentp/cruzdb
+CruzDB is available at https://github.com/brentp/cruzdb under the MIT open-source license.
 
 \section{Contact:} \href{bpederse@gmail.com}{bpederse@gmail.com}, \href{subhajyoti.de@ucdenver.edu}{subhajyoti.de@ucdenver.edu}
 \end{abstract}
@@ -56,7 +55,7 @@ We present example code from the library and then describe four diverse findings
 
 \section{Approach}
 
-CruzDB utilizes the python programming language and sqlalchemy (SQL-alchemy) library to access publicly available data hosted at the UCSC genome browser database\citep{Dreszer} . By using sqlalchemy, we are able to wrap the database tables dynamically rather than requiring explicit code for each of the thousands of available tables (10,076 in the hg19 database). 
+CruzDB utilizes the python programming language and sqlalchemy (SQL-alchemy) library to access publicly available data hosted at the UCSC genome browser database\citep{Dreszer} . By using sqlalchemy, we are able to wrap the database tables dynamically rather than requiring explicit code for each of the thousands of available tables (10,076 in the hg19 database) for each organism and version-specific database. 
 
 Although CruzDB can function using only the remote data from UCSC's MySQL instance, we show that  substantial improvements in speed can be achieved from having a local mirror, and utilizing built-in parallelization (described in next section). The library contains a suite of tests to ensure correctness. CruzDB requires python 2.6 or 2.7, the MySQL client libraries and the python sqlalchemy library. Installation is available using standard python tools from http://pypi.python.org/pypi/cruzdb or from the source repository at https://github.com/brentp/cruzdb/.
 
@@ -72,10 +71,10 @@ In order to further speed up large numbers of queries, we provide a memory-effic
 The most common use-case has been to annotate a list of intervals with any table from the UCSC genome-browser database. We provide an interface, by which, with a single command, a user can annotate a file of intervals with a list of tables present in the database. For gene-like tables, the output lists the nearest gene, and whether the interval overlaps an exon, intron, untranslated region, or other gene feature.
 
 \begin{figure}[!tpb]%figure1
-\centerline{\includegraphics[bb=0 0 216 216]{figure_1.eps}}
+\centerline{\includegraphics[bb=0 0 216 216]{figure1.eps}}
 \caption{Intervals annoted per second for a set of about 3,300 intervals using a local SQLite,
-local MySQL or remote (UCSC) MySQL instances for parallel SQL queries (red) or traditional, 
-serial queries (blue).
+local MySQL or remote (UCSC) MySQL instances for parallel SQL queries (light) or traditional, 
+serial queries (dark).
 }\label{fig:01}
 \end{figure}
 \end{methods}
@@ -148,9 +147,9 @@ Here, we use lincRNA transcripts available in the UCSC hg19 from \citep{Cabili} 
 Using a more relaxed criteria, where a SNP was selected simply if it was closer to a lincRNA than to the nearest gene, we found 2153 SNPs (Supplementary File 10). Our findings, combined with the recent study showing a lower incidence of SNPs within lincRNAs \citep{Chen} show the importance of annotating GWAS results with lincRNAs in addition to genes.
 
 \subsection{Lamina Associated Domains}
-Within the nucleus, different genomic regions occupy distinct nuclear territories, such that some regions are in contact with nuclear lamina (termed lamina-associated domains or LADs) \citep{Guelen,Dittmer}. These regions usually have repressive chromatin marks and lower levels of gene expression. However, it has not yet been investigated systematically whether certain classes of genes are more clustered in LADs compared to that expected by chance. Overlaying data on lamina associated domains (LADs) from \citep{Guelen}, and known genes, we find over 5000 genes overlap completely/partially with the LADs (Supplementary File 11). Furthermore, piping the genes that overlap a LAD with a score \textgreater 0.9 (the fraction of probes with a positive smoothed log-ratio) to the DAVID gene-ontology enrichment software \citep{Huang} we report very strong enrichment for categories related to olfaction (adjusted p \textless 1e-80), G-protein coupled receptor (adjusted p \textless 1e-60), and other categories related to sensing (Supplementary File 12).  Our findings are consistent with a recent report \citep{Clowney} that nuclear clustering of olfactory receptor genes governs their monogenic expression. It is suspected that laminB receptor-induced changes in nuclear architecture influences singular transcription pattern of the olfactory receptor genes \citep{Clowney}.
+Within the nucleus, different genomic regions occupy distinct nuclear territories, such that some regions are in contact with nuclear lamina--termed lamina-associated domains or LADs \citep{Guelen,Dittmer}. These regions usually have repressive chromatin marks and lower levels of gene expression. However, it has not yet been investigated systematically whether certain classes of genes are more clustered in LADs compared to that expected by chance. Overlaying data on lamina associated domains (LADs) from \citep{Guelen}, and known genes, we find over 5000 genes overlap completely/partially with the LADs (Supplementary File 11). Furthermore, piping the genes that overlap a LAD with a score \textgreater 0.9 (the fraction of probes with a positive smoothed log-ratio) to the DAVID gene-ontology enrichment software \citep{Huang} we report very strong enrichment for categories related to olfaction (adjusted p \textless 1e-80), G-protein coupled receptor (adjusted p \textless 1e-60), and other categories related to sensing (Supplementary File 12).  Our findings are consistent with a recent report \citep{Clowney} that nuclear clustering of olfactory receptor genes governs their monogenic expression. It is suspected that laminB receptor-induced changes in nuclear architecture influences singular transcription pattern of the olfactory receptor genes \citep{Clowney}.
 
-Furthermore, when we filter to genes that are strictly contained within a LAD (not merely overlapping) with a score \textgreater 0.9, and send that stricter subset of 2,570 genes to DAVID, we find even stronger enrichment of olfaction and related terms (adjusted p \textless  1e-106), g-protein coupled recepter (adjusted p \textless  1e-95) (Supplementary File 13).
+Furthermore, when we filter to genes that are strictly contained within a LAD (not merely overlapping) with a score \textgreater 0.9, and send that stricter subset of 2,570 genes to DAVID, we find even stronger enrichment of olfaction and related terms (adjusted p \textless  1e-106), g-protein coupled recepter (adjusted p \textless  1e-95, Supplementary File 13).
 
 
 
@@ -162,7 +161,7 @@ Furthermore, when we filter to genes that are strictly contained within a LAD (n
 \section{Discussion}
 
 We have showcased the programmatic interface of CruzDB using miRNA-binding sites as motivation, and further demonstrated its utility using 3 biological examples.
-The biological examples and their CruzDB code demonstrate the simple syntax, and the potential of this utility to facilitate hypothesis-driven studies.
+The biological examples and their CruzDB code demonstrate the simple syntax, and the potential of this utility to facilitate hypothesis-driven studies. Although the examples we have shown are in human version \textit{hg19}, CruzDB can be used for any organism and version available in the UCSC database by using, for example '\textit{dm3}' as the initializer.
 
 While previous studies have demonstrated higher order organization of DNA replication timing patterns in the human genome, our observation that replication timing patterns correlate with intron-exon structures reveals a finer-scale stratification of DNA replication patterns within gene regions. LincRNAs play major regulatory roles in different biological processes in neuronal and other tissue types, but their role in complex cognitive traits and diseases have not been systematically assessed yet. We report several instances where disease-associated variants overlap with lincRNAs with relevant biological functions. Our findings, combined with the recent study showing a lower incidence of SNPs within lincRNAs \citep{Chen}, highlight the importance of examining GWAS hits in this context. Finally, integrating data on lamina-associated domains and protein-coding regions, we find that olfactory receptor genes are highly enriched in the lamina-associated domains. Our findings are consistent with a recent report that nuclear clustering of olfactory receptor genes governs their monogenic expression, and that laminB receptor-induced changes in nuclear architecture influence singular transcription pattern of the olfactory receptor genes \citep{Clowney}. 
 
@@ -186,7 +185,8 @@ Using the library, one can mirror the UCSC databases to a local SQLite or MySQL 
 
 %\section*{Acknowledgement}
 
-%\paragraph{Funding\textcolon} 
+\paragraph{Funding\textcolon} 
+SD acknowledges support from the NCI Physical Sciences Oncology Center pilot grant (U54CA143798), American Cancer Society grant (ACS IRG 57-001-53), and University of Colorado School of Medicine startup grant.
 
 %\bibliographystyle{natbib}
 %\bibliographystyle{achemnat}
