@@ -1,5 +1,7 @@
 A rendered version of the docs is available at: http://pythonhosted.org/cruzdb/
 
+A paper describing cruzdb is in Bioinformatics: http://bioinformatics.oxfordjournals.org/cgi/content/abstract/btt534?ijkey=9I8rQeolKOhzFHv&keytype=ref
+
 cruzdb overview
 ===============
 
