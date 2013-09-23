@@ -1,6 +1,5 @@
 import sys
 import os
-import itertools
 from cruzdb.models import Feature, ABase
 from toolshed import reader, nopen
 
@@ -78,7 +77,8 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             table_iter = q #page_query(q, g.session)
             intersecters.append(Intersecter(table_iter))
 
-    elif isinstance(fname, basestring) and sum(1 for _ in nopen(fname)) > 25000:
+    elif isinstance(fname, basestring) and os.path.exists(fname) \
+            and sum(1 for _ in nopen(fname)) > 25000:
         print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
     if header is None:
         header = []
@@ -93,9 +93,10 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
                 h = t if isinstance(t, basestring) else t._table.name if hasattr(t, "_table") else t.first()._table.name
                 extra_header += ["%s_%s" % (h, a) for a in annos]
 
-            if 0 != len(header) and not header[0].startswith("#"):
-                header[0] = "#" + header[0]
-            print >>out, "\t".join(header + extra_header)
+            if 0 != len(header):
+                if not header[0].startswith("#"):
+                    header[0] = "#" + header[0]
+                print >>out, "\t".join(header + extra_header)
             if header == toks: continue
 
         if not isinstance(toks, ABase):
