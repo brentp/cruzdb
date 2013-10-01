@@ -3,6 +3,7 @@ cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
 """
 import soup
 import sys
+import os
 
 class BigException(Exception): pass
 
@@ -56,6 +57,8 @@ class Genome(soup.Genome):
         internal: create a dburl from a set of parameters or the defaults on
         this object
         """
+        if os.path.exists(db):
+            db = "sqlite:///" + db
 
         if db.startswith(("sqlite://", "mysql://", "postgresql://")):
 
@@ -169,7 +172,8 @@ class Genome(soup.Genome):
             if bins:
                 chunk['bin'] = 1
             if i == 0 and not table in self.tables:
-                schema = sql.get_sqlite_schema(chunk, table)
+                flavor = self.url.split(":")[0]
+                schema = sql.get_schema(chunk, table, flavor)
                 print schema
                 self.engine.execute(schema)
             elif i == 0:
