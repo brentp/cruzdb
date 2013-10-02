@@ -64,9 +64,9 @@ DataFrames
 ----------
 ... are so in. We can get one from a table as::
 
-   >>> df = g.dataframe('knownGene', limit=20) 
+   >>> df = g.dataframe('cpgIslandExt') 
    >>> df.columns #doctest: +ELLIPSIS
-   Index([name, chrom, strand, txStart, txEnd, cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, proteinID, alignID], dtype=object)
+   Index([chrom, chromStart, chromEnd, name, length, cpgNum, gcNum, perCpg, perGc, obsExp], dtype=object)
 
 
 

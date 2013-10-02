@@ -4,6 +4,7 @@ cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
 import soup
 import sys
 import os
+from sqlalchemy.orm.query import Query
 
 class BigException(Exception): pass
 
@@ -95,7 +96,7 @@ class Genome(soup.Genome):
         from mirror import mirror
         return mirror(self, tables, dest_url)
 
-    def dataframe(self, table, limit=None, offset=None):
+    def dataframe(self, table):
         """
         create a pandas dataframe from a table or query
 
@@ -114,13 +115,15 @@ class Genome(soup.Genome):
         from pandas import DataFrame
         if isinstance(table, basestring):
             table = getattr(self, table)
-        records = table._table.select()
-        if not limit is None:
-            records = records.limit(limit)
-        if not offset is None:
-            records = records.offset(offset)
-        records = list(records.execute())
-        cols = [c.name for c in table._table.columns]
+        try:
+            rec = table.first()
+        except AttributeError:
+            rec = table[0]
+        if hasattr(table, "all"):
+            records = table.all()
+        else:
+            records = [tuple(t) for t in table]
+        cols = [c.name for c in rec._table.columns]
         return DataFrame.from_records(records, columns=cols)
 
     @property

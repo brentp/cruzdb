@@ -96,13 +96,13 @@ class TestFeature(unittest.TestCase):
 
 class TestBasic(unittest.TestCase):
     def setUp(self):
-        self.db = Genome('hg18', host="localhost", user="brentp")
+        self.db = Genome('hg18')
 
     def testFirst(self):
         self.assert_(hasattr(self.db.refGene.first(), "txStart"))
 
     def test_bed_gene_pred(self):
-        g = Genome('hg19', host="localhost", user="brentp")
+        g = Genome('hg19')
         from sqlalchemy import and_
         from cStringIO import StringIO
         query = g.knownGene.filter(and_(g.knownGene.txStart > 10000, g.knownGene.txEnd < 20000))
@@ -131,7 +131,7 @@ class TestBasic(unittest.TestCase):
 
 class TestGene(unittest.TestCase):
     def setUp(self):
-        self.db = Genome('hg18', host="localhost", user="brentp")
+        self.db = Genome('hg18')
         self.gene = self.db.refGene.filter_by(name2="MUC5B").first()
 
     def testExons(self):
@@ -152,8 +152,8 @@ class TestGene(unittest.TestCase):
 
 class TestDb(unittest.TestCase):
     def setUp(self):
-        self.dba = Genome('hg18', host="localhost", user="brentp")
-        self.dbb = Genome('hg19', host="localhost", user="brentp")
+        self.dba = Genome('hg18')
+        self.dbb = Genome('hg19')
 
     def test_protein(self):
 
@@ -217,8 +217,17 @@ class TestDb(unittest.TestCase):
         self.assert_(all(d.start <= fm.start for d in down))
 
     def test_dataframe(self):
-        kg = Genome('hg18', host='localhost').dataframe('knownGene', limit=10)
-        assert kg.shape[0] == 10
+        g = Genome('hg18')
+
+        kg = g.dataframe('cpgIslandExt')
+        self.assert_(kg.shape[0] == g.cpgIslandExt.count())
+
+        q = g.cpgIslandExt.filter(g.cpgIslandExt.chromStart < 300000).limit(10)
+
+        df = g.dataframe(q)
+        self.assert_(df.shape[0] == 10)
+
+
 
     def test_mirror(self):
 

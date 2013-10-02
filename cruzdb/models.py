@@ -525,8 +525,8 @@ class ABase(object):
             return seqs
 
     def __iter__(self):
-        for k in ('chrom', 'start', 'end', 'name', 'score', 'strand'):
-            yield str(getattr(self, k, ""))
+        for k in self._table.columns:
+            yield str(getattr(self, k.name, ""))
 
     def ncbi_blast(self, db="nr", megablast=True, sequence=None):
         """
