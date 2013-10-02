@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='cruzdb',
-      version='0.5.2',
+      version='0.5.3',
       description='''Interface to UCSC genomic databases.
 Also allows things like up/downstream/k-nearest-neighbor queries and mirroring
 of tables to local sqlite databases''',
