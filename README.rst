@@ -60,6 +60,16 @@ As motivation, here's an example of some of the capabilities::
     >>> print transcript.localize(transcript.cdsStart, cdna=True)
     None
 
+Command-Line Interface
+======================
+
+with cruzdb 0.5.4+ installed, given a file `input.bed` you can do::
+
+    python -m cruzdb hg18 input.bed refGene cpgIslandExt
+
+to have the intervals annotated with the `refGene` and `cpgIslandExt`
+tables from versoin `hg18`.
+
 DataFrames
 ----------
 ... are so in. We can get one from a table as::
