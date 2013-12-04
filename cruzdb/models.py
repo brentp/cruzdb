@@ -838,4 +838,7 @@ class knownGene(ABase):
                 not ">" in x]
         return "".join(seq)
 
+class all_mrna(ABase):
+    __tablename__ = "all_mrna"
 
+    qName = Column(String, unique=False, primary_key=True)
