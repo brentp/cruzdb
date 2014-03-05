@@ -13,6 +13,9 @@ class Genome(sqlsoup.SQLSoup):
         pids = [x for x in tbl.columns if x.name in ('chrom', 'chromStart', 'name',
                                                           'txStart', 'kgID')
                                        or x.primary_key or x.unique]
+        if pids == []:
+            pids = [x for x in tbl.columns if any(c in x.name.lower() for c in
+                'chrom start name'.split())]
         models = __import__("cruzdb.models", globals(), locals(), [], -1).models
         try:
             base = getattr(models, tablename)
