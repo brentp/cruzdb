@@ -49,7 +49,7 @@ class Genome(soup.Genome):
             use of an existing engine
 
     """
-    url =  "mysql+%(dialect)://%(user)s%(password)s@%(host)s/%(db)s"
+    url = "mysql+{dialect}://{user}{password}@{host}/{db}"
     db_regex = re.compile(r"^(sqlite|mysql|postgresql)(.+[^:]+){0,1}://")
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
@@ -81,9 +81,8 @@ class Genome(soup.Genome):
             self.host = host
             self.user = user
             self.password = (":" + password) if password else ""
-            self.dburl = self.url % dict(db=self.db, user=self.user,
+            self.dburl = self.url.format(db=self.db, user=self.user,
                 host=self.host, password=self.password, dialect=dialect)
-
 
     def mirror(self, tables, dest_url):
         """
