@@ -82,7 +82,7 @@ class Genome(soup.Genome):
             self.user = user
             self.password = (":" + password) if password else ""
             self.dburl = self.url % dict(db=self.db, user=self.user,
-                host=self.host, password=self.password, dialect)
+                host=self.host, password=self.password, dialect=dialect)
 
 
     def mirror(self, tables, dest_url):
