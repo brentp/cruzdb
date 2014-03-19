@@ -50,7 +50,7 @@ class Genome(soup.Genome):
 
     """
     url =  "mysql+%(dialect)://%(user)s%(password)s@%(host)s/%(db)s"
-    db_regex = re.compile(r"^(sqlite|mysql|postgresql)(.+[^:]+)://")
+    db_regex = re.compile(r"^(sqlite|mysql|postgresql)(.+[^:]+){0,1}://")
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
             password="", dialect="mysqldb", engine=None):
