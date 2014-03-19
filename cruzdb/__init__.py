@@ -4,6 +4,7 @@ cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
 import soup
 import sys
 import os
+import re
 from sqlalchemy.orm.query import Query
 
 class BigException(Exception): pass
@@ -38,22 +39,28 @@ class Genome(soup.Genome):
         if `db` is a dburl, this is not needed. otherwise it's
         the database password
 
+    dialect : str
+        If specified, use a specific dialect to connect to the database
+        (e.g. "mysqldb", "oursql" etc.). See the SQLalchemy documentation
+        for more details. Defaults to "mysqldb".
+
     engine : sqlalchemy.engine
         if specified, all other parameters must be unused. just forces
             use of an existing engine
 
     """
-    url = "mysql://%(user)s%(password)s@%(host)s/%(db)s"
+    url =  "mysql+%(dialect)://%(user)s%(password)s@%(host)s/%(db)s"
+    db_regex = re.compile(r"^(sqlite|mysql|postgresql)(.+[^:]+)://")
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
-            password="", engine=None):
+            password="", dialect="mysqldb", engine=None):
 
-        self.create_url(db, user, host, password)
+        self.create_url(db, user, host, password, dialect)
         soup.Genome.__init__(self, self.dburl)
         self.session.autoflush = False
 
     def create_url(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
-        password=""):
+        password="", dialect="mysqldb"):
         """
         internal: create a dburl from a set of parameters or the defaults on
         this object
@@ -61,8 +68,8 @@ class Genome(soup.Genome):
         if os.path.exists(db):
             db = "sqlite:///" + db
 
-        if db.startswith(("sqlite://", "mysql://", "postgresql://")):
-
+        # Is this a DB URL? If so, use it directly
+        if self.db_regex.findall(db):
             self.db = self.url = db
             self.dburl = db
             self.user = self.host = self.password = ""
@@ -75,7 +82,7 @@ class Genome(soup.Genome):
             self.user = user
             self.password = (":" + password) if password else ""
             self.dburl = self.url % dict(db=self.db, user=self.user,
-                host=self.host, password=self.password)
+                host=self.host, password=self.password, dialect)
 
 
     def mirror(self, tables, dest_url):
