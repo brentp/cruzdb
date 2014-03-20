@@ -501,9 +501,7 @@ class Genome(soup.Genome):
         return frozenset(bins)
 
     def __repr__(self):
-        return "%s('%s')" % (self.__class__.__name__,
-            self.url % dict(db=self.db, user=self.user, host=self.host,
-            password="?" if self.password else ""))
+        return "%s('%s')" % (self.__class__.__name__, self.dburl)
 
     @classmethod
     def save_bed(cls, query, filename=sys.stdout):
