@@ -1,4 +1,4 @@
-import sqlsoup
+from . import sqlsoup
 from sqlalchemy import Table, util
 
 
@@ -30,6 +30,6 @@ class Genome(sqlsoup.SQLSoup):
 if __name__ == "__main__":
     db = Genome('mysql://genome@genome-mysql.cse.ucsc.edu/hg19')
 
-    print db.cpgIslandExt.first()
-    print db.refGene.first()
+    print(db.cpgIslandExt.first())
+    print(db.refGene.first())
 

@@ -13,7 +13,7 @@ of tables to local sqlite databases''',
       url='https://github.com/brentp/cruzdb/',
       packages=['cruzdb', 'cruzdb.tests'],
       # can also use mysql-ctypes
-      #requires=['mysql-python', 'sqlalchemy>=0.7'],
+      #requires=['mysql-python', 'sqlalchemy>=0.7', 'six'],
       classifiers=[
           'Development Status :: 4 - Beta',
           'Environment :: Console',

@@ -447,7 +447,7 @@ class SQLSoup(object):
         """
         try:
             return self._cache[attr]
-        except KeyError, ke:
+        except KeyError:
             return self.map_to(attr, tablename=attr, schema=schema)
 
     def __getattr__(self, attr):
