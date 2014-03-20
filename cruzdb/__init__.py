@@ -69,7 +69,7 @@ class Genome(soup.Genome):
             db = "sqlite:///" + db
 
         # Is this a DB URL? If so, use it directly
-        if self.db_regex.findall(db):
+        if self.db_regex.match(db):
             self.db = self.url = db
             self.dburl = db
             self.user = self.host = self.password = ""
