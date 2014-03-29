@@ -9,6 +9,8 @@ import os
 import re
 from sqlalchemy.orm.query import Query
 
+__version__ = "0.5.5"
+
 class BigException(Exception): pass
 
 from .tests import test

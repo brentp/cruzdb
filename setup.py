@@ -1,9 +1,26 @@
 #!/usr/bin/env python
-
+import os
 from distutils.core import setup
 
+
+# stolen from mpld3
+def get_version():
+    """Get the version info from the mpld3 package without importing it"""
+    import ast
+
+    with open(os.path.join("cruzdb", "__init__.py"), "r") as init_file:
+        module = ast.parse(init_file.read())
+
+    version = (ast.literal_eval(node.value) for node in ast.walk(module)
+               if isinstance(node, ast.Assign)
+               and node.targets[0].id == "__version__")
+    try:
+        return next(version)
+    except StopIteration:
+        raise ValueError("version could not be located")
+
 setup(name='cruzdb',
-      version='0.5.4',
+      version=get_version(),
       description='''Interface to UCSC genomic databases.
 Also allows things like up/downstream/k-nearest-neighbor queries and mirroring
 of tables to local sqlite databases''',

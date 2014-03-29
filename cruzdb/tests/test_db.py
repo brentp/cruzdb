@@ -255,4 +255,4 @@ class TestDb(unittest.TestCase):
         del self.dba
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(failfast=True)

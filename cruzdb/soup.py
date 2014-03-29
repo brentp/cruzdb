@@ -1,7 +1,6 @@
 from . import sqlsoup
 from sqlalchemy import Table, util
 
-
 class Genome(sqlsoup.SQLSoup):
 
     def map_to(self, attrname, tablename=None, selectable=None,
