@@ -1,14 +1,17 @@
+from __future__ import print_function
+
 import sys
 import os
 from cruzdb.models import Feature, ABase
 from toolshed import reader, nopen
+import six
 
 def _annotate(args):
-    print args
+    print(args)
     try:
         return annotate(*args)
     except:
-        print >>sys.stderr, args
+        print(args, file=sys.stderr)
         raise
 
 def _split_chroms(fname):
@@ -18,8 +21,8 @@ def _split_chroms(fname):
     for d in reader(fname, header="ordered"):
         if not d['chrom'] in chroms:
             chroms[d['chrom']] = open(t + "." + d['chrom'], "w")
-            print >> chroms[d['chrom']], "\t".join(d.keys())
-        print >>chroms[d['chrom']], "\t".join(d.values())
+            print ("\t".join(d.keys()), file=chroms[d['chrom']])
+        print("\t".join(d.values()), file=chroms[d['chrom']])
     for k in chroms:
         chroms[k].close()
         chroms[k] = (chroms[k], chroms[k].name + ".anno")
@@ -35,7 +38,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
     if feature_strand is True, then the distance is negative if t
     """
     close = False
-    if isinstance(out, basestring):
+    if isinstance(out, six.string_types):
         out = nopen(out, "w")
         close = True
 
@@ -50,9 +53,9 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
         def write_result(fanno, written=[False]):
             for i, d in enumerate(reader(fanno, header="ordered")):
                 if i == 0 and written[0] == False:
-                    print >>out, "\t".join(d.keys())
+                    print ("\t".join(d.keys()), file=out)
                     written[0] = True
-                print >>out, "\t".join(d.values())
+                print ("\t".join(d.values()), file=out)
             os.unlink(fanno)
             os.unlink(fanno.replace(".anno", ""))
 
@@ -64,22 +67,22 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
         p.join()
         return out.name
 
-    if isinstance(g, basestring):
+    if isinstance(g, six.string_types):
         from . import Genome
         g = Genome(g)
     if in_memory:
         from . intersecter import Intersecter
         intersecters = [] # 1 per table.
         for t in tables:
-            q = getattr(g, t) if isinstance(t, basestring) else t
+            q = getattr(g, t) if isinstance(t, six.string_types) else t
             if _chrom is not None:
                 q = q.filter_by(chrom=_chrom)
             table_iter = q #page_query(q, g.session)
             intersecters.append(Intersecter(table_iter))
 
-    elif isinstance(fname, basestring) and os.path.exists(fname) \
+    elif isinstance(fname, six.string_types) and os.path.exists(fname) \
             and sum(1 for _ in nopen(fname)) > 25000:
-        print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
+        print ("annotating many intervals, may be faster using in_memory=True", file=sys.stderr)
     if header is None:
         header = []
     extra_header = []
@@ -89,14 +92,14 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
                 header = toks
         if j == 0:
             for t in tables:
-                annos = (getattr(g, t) if isinstance(t, basestring) else t).first().anno_cols
-                h = t if isinstance(t, basestring) else t._table.name if hasattr(t, "_table") else t.first()._table.name
+                annos = (getattr(g, t) if isinstance(t, six.string_types) else t).first().anno_cols
+                h = t if isinstance(t, six.string_types) else t._table.name if hasattr(t, "_table") else t.first()._table.name
                 extra_header += ["%s_%s" % (h, a) for a in annos]
 
             if 0 != len(header):
                 if not header[0].startswith("#"):
                     header[0] = "#" + header[0]
-                print >>out, "\t".join(header + extra_header)
+                print("\t".join(header + extra_header), file=out)
             if header == toks: continue
 
         if not isinstance(toks, ABase):
@@ -121,7 +124,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             else:
                 objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k=1)
             if len(objs) == 0:
-                print >>out, "\t".join(toks + ["", "", ""])
+                print ("\t".join(toks + ["", "", ""]), file=out)
                 continue
 
             gp = hasattr(objs[0], "exonStarts")
@@ -139,7 +142,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             # convert to negative if the feature is upstream of the query
             for i, s in enumerate(strands):
                 if s == 1: continue
-                if isinstance(pure_dists[i], basestring): continue
+                if isinstance(pure_dists[i], six.string_types): continue
                 pure_dists[i] *= -1
 
             for i, (pd, d) in enumerate(zip(pure_dists, dists)):
@@ -157,7 +160,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             for i in range(len(name_dists[0])): # iterate over the dist, feature, name cols
 
                 toks.append(";".join(nd[i] for nd in name_dists))
-        print >>out, "\t".join(toks)
+        print("\t".join(toks), file=out)
 
     if close:
         out.close()
