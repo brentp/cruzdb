@@ -4,6 +4,9 @@ from a UCSC table. It uses sqlalchemy reflection to
 do the lifiting.
 
 """
+
+from __future__ import print_function
+
 from sqlalchemy import Column, String, ForeignKey, Float, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
@@ -11,14 +14,17 @@ from sqlalchemy.schema import PrimaryKeyConstraint
 
 import sys
 from operator import itemgetter
+import six
 
 # needed to avoid circular imports
 #CHANGED:from init import Base
 from .sequence import sequence as _sequence
 from .__init__ import Genome
 
-
 import re
+
+if six.PY3:
+    long = int
 
 def _ncbi_parse(html):
     from collections import OrderedDict
@@ -26,7 +32,7 @@ def _ncbi_parse(html):
     try:
         info = html.split("Sequences producing significant alignments")[1].split("<tbody>")[1]
     except IndexError:
-        print >>sys.stderr, html
+        print(html, file=sys.stderr)
         raise
     info = info.split("</table>")[0]
     regexp = re.compile(r'<tr>(.+?)(<\/tr>)', re.MULTILINE | re.DOTALL)
@@ -44,7 +50,7 @@ def _ncbi_parse(html):
                 pcols.append("")
             yield OrderedDict(zip(colnames, pcols))
         except:
-            print >>sys.stderr, record
+            print(record, file=sys.stderr)
 
 class CruzException(Exception):
     pass
@@ -558,20 +564,20 @@ class ABase(object):
                     )
 
         if not ("RID =" in r.text and "RTOE" in r.text):
-            print >>sys.stderr, "no results"
+            print("no results", file=sys.stderr)
             raise StopIteration
         rid = r.text.split("RID = ")[1].split("\n")[0]
 
         import time
         time.sleep(4)
-        print >>sys.stderr, "checking..."
+        print("checking...", file=sys.stderr)
         r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
                 data=dict(RID=rid, format="Text",
                     DESCRIPTIONS=100,
                     DATABASE=db,
                     CMD="Get", ))
         while "Status=WAITING" in r.text:
-            print >>sys.stderr, "checking..."
+            print("checking...", file=sys.stderr)
             time.sleep(10)
             r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
                 data=dict(RID=rid, format="Text",
@@ -642,13 +648,13 @@ class ABase(object):
             return pos
 
         subtract = 0
-        print >>sys.stderr, "exon lengths:", sum((ie - ib) for ib, ie in self.exons)
+        print("exon lengths:", sum((ie - ib) for ib, ie in self.exons), file=sys.stderr)
         for estart, eend in exons:
             if iend < pos:
                 subtract += (iend - istart)
             elif istart < pos and iend > pos:
                 subtract += (pos - istart)
-            print >>sys.stderr, subtract, (istart, iend), pos
+            print(subtract, (istart, iend), pos, file=sys.stderr)
         return pos - subtract
 
     def localize(self, *positions, **kwargs):
@@ -679,7 +685,7 @@ class ABase(object):
         for original_p in positions:
             subtract = 0
             p = original_p
-            print >>sys.stderr, p, l
+            print(p, l, file=sys.stderr)
             if p < 0 or p >= l: # outside of transcript
                 local_ps.append(None)
                 continue
