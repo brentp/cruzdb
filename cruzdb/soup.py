@@ -1,6 +1,8 @@
 from . import sqlsoup
 from sqlalchemy import Table, util
 
+import importlib # NOTE: Py2.7+ !
+
 class Genome(sqlsoup.SQLSoup):
 
     def map_to(self, attrname, tablename=None, selectable=None,
@@ -15,7 +17,8 @@ class Genome(sqlsoup.SQLSoup):
         if pids == []:
             pids = [x for x in tbl.columns if any(c in x.name.lower() for c in
                 'chrom start name'.split())]
-        models = __import__("cruzdb.models", globals(), locals(), [], -1).models
+
+        models = importlib.import_module("cruzdb.models")
         try:
             base = getattr(models, tablename)
         except AttributeError:
