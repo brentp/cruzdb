@@ -9,6 +9,9 @@ import os
 import re
 from sqlalchemy.orm.query import Query
 
+if six.PY3:
+    long = int
+
 __version__ = "0.5.5"
 
 class BigException(Exception): pass
@@ -103,7 +106,7 @@ class Genome(soup.Genome):
         dest_url: str
             a dburl string, e.g. 'sqlite:///local.db'
         """
-        from mirror import mirror
+        from .mirror import mirror
         return mirror(self, tables, dest_url)
 
     def dataframe(self, table):
@@ -195,7 +198,7 @@ class Genome(soup.Genome):
 
             tbl = getattr(self, table)._table
             cols = chunk.columns
-            data = list(dict(zip(cols, x)) for x in chunk.values)
+            data = list(dict(list(zip(cols, x))) for x in chunk.values)
             if needs_name:
                 for d in data:
                     d['name'] = "%s:%s" % (d.get("chrom"), d.get("txStart", d.get("chromStart")))
@@ -421,7 +424,7 @@ class Genome(soup.Genome):
         if len(dists) == 0:
             return []
 
-        dists, res = zip(*dists)
+        dists, res = list(zip(*dists))
 
         if len(res) == k:
             return res
@@ -499,7 +502,7 @@ class Genome(soup.Genome):
 
         bins = [1]
         for offset in offsets:
-            bins.extend(range(offset + start, offset + end + 1))
+            bins.extend(list(range(offset + start, offset + end + 1)))
             start >>= binNextShift
             end >>= binNextShift
         return frozenset(bins)
