@@ -14,8 +14,8 @@ from operator import itemgetter
 
 # needed to avoid circular imports
 #CHANGED:from init import Base
-from sequence import sequence as _sequence
-from __init__ import Genome
+from .sequence import sequence as _sequence
+from .__init__ import Genome
 
 
 import re
