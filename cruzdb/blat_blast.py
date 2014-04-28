@@ -1,6 +1,11 @@
 import requests
 from .models import Blat
 
+import six
+
+if six.PY3:
+    long = int
+
 def blat(seq, name, db, seq_type="DNA"):
     r = requests.post('http://genome.ucsc.edu/cgi-bin/hgBlat',
             data=dict(db=db, type=seq_type, userSeq=seq, output="html"))
