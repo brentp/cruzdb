@@ -52,7 +52,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
                 if i == 0 and written[0] == False:
                     print >>out, "\t".join(d.keys())
                     written[0] = True
-                print >>out, "\t".join(d.values())
+                print >>out, "\t".join(x if x else "NA" for x in d.values())
             os.unlink(fanno)
             os.unlink(fanno.replace(".anno", ""))
 
