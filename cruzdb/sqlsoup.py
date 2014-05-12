@@ -77,9 +77,6 @@ class SelectableClassType(type):
             raise AttributeError()
         return getattr(cls._query, attr)
 
-    def __getitem__(cls, key):
-        return cls._query[key]
-
 class TableClassType(SelectableClassType):
     """Represent a SQLSoup mapping to a :class:`sqlalchemy.schema.Table`
     construct.
@@ -102,6 +99,9 @@ class TableClassType(SelectableClassType):
         
         """
         class_mapper(cls)._configure_property(propname, relationship(*args, **kwargs))
+    def __getitem__(cls, key):
+        return cls._query[key]
+
 
 def _is_outer_join(selectable):
     if not isinstance(selectable, sql.Join):
@@ -158,7 +158,15 @@ def _class_for_table(session, engine, selectable, base_cls, mapper_kwargs):
         t1, t2 = _compare(self, o)
         return t1 == t2
 
-    for m in ['__eq__', '__lt__']:
+    def __repr__(self):
+        L = ["%s=%r" % (key, getattr(self, key, ''))
+             for key in self.__class__.c.keys()]
+        return '%s(%s)' % (self.__class__.__name__, ','.join(L))
+
+    def __getitem__(self, key):
+        return self._query[key]
+
+    for m in ['__eq__', '__repr__', '__lt__', '__getitem__']:
         setattr(klass, m, eval(m))
     klass._table = selectable
     klass.c = expression.ColumnCollection()
@@ -343,7 +351,7 @@ class SQLSoup(object):
             raise ArgumentError("'tablename' or 'selectable' argument is "
                                     "required.")
 
-        if not selectable.primary_key.columns and not  \
+        if not selectable.primary_key.columns and not \
                              'primary_key' in mapper_args:
             if tablename:
                 raise SQLSoupError(

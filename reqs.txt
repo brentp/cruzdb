@@ -1,3 +1,4 @@
 #mysql-ctypes
 mysql-python
 sqlalchemy>=0.7
+six

@@ -86,6 +86,7 @@ class TestFeature(unittest.TestCase):
         self.assert_(str(f.txStart) in repr(r), r)
         self.assert_(str(f.txEnd) in repr(r), r)
 
+
     def test_downstream(self):
         f = self.f
         u = f.downstream(10)
@@ -166,6 +167,11 @@ class TestDb(unittest.TestCase):
     def test_ok(self):
         ga = self.dba.refGene.filter_by(name2="MUC5B").first()
         self.assert_(ga is not None)
+
+    def test_repr(self):
+        self.assert_("Genome" in repr(self.dba))
+        self.assert_("hg18" in repr(self.dba))
+        self.assert_("mysqldb" in repr(self.dba))
 
     def test_bins(self):
         bins = Genome.bins(12345, 56779)
@@ -249,4 +255,4 @@ class TestDb(unittest.TestCase):
         del self.dba
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(failfast=True)

@@ -1,14 +1,19 @@
 """
 cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
 """
-import soup
+from __future__ import print_function
+from . import soup
+import six
 import sys
 import os
+import re
 from sqlalchemy.orm.query import Query
+
+__version__ = "0.5.5"
 
 class BigException(Exception): pass
 
-from tests import test
+from .tests import test
 
 def _open(filelike, mode='r'):
     if hasattr(filelike, 'read'): return filelike
@@ -38,22 +43,28 @@ class Genome(soup.Genome):
         if `db` is a dburl, this is not needed. otherwise it's
         the database password
 
+    dialect : str
+        If specified, use a specific dialect to connect to the database
+        (e.g. "mysqldb", "oursql" etc.). See the SQLalchemy documentation
+        for more details. Defaults to "mysqldb".
+
     engine : sqlalchemy.engine
         if specified, all other parameters must be unused. just forces
             use of an existing engine
 
     """
-    url = "mysql://%(user)s%(password)s@%(host)s/%(db)s"
+    url = "mysql+{dialect}://{user}{password}@{host}/{db}"
+    db_regex = re.compile(r"^(sqlite|mysql|postgresql)(.+[^:]+){0,1}://")
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
-            password="", engine=None):
+            password="", dialect="mysqldb", engine=None):
 
-        self.create_url(db, user, host, password)
+        self.create_url(db, user, host, password, dialect)
         soup.Genome.__init__(self, self.dburl)
         self.session.autoflush = False
 
     def create_url(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
-        password=""):
+        password="", dialect="mysqldb"):
         """
         internal: create a dburl from a set of parameters or the defaults on
         this object
@@ -61,8 +72,8 @@ class Genome(soup.Genome):
         if os.path.exists(db):
             db = "sqlite:///" + db
 
-        if db.startswith(("sqlite://", "mysql://", "postgresql://")):
-
+        # Is this a DB URL? If so, use it directly
+        if self.db_regex.match(db):
             self.db = self.url = db
             self.dburl = db
             self.user = self.host = self.password = ""
@@ -74,9 +85,8 @@ class Genome(soup.Genome):
             self.host = host
             self.user = user
             self.password = (":" + password) if password else ""
-            self.dburl = self.url % dict(db=self.db, user=self.user,
-                host=self.host, password=self.password)
-
+            self.dburl = self.url.format(db=self.db, user=self.user,
+                host=self.host, password=self.password, dialect=dialect)
 
     def mirror(self, tables, dest_url):
         """
@@ -113,7 +123,7 @@ class Genome(soup.Genome):
             an offset for the query
         """
         from pandas import DataFrame
-        if isinstance(table, basestring):
+        if isinstance(table, six.string_types):
             table = getattr(self, table)
         try:
             rec = table.first()
@@ -159,7 +169,7 @@ class Genome(soup.Genome):
         if table is None:
             import os.path as op
             table = op.basename(op.splitext(fname)[0]).replace(".", "_")
-            print >>sys.stderr, "writing to:", table
+            print("writing to:", table, file=sys.stderr)
 
         from pandas.io import sql
         import pandas as pa
@@ -177,7 +187,7 @@ class Genome(soup.Genome):
             if i == 0 and not table in self.tables:
                 flavor = self.url.split(":")[0]
                 schema = sql.get_schema(chunk, table, flavor)
-                print schema
+                print(schema)
                 self.engine.execute(schema)
             elif i == 0:
                 print >>sys.stderr,\
@@ -256,7 +266,7 @@ class Genome(soup.Genome):
             0-based end position
 
         """
-        if isinstance(table, basestring):
+        if isinstance(table, six.string_types):
             table = getattr(self, table)
 
         try:
@@ -495,9 +505,7 @@ class Genome(soup.Genome):
         return frozenset(bins)
 
     def __repr__(self):
-        return "%s('%s')" % (self.__class__.__name__,
-            self.url % dict(db=self.db, user=self.user, host=self.host,
-            password="?" if self.password else ""))
+        return "%s('%s')" % (self.__class__.__name__, self.dburl)
 
     @classmethod
     def save_bed(cls, query, filename=sys.stdout):
@@ -529,25 +537,25 @@ if __name__ == "__main__":
 
 
     #1/0
-    print g.cpgIslandExt[12].bed()
-    print g.cpgIslandExt[12].bed('length', 'perCpg')
+    print(g.cpgIslandExt[12].bed())
+    print(g.cpgIslandExt[12].bed('length', 'perCpg'))
 
     #sys.exit()
 
-    print "refGene"
+    print("refGene")
     f = g.refGene[19]
-    print f.bed12()
+    print(f.bed12())
     f = g.refGene[19]
-    print repr(f), f.cdsStart, f.cdsEnd
-    print "exons", f.exons
-    print "coding exons", f.coding_exons
-    print "cds", f.cds
+    print(repr(f), f.cdsStart, f.cdsEnd)
+    print("exons", f.exons)
+    print("coding exons", f.coding_exons)
+    print("cds", f.cds)
 
-    print "introns", f.introns
-    print "5'utr", f.utr5
-    print "3'utr", f.utr3
+    print("introns", f.introns)
+    print("5'utr", f.utr5)
+    print("3'utr", f.utr3)
 
-    print f.browser_link
+    print(f.browser_link)
     #f.txEnd = f.txStart + 30
     #print list(f.blat())
     #print f.cds_sequence
@@ -555,9 +563,9 @@ if __name__ == "__main__":
     from sqlalchemy import and_
     query = g.refGene.filter(and_(g.refGene.txStart > 10000, g.refGene.txEnd < 40000))
     t = time.time()
-    print query
+    print(query)
     query.all()
-    print time.time() - t
+    print(time.time() - t)
 
     query = g.refGene.filter(and_(g.refGene.txStart > 10000, g.refGene.txEnd < 40000))
     query = query.filter(g.refGene.bin.in_(Genome.bins(10000, 40000)))
@@ -566,24 +574,24 @@ if __name__ == "__main__":
     query = g.bin_query(g.refGene, "chr1", 10000, 40000)
 
     query.all()
-    print time.time() - t
+    print(time.time() - t)
 
 
     g = Genome('hg19')
     t = time.time()
     q = g.snp135Common
     q = q.filter(q.bin.in_(Genome.bins(1000, 2000)))
-    print q
+    print(q)
     q.first()
-    print time.time() - t
+    print(time.time() - t)
 
     Genome.save_bed(query)
 
     for transcript in g.refGene:
-        print transcript, transcript.sequence()[:100] + "..."
+        print(transcript, transcript.sequence()[:100] + "...")
         if transcript.txEnd > 8000: break
 
     kg = g.refGene._table
     q = kg.select(kg.c.txStart < 5000)
 
-    print list(g.session.execute(q))
+    print(list(g.session.execute(q)))

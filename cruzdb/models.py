@@ -479,7 +479,13 @@ class ABase(object):
             return "%s(%s:%s:%i-%i)" % (self.__class__.__name__, self.chrom, self.gene_name,
                 self.start, self.end)
         except:
-            return "%s(%s)" % (self.__tablename__, self.chrom)
+            try:
+                return "%s(%s)" % (self.__tablename__, self.chrom)
+            except:
+                attr = [x.name for x in self._table.columns if "name" in
+                        x.name.lower()][-1]
+                name = getattr(self, attr)
+                return "%s(\"%s\")" % (self.__tablename__, name)
 
 
     @property
@@ -741,7 +747,6 @@ class cpgIslandExt(Feature):
         return dist
 
 cpgRafaLab = cpgIslandExt
-
 
 class SNP(ABase):
     __table_args__ = (
