@@ -9,8 +9,10 @@ import os
 import re
 from sqlalchemy.orm.query import Query
 
+dialect = "mysqldb"
 if six.PY3:
     long = int
+    dialect = "oursql"
 
 __version__ = "0.5.5"
 
@@ -60,7 +62,7 @@ class Genome(soup.Genome):
     db_regex = re.compile(r"^(sqlite|mysql|postgresql)(.+[^:]+){0,1}://")
 
     def __init__(self, db="", user="genome", host="genome-mysql.cse.ucsc.edu",
-            password="", dialect="mysqldb", engine=None):
+            password="", dialect=dialect, engine=None):
 
         self.create_url(db, user, host, password, dialect)
         soup.Genome.__init__(self, self.dburl)

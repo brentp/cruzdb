@@ -129,8 +129,8 @@ def _class_for_table(session, engine, selectable, base_cls, mapper_kwargs):
     selectable = expression._clause_element_as_expr(selectable)
     mapname = _selectable_name(selectable)
     # Py2K
-    if six.PY2 and isinstance(mapname, six.text_types): 
-        engine_encoding = engine.dialect.encoding 
+    if six.PY2 and isinstance(mapname, six.text_type):
+        engine_encoding = engine.dialect.encoding
         mapname = mapname.encode(engine_encoding)
     # end Py2K
 
