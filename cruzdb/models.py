@@ -164,12 +164,17 @@ class ABase(object):
         # drop the trailing comma
         if not self.is_gene_pred: return []
         if hasattr(self, "exonStarts"):
-            starts = (long(s) for s in self.exonStarts[:-1].split(","))
-            ends = (long(s) for s in self.exonEnds[:-1].split(","))
+            try:
+                starts = (long(s) for s in self.exonStarts[:-1].split(","))
+                ends = (long(s) for s in self.exonEnds[:-1].split(","))
+            except TypeError:
+                starts = (long(s) for s in self.exonStarts[:-1].decode().split(","))
+                ends = (long(s) for s in self.exonEnds[:-1].decode().split(","))
         else: # it is bed12
-            starts = [self.start + long(s) for s in self.chromStarts[:-1].split(",")]
+            starts = [self.start + long(s) for s in
+                        self.chromStarts[:-1].decode().split(",")]
             ends = [starts[i] + long(size) for i, size \
-                    in enumerate(self.blockSizes[:-1].split(","))]
+                        in enumerate(self.blockSizes[:-1].decode().split(","))]
 
 
         return zip(starts, ends)
@@ -627,7 +632,7 @@ class ABase(object):
         """
         if not self.is_gene_pred:
             raise CruzException("can't create bed12 from non genepred feature")
-        exons = self.exons
+        exons = list(self.exons)
         # go from global start, stop, to relative start, length...
         sizes = ",".join([str(e[1] - e[0]) for e in exons]) + ","
         starts = ",".join([str(e[0] - self.txStart) for e in exons]) + ","
@@ -700,7 +705,7 @@ class ABase(object):
 
             local_ps.append(p - subtract if subtract is not None else None)
 
-        assert all(p >=0 or p is None for p in local_ps), (local_ps)
+        assert all(p is None or p >=0 for p in local_ps), (local_ps)
         return local_ps[0] if len(positions) == 1 else local_ps
 
 

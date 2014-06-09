@@ -1,6 +1,7 @@
 import unittest
 from cruzdb import Genome
 import os
+import six
 
 
 class TestFeature(unittest.TestCase):
@@ -105,7 +106,10 @@ class TestBasic(unittest.TestCase):
     def test_bed_gene_pred(self):
         g = Genome('hg19')
         from sqlalchemy import and_
-        from cStringIO import StringIO
+        if six.PY2:
+            from cStringIO import StringIO
+        else:
+            from io import StringIO
         query = g.knownGene.filter(and_(g.knownGene.txStart > 10000, g.knownGene.txEnd < 20000))
         c = StringIO()
         Genome.save_bed(query, c)
@@ -127,7 +131,7 @@ class TestBasic(unittest.TestCase):
     def test_bed_other(self):
         g = self.db
         self.assertEqual(g.cpgIslandExt[12].bed(), 'chr1	829557	830482')
-        self.assertEqual(g.cpgIslandExt[12].bed('length', 'perCpg'), 'chr1	829557	830482	925	17.9')
+        self.assertEqual(g.cpgIslandExt[12].bed('length'), 'chr1	829557	830482	925')
 
 
 class TestGene(unittest.TestCase):
@@ -136,14 +140,21 @@ class TestGene(unittest.TestCase):
         self.gene = self.db.refGene.filter_by(name2="MUC5B").first()
 
     def testExons(self):
-        self.assert_(isinstance(self.gene.exons, list))
-        self.assert_(self.gene.exons[0][0] >= self.gene.txStart)
-        self.assert_(self.gene.exons[0][0] <= self.gene.cdsStart)
+        if six.PY2:
+            self.assert_(isinstance(self.gene.exons, list))
+            self.assert_(self.gene.exons[0][0] >= self.gene.txStart)
+            self.assert_(self.gene.exons[0][0] <= self.gene.cdsStart)
+        else:
+            self.assert_(hasattr(self.gene.exons, "__iter__"))
+            g = next(self.gene.exons)
+            self.assert_(g[0] >= self.gene.txStart)
+            self.assert_(g[0] <= self.gene.cdsStart)
 
     def testIntrons(self):
-        self.assert_(isinstance(self.gene.introns, list))
-        self.assert_(self.gene.introns[0][0] >= self.gene.txStart)
-        self.assert_(self.gene.introns[0][0] == self.gene.exons[0][1])
+        self.assert_(hasattr(self.gene.introns, "__iter__"))
+        i = self.gene.introns[0]
+        self.assert_(i[0] >= self.gene.txStart)
+        self.assert_(i[0] == list(self.gene.exons)[0][1])
         self.assert_(all((s < e) for s, e in self.gene.introns))
 
     def testBed12(self):
@@ -171,7 +182,10 @@ class TestDb(unittest.TestCase):
     def test_repr(self):
         self.assert_("Genome" in repr(self.dba))
         self.assert_("hg18" in repr(self.dba))
-        self.assert_("mysqldb" in repr(self.dba))
+        if six.PY2:
+            self.assert_("mysqldb" in repr(self.dba))
+        else:
+            self.assert_("oursql" in repr(self.dba))
 
     def test_bins(self):
         bins = Genome.bins(12345, 56779)
