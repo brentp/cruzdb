@@ -154,7 +154,14 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
                             for (n, d) in zip(names, dists)])
             name_dists = [nd.split(sep) for nd in name_dists]
 
-            for i in range(len(name_dists[0])): # iterate over the dist, feature, name cols
+            # just take the first gene name if they are all the same
+            if len(set(nd[0] for nd in name_dists)) == 1:
+                toks.append(name_dists[0][0])
+            else:
+                toks.append(";".join(nd[0] for nd in name_dists))
+
+            # iterate over the feat type, dist cols
+            for i in range(1, len(name_dists[0])):
 
                 toks.append(";".join(nd[i] for nd in name_dists))
         print >>out, "\t".join(toks)

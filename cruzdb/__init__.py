@@ -9,7 +9,7 @@ import os
 import re
 from sqlalchemy.orm.query import Query
 
-__version__ = "0.5.5"
+__version__ = "0.5.6"
 
 class BigException(Exception): pass
 
