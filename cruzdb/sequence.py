@@ -1,4 +1,5 @@
-import urllib as U
+from six.moves.urllib.request import urlopen
+
 
 __all__ = ('sequence', )
 
@@ -19,7 +20,7 @@ def sequence(db, chrom, start, end):
     """
     url = "http://genome.ucsc.edu/cgi-bin/das/%s" % db
     url += "/dna?segment=%s:%i,%i"
-    xml = U.urlopen(url % (chrom, start, end)).read()
+    xml = urlopen(url % (chrom, start, end)).read().decode('utf-8')
     return _seq_from_xml(xml)
 
 if __name__ == "__main__":
