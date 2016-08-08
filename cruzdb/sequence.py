@@ -1,7 +1,5 @@
-try:
-    from six.moves.urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
+from six.moves.urllib.request import urlopen
+
 
 __all__ = ('sequence', )
 
