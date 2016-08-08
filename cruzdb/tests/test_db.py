@@ -268,5 +268,20 @@ class TestDb(unittest.TestCase):
     def tearDown(self):
         del self.dba
 
+
+class TestSequence(unittest.TestCase):
+
+    def test_sequence(self):
+        from cruzdb.sequence import sequence
+        g = "hg19"
+        chrom = "chr1"
+        start = 12910
+        end = 12922
+        expected = "gagtctttcccag"
+        seq = sequence(g, chrom, start, end)
+        self.assertEqual(seq, expected)
+
+
+
 if __name__ == "__main__":
     unittest.main(failfast=True)
