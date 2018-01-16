@@ -1,5 +1,7 @@
 # from http://www.tylerlesmann.com/2009/apr/27/copying-databases-across-platforms-sqlalchemy/
 
+from __future__ import print_function
+
 from sqlalchemy import create_engine, Table, select, Enum, Column, MetaData
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -15,7 +17,7 @@ def make_session(connection_string):
     if "///" in connection_string and \
         os.path.exists(connection_string.split("///")[1]) and \
         connection_string.startswith("sqlite"):
-            print >>sys.stderr, "attempting to add to existing sqlite database"
+            print("attempting to add to existing sqlite database", file=sys.stderr)
     engine = create_engine(connection_string, echo=False, convert_unicode=True)
     Session = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False,
             autocommit=False)
@@ -85,7 +87,7 @@ def mirror(genome, tables, connection_string):
     for table_name in tables:
         # cause it ot be mapped
         table = getattr(genome, table_name)._table
-        print >>sys.stderr, 'Mirroring', table_name
+        print('Mirroring', table_name, file=sys.stderr)
 
         table = set_table(genome, table, table_name,
                 connection_string, dmeta)
@@ -97,7 +99,7 @@ def mirror(genome, tables, connection_string):
         destination.commit()
         ins = table.insert()
 
-        columns = table.columns.keys()
+        columns = list(table.columns.keys())
         records = []
         table_obj = getattr(genome, table_name)._table
         t = getattr(genome, table_name)
@@ -108,7 +110,7 @@ def mirror(genome, tables, connection_string):
             records.append(data)
             if ii % 20000 == 0 and ii > 0:
                 destination.execute(ins, records)
-                print >>sys.stderr, "processing record %i" % ii
+                print("processing record %i" % ii, file=sys.stderr)
                 destination.commit()
                 records = []
         destination.execute(ins, records)
@@ -120,8 +122,8 @@ def mirror(genome, tables, connection_string):
     newg = Genome(connection_string)
     new_counts = [getattr(newg, table_name).count() for table_name in tables]
     for tbl, oc, nc in zip(tables, orig_counts, new_counts):
-        if oc != nc: print >>sys.stderr, "ERROR: mirrored table '%s' has %i \
-            rows while the original had %i" % (tbl, nc, oc)
+        if oc != nc: print("ERROR: mirrored table '%s' has %i \
+            rows while the original had %i" % (tbl, nc, oc), file=sys.stderr)
     return newg
 
 if __name__ == "__main__":

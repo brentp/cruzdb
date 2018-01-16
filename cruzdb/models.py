@@ -4,6 +4,9 @@ from a UCSC table. It uses sqlalchemy reflection to
 do the lifiting.
 
 """
+
+from __future__ import print_function
+
 from sqlalchemy import Column, String, ForeignKey, Float, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship, backref
@@ -11,14 +14,17 @@ from sqlalchemy.schema import PrimaryKeyConstraint
 
 import sys
 from operator import itemgetter
+import six
 
 # needed to avoid circular imports
 #CHANGED:from init import Base
-from sequence import sequence as _sequence
-from __init__ import Genome
-
+from .sequence import sequence as _sequence
+from .__init__ import Genome
 
 import re
+
+if six.PY3:
+    long = int
 
 def _ncbi_parse(html):
     from collections import OrderedDict
@@ -26,7 +32,7 @@ def _ncbi_parse(html):
     try:
         info = html.split("Sequences producing significant alignments")[1].split("<tbody>")[1]
     except IndexError:
-        print >>sys.stderr, html
+        print(html, file=sys.stderr)
         raise
     info = info.split("</table>")[0]
     regexp = re.compile(r'<tr>(.+?)(<\/tr>)', re.MULTILINE | re.DOTALL)
@@ -44,7 +50,7 @@ def _ncbi_parse(html):
                 pcols.append("")
             yield OrderedDict(zip(colnames, pcols))
         except:
-            print >>sys.stderr, record
+            print(record, file=sys.stderr)
 
 class CruzException(Exception):
     pass
@@ -77,8 +83,8 @@ class Interval(object):
         check for overlap with the other interval
         """
         if self.chrom != other.chrom: return False
-        if self.start > other.end: return False
-        if other.start > self.end: return False
+        if self.start >= other.end: return False
+        if other.start >= self.end: return False
         return True
 
     def is_upstream_of(self, other):
@@ -158,12 +164,17 @@ class ABase(object):
         # drop the trailing comma
         if not self.is_gene_pred: return []
         if hasattr(self, "exonStarts"):
-            starts = (long(s) for s in self.exonStarts[:-1].split(","))
-            ends = (long(s) for s in self.exonEnds[:-1].split(","))
+            try:
+                starts = (long(s) for s in self.exonStarts[:-1].split(","))
+                ends = (long(s) for s in self.exonEnds[:-1].split(","))
+            except TypeError:
+                starts = (long(s) for s in self.exonStarts[:-1].decode().split(","))
+                ends = (long(s) for s in self.exonEnds[:-1].decode().split(","))
         else: # it is bed12
-            starts = [self.start + long(s) for s in self.chromStarts[:-1].split(",")]
+            starts = [self.start + long(s) for s in
+                        self.chromStarts[:-1].decode().split(",")]
             ends = [starts[i] + long(size) for i, size \
-                    in enumerate(self.blockSizes[:-1].split(","))]
+                        in enumerate(self.blockSizes[:-1].decode().split(","))]
 
 
         return zip(starts, ends)
@@ -558,20 +569,20 @@ class ABase(object):
                     )
 
         if not ("RID =" in r.text and "RTOE" in r.text):
-            print >>sys.stderr, "no results"
+            print("no results", file=sys.stderr)
             raise StopIteration
         rid = r.text.split("RID = ")[1].split("\n")[0]
 
         import time
         time.sleep(4)
-        print >>sys.stderr, "checking..."
+        print("checking...", file=sys.stderr)
         r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
                 data=dict(RID=rid, format="Text",
                     DESCRIPTIONS=100,
                     DATABASE=db,
                     CMD="Get", ))
         while "Status=WAITING" in r.text:
-            print >>sys.stderr, "checking..."
+            print("checking...", file=sys.stderr)
             time.sleep(10)
             r = requests.post('http://blast.ncbi.nlm.nih.gov/Blast.cgi',
                 data=dict(RID=rid, format="Text",
@@ -621,7 +632,7 @@ class ABase(object):
         """
         if not self.is_gene_pred:
             raise CruzException("can't create bed12 from non genepred feature")
-        exons = self.exons
+        exons = list(self.exons)
         # go from global start, stop, to relative start, length...
         sizes = ",".join([str(e[1] - e[0]) for e in exons]) + ","
         starts = ",".join([str(e[0] - self.txStart) for e in exons]) + ","
@@ -642,13 +653,13 @@ class ABase(object):
             return pos
 
         subtract = 0
-        print >>sys.stderr, "exon lengths:", sum((ie - ib) for ib, ie in self.exons)
+        print("exon lengths:", sum((ie - ib) for ib, ie in self.exons), file=sys.stderr)
         for estart, eend in exons:
             if iend < pos:
                 subtract += (iend - istart)
             elif istart < pos and iend > pos:
                 subtract += (pos - istart)
-            print >>sys.stderr, subtract, (istart, iend), pos
+            print(subtract, (istart, iend), pos, file=sys.stderr)
         return pos - subtract
 
     def localize(self, *positions, **kwargs):
@@ -679,7 +690,7 @@ class ABase(object):
         for original_p in positions:
             subtract = 0
             p = original_p
-            print >>sys.stderr, p, l
+            print(p, l, file=sys.stderr)
             if p < 0 or p >= l: # outside of transcript
                 local_ps.append(None)
                 continue
@@ -694,7 +705,7 @@ class ABase(object):
 
             local_ps.append(p - subtract if subtract is not None else None)
 
-        assert all(p >=0 or p is None for p in local_ps), (local_ps)
+        assert all(p is None or p >=0 for p in local_ps), (local_ps)
         return local_ps[0] if len(positions) == 1 else local_ps
 
 
