@@ -5,7 +5,7 @@ A paper describing cruzdb is in Bioinformatics: https://doi.org/10.1093/bioinfor
 cruzdb overview
 ===============
 
-The UCSC `Genomes Database`_ is a great resource for annoations, regulation
+The UCSC `Genomes Database`_ is a great resource for annotations, regulation
 and variation and all kinds of data for a growing number of taxa.
 This library aims to make utilizing that data simple so that we can do
 sophisticated analyses without resorting to `awk-ful`_, error-prone
@@ -68,7 +68,7 @@ with cruzdb 0.5.4+ installed, given a file `input.bed` you can do::
     python -m cruzdb hg18 input.bed refGene cpgIslandExt
 
 to have the intervals annotated with the `refGene` and `cpgIslandExt`
-tables from versoin `hg18`.
+tables from version `hg18`.
 
 DataFrames
 ----------
