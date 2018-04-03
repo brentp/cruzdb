@@ -9,6 +9,9 @@ import os
 import re
 from sqlalchemy.orm.query import Query
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 __version__ = "0.5.6"
 
 class BigException(Exception): pass
