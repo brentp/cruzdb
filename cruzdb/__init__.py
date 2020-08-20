@@ -2,6 +2,7 @@
 cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
 """
 from __future__ import print_function
+from builtins import int
 from . import soup
 import six
 import sys
@@ -394,7 +395,7 @@ class Genome(soup.Genome):
         else:
             chrom = chrom_or_feat
 
-        qstart, qend = long(start), long(end)
+        qstart, qend = int(start), int(end)
         res = self.bin_query(table, chrom, qstart, qend)
 
         i, change = 1, 350
