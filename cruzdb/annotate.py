@@ -1,14 +1,18 @@
 import sys
 import os
+from __future__ import print_function
 from cruzdb.models import Feature, ABase
 from toolshed import reader, nopen
 
+if sys.version_info[0] >= 3:
+    basestring = str
+
 def _annotate(args):
-    print args
+    print(args)
     try:
         return annotate(*args)
     except:
-        print >>sys.stderr, args
+        print(args, file=sys.stderr)
         raise
 
 def _split_chroms(fname):
@@ -18,8 +22,8 @@ def _split_chroms(fname):
     for d in reader(fname, header="ordered"):
         if not d['chrom'] in chroms:
             chroms[d['chrom']] = open(t + "." + d['chrom'], "w")
-            print >> chroms[d['chrom']], "\t".join(d.keys())
-        print >>chroms[d['chrom']], "\t".join(d.values())
+            print("\t".join(d.keys()), file=chroms[d['chrom']])
+        print("\t".join(d.values()), file=chroms[d['chrom']])
     for k in chroms:
         chroms[k].close()
         chroms[k] = (chroms[k], chroms[k].name + ".anno")
@@ -50,14 +54,14 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
         def write_result(fanno, written=[False]):
             for i, d in enumerate(reader(fanno, header="ordered")):
                 if i == 0 and written[0] == False:
-                    print >>out, "\t".join(d.keys())
+                    print("\t".join(d.keys()), file=out)
                     written[0] = True
-                print >>out, "\t".join(x if x else "NA" for x in d.values())
+                print("\t".join(x if x else "NA" for x in d.values()), file=out)
             os.unlink(fanno)
             os.unlink(fanno.replace(".anno", ""))
 
         for fchrom, (fout, fanno) in chroms:
-            p.apply_async(annotate, args=(g.db, fout.name, tables, feature_strand, True,
+            p.apply_async(annotate, args=(g.db, fout.name, tables, feature_strand, False, # True causes it to silently fail, resulting in nothing being writting in the output file
                                  header, fanno, fchrom),
                                  callback=write_result)
         p.close()
@@ -79,7 +83,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
 
     elif isinstance(fname, basestring) and os.path.exists(fname) \
             and sum(1 for _ in nopen(fname)) > 25000:
-        print >>sys.stderr, "annotating many intervals, may be faster using in_memory=True"
+        print("annotating many intervals, may be faster using in_memory=True", file=sys.stderr)
     if header is None:
         header = []
     extra_header = []
@@ -96,7 +100,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             if 0 != len(header):
                 if not header[0].startswith("#"):
                     header[0] = "#" + header[0]
-                print >>out, "\t".join(header + extra_header)
+                print("\t".join(header + extra_header), file=out)
             if header == toks: continue
 
         if not isinstance(toks, ABase):
@@ -121,7 +125,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             else:
                 objs = g.knearest(tbl, toks[0], int(toks[1]), int(toks[2]), k=1)
             if len(objs) == 0:
-                print >>out, "\t".join(toks + ["", "", ""])
+                print("\t".join(toks + ["", "", ""]), file=out)
                 continue
 
             gp = hasattr(objs[0], "exonStarts")
@@ -164,7 +168,7 @@ def annotate(g, fname, tables, feature_strand=False, in_memory=False,
             for i in range(1, len(name_dists[0])):
 
                 toks.append(";".join(nd[i] for nd in name_dists))
-        print >>out, "\t".join(toks)
+        print("\t".join(toks), file=out)
 
     if close:
         out.close()
