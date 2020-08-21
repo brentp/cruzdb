@@ -2,7 +2,7 @@
 cruzdb: library for pythonic access to UCSC genome-browser's MySQL database
 """
 from __future__ import print_function
-from builtins import int
+from past.builtins import long
 from . import soup
 import six
 import sys
