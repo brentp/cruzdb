@@ -259,7 +259,7 @@ class ABase(object):
         # drop the trailing comma
         starts = (long(s) for s in self.exonStarts[:-1].split(b","))
         ends = (long(s) for s in self.exonEnds[:-1].split(b","))
-        return [(s, e) for s, e in list(zip(starts, ends))
+        return [(s, e) for s, e in zip(starts, ends)
                                           if e > self.cdsStart and
                                              s < self.cdsEnd]
 
@@ -322,8 +322,8 @@ class ABase(object):
         if not self.is_gene_pred: return []
         se = self.exons
         if not (se or exons) or exons == []: return []
-        starts, ends = list(zip(*exons)) if exons is not None else list(zip(*se))
-        return [(e, s) for e, s in list(zip(ends[:-1], starts[1:]))]
+        starts, ends = zip(*exons) if exons is not None else zip(*se)
+        return [(e, s) for e, s in zip(ends[:-1], starts[1:])]
 
     introns = property(_introns)
 
