@@ -395,7 +395,7 @@ class Genome(soup.Genome):
         else:
             chrom = chrom_or_feat
 
-        qstart, qend = int(start), int(end)
+        qstart, qend = long(start), long(end)
         res = self.bin_query(table, chrom, qstart, qend)
 
         i, change = 1, 350
