@@ -15,7 +15,7 @@ class Genome(sqlsoup.SQLSoup):
         if pids == []:
             pids = [x for x in tbl.columns if any(c in x.name.lower() for c in
                 'chrom start name'.split())]
-        models = __import__("cruzdb.models", globals(), locals(), [], -1).models
+        models = __import__("cruzdb.models", globals(), locals(), []).models
         try:
             base = getattr(models, tablename)
         except AttributeError:
