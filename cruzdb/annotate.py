@@ -1,6 +1,6 @@
+from __future__ import print_function
 import sys
 import os
-from __future__ import print_function
 from cruzdb.models import Feature, ABase
 from toolshed import reader, nopen
 
