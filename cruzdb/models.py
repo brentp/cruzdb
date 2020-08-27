@@ -48,7 +48,7 @@ def _ncbi_parse(html):
                 pcols.append(cols[-1].split("href=")[1].split(">")[0])
             except IndexError: # no link
                 pcols.append("")
-            yield OrderedDict(zip(colnames, pcols))
+            yield OrderedDict(list(zip(colnames, pcols)))
         except:
             print(record, file=sys.stderr)
 
@@ -63,7 +63,7 @@ class Interval(object):
     ----------
 
     start : int
-    
+
     end : int
 
     chrom : str
@@ -82,9 +82,12 @@ class Interval(object):
         """
         check for overlap with the other interval
         """
-        if self.chrom != other.chrom: return False
-        if self.start >= other.end: return False
-        if other.start >= self.end: return False
+        try:
+            if self.chrom != other.chrom: return False
+            if self.start >= other.end: return False
+            if other.start >= self.end: return False
+        except TypeError:
+            return False
         return True
 
     def is_upstream_of(self, other):
@@ -177,7 +180,7 @@ class ABase(object):
                         in enumerate(self.blockSizes[:-1].decode().split(","))]
 
 
-        return zip(starts, ends)
+        return list(zip(starts, ends))
 
     @property
     def gene_features(self):
@@ -254,8 +257,8 @@ class ABase(object):
         cdsEnd
         """
         # drop the trailing comma
-        starts = (long(s) for s in self.exonStarts[:-1].split(","))
-        ends = (long(s) for s in self.exonEnds[:-1].split(","))
+        starts = (long(s) for s in self.exonStarts[:-1].split(b","))
+        ends = (long(s) for s in self.exonEnds[:-1].split(b","))
         return [(s, e) for s, e in zip(starts, ends)
                                           if e > self.cdsStart and
                                              s < self.cdsEnd]

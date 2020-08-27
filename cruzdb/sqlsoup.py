@@ -2,6 +2,7 @@
 
 """
 
+import sys
 from sqlalchemy import Table, MetaData, join
 from sqlalchemy import schema, sql, util
 from sqlalchemy.engine.base import Engine
@@ -10,6 +11,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker, mapper, \
                             object_session, attributes
 from sqlalchemy.orm.interfaces import MapperExtension, EXT_CONTINUE
 from sqlalchemy.sql import expression
+
+if sys.version_info[0] >= 3:
+    basestring = str
 
 __version__ = '0.9.0'
 __all__ = ['SQLSoupError', 'SQLSoup', 'SelectableClassType', 'TableClassType', 'Session']
@@ -127,9 +131,10 @@ def _class_for_table(session, engine, selectable, base_cls, mapper_kwargs):
     selectable = expression._clause_element_as_expr(selectable)
     mapname = _selectable_name(selectable)
     # Py2K
-    if isinstance(mapname, unicode): 
-        engine_encoding = engine.dialect.encoding 
-        mapname = mapname.encode(engine_encoding)
+    if sys.version_info[0] < 3:
+        if isinstance(mapname, unicode):
+            engine_encoding = engine.dialect.encoding
+            mapname = mapname.encode(engine_encoding)
     # end Py2K
 
     if isinstance(selectable, Table):

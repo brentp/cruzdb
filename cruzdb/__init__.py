@@ -5,6 +5,8 @@ from __future__ import print_function
 from . import soup
 import six
 import sys
+if sys.version_info[0] >= 3:
+    from past.builtins import long
 import os
 import re
 from sqlalchemy.orm.query import Query
